@@ -110,6 +110,15 @@ export const useAudioSync = (surah: Surah) => {
     play();
   }, [seek, play]);
 
+  const playFromVerse = useCallback((verseIndex: number) => {
+    const verse = surah.verses[verseIndex];
+    if (verse && verse.wordTimings.length > 0) {
+      const startTime = verse.wordTimings[0].start;
+      seek(startTime);
+      play();
+    }
+  }, [surah.verses, seek, play]);
+
   return {
     isPlaying,
     currentTime,
@@ -120,5 +129,6 @@ export const useAudioSync = (surah: Surah) => {
     toggle,
     seek,
     restart,
+    playFromVerse,
   };
 };

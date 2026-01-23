@@ -17,6 +17,7 @@ export const QuranReader = ({ surah }: QuranReaderProps) => {
     toggle,
     seek,
     restart,
+    playFromVerse,
   } = useAudioSync(surah);
 
   return (
@@ -38,6 +39,7 @@ export const QuranReader = ({ surah }: QuranReaderProps) => {
               verse={verse}
               verseIndex={index}
               currentWord={currentWord}
+              onPlayVerse={playFromVerse}
             />
           ))}
         </div>

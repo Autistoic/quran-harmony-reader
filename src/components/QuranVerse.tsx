@@ -1,26 +1,39 @@
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
+import { Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface QuranVerseProps {
   verse: Verse;
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
+  onPlayVerse?: (verseIndex: number) => void;
 }
 
-export const QuranVerse = ({ verse, verseIndex, currentWord }: QuranVerseProps) => {
+export const QuranVerse = ({ verse, verseIndex, currentWord, onPlayVerse }: QuranVerseProps) => {
   const words = verse.arabic.split(' ');
   const translitWords = verse.transliteration.split(' ');
   
   return (
-    <div className="py-6 border-b border-border/50 last:border-b-0">
-      {/* Verse number badge */}
-      {verse.verseNumber && (
-        <div className="flex justify-center mb-4">
+    <div className="py-6 border-b border-border/50 last:border-b-0 group">
+      {/* Verse header with number and play button */}
+      <div className="flex justify-center items-center gap-3 mb-4">
+        {onPlayVerse && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onPlayVerse(verseIndex)}
+            className="h-8 w-8 rounded-full opacity-50 group-hover:opacity-100 transition-opacity text-primary hover:bg-primary/10"
+          >
+            <Play className="h-4 w-4" />
+          </Button>
+        )}
+        {verse.verseNumber && (
           <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
             {verse.verseNumber}
           </span>
-        </div>
-      )}
+        )}
+      </div>
       
       {/* Arabic text */}
       <p className="text-center font-arabic text-3xl md:text-4xl leading-loose mb-4 text-foreground" dir="rtl">
