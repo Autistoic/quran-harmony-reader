@@ -56,10 +56,10 @@ export const QuranVerse = ({ verse, verseIndex, currentWord, onPlayVerse }: Qura
         })}
       </p>
       
-      {/* Transliteration - reversed to match Arabic visual order (RTL) */}
-      <p className="text-center font-transliteration text-lg text-muted-foreground italic flex flex-wrap-reverse justify-center gap-x-2" dir="rtl">
+      {/* Transliteration - same visual order as Arabic (RTL display) */}
+      <p className="text-center font-transliteration text-lg text-muted-foreground italic" dir="rtl">
         {translitWords.map((word, idx) => (
-          <span key={idx}>{word}</span>
+          <span key={idx} className="inline-block mx-1">{word}</span>
         ))}
       </p>
     </div>
