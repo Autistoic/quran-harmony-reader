@@ -3,12 +3,14 @@ import { useAudioSync } from '@/hooks/useAudioSync';
 import { QuranVerse } from './QuranVerse';
 import { AudioPlayer } from './AudioPlayer';
 import { SurahHeader } from './SurahHeader';
+import { SurahNavigation } from './SurahNavigation';
 
 interface QuranReaderProps {
   surah: Surah;
+  onNavigate?: (surah: Surah) => void;
 }
 
-export const QuranReader = ({ surah }: QuranReaderProps) => {
+export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
   const {
     isPlaying,
     currentTime,
@@ -28,6 +30,11 @@ export const QuranReader = ({ surah }: QuranReaderProps) => {
       </div>
 
       <div className="relative max-w-3xl mx-auto px-4 py-8 md:py-12">
+        {/* Navigation */}
+        {onNavigate && (
+          <SurahNavigation currentSurah={surah} onNavigate={onNavigate} />
+        )}
+
         {/* Header */}
         <SurahHeader surah={surah} />
 

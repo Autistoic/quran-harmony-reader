@@ -1,8 +1,16 @@
+import { useState } from 'react';
 import { QuranReader } from '@/components/QuranReader';
-import { surahAlIkhlas } from '@/data/surahs';
+import { surahs, Surah } from '@/data/surahs';
 
 const Index = () => {
-  return <QuranReader surah={surahAlIkhlas} />;
+  const [currentSurah, setCurrentSurah] = useState<Surah>(surahs[0]);
+
+  return (
+    <QuranReader 
+      surah={currentSurah} 
+      onNavigate={setCurrentSurah}
+    />
+  );
 };
 
 export default Index;
