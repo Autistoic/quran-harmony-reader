@@ -9,6 +9,7 @@ interface QuranVerseProps {
 
 export const QuranVerse = ({ verse, verseIndex, currentWord }: QuranVerseProps) => {
   const words = verse.arabic.split(' ');
+  const translitWords = verse.transliteration.split(' ');
   
   return (
     <div className="py-6 border-b border-border/50 last:border-b-0">
@@ -42,9 +43,11 @@ export const QuranVerse = ({ verse, verseIndex, currentWord }: QuranVerseProps) 
         })}
       </p>
       
-      {/* Transliteration */}
-      <p className="text-center font-transliteration text-lg text-muted-foreground italic">
-        {verse.transliteration}
+      {/* Transliteration - reversed to match Arabic visual order (RTL) */}
+      <p className="text-center font-transliteration text-lg text-muted-foreground italic flex flex-wrap-reverse justify-center gap-x-2" dir="rtl">
+        {translitWords.map((word, idx) => (
+          <span key={idx}>{word}</span>
+        ))}
       </p>
     </div>
   );
