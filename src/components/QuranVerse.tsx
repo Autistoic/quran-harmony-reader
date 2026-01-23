@@ -11,9 +11,6 @@ interface QuranVerseProps {
 }
 
 export const QuranVerse = ({ verse, verseIndex, currentWord, onPlayVerse }: QuranVerseProps) => {
-  const words = verse.arabic.split(' ');
-  const translitWords = verse.transliteration.split(' ');
-  
   return (
     <div className="py-6 border-b border-border/50 last:border-b-0 group">
       {/* Verse header with number and play button */}
@@ -37,7 +34,7 @@ export const QuranVerse = ({ verse, verseIndex, currentWord, onPlayVerse }: Qura
       
       {/* Arabic text */}
       <p className="text-center font-arabic text-3xl md:text-4xl leading-loose mb-4 text-foreground" dir="rtl">
-        {words.map((word, wordIndex) => {
+        {verse.wordTimings.map((wordTiming, wordIndex) => {
           const isHighlighted = 
             currentWord?.verseIndex === verseIndex && 
             currentWord?.wordIndex === wordIndex;
@@ -50,17 +47,31 @@ export const QuranVerse = ({ verse, verseIndex, currentWord, onPlayVerse }: Qura
                 isHighlighted && "bg-accent text-accent-foreground font-bold scale-110 shadow-lg"
               )}
             >
-              {word}
+              {wordTiming.word}
             </span>
           );
         })}
       </p>
       
-      {/* Transliteration - same visual order as Arabic (RTL display) */}
+      {/* Transliteration - highlights sync with Arabic */}
       <p className="text-center font-transliteration text-lg text-muted-foreground italic" dir="rtl">
-        {translitWords.map((word, idx) => (
-          <span key={idx} className="inline-block mx-1">{word}</span>
-        ))}
+        {verse.wordTimings.map((wordTiming, wordIndex) => {
+          const isHighlighted = 
+            currentWord?.verseIndex === verseIndex && 
+            currentWord?.wordIndex === wordIndex;
+          
+          return (
+            <span
+              key={wordIndex}
+              className={cn(
+                "inline-block mx-1 px-1 rounded transition-all duration-200",
+                isHighlighted && "bg-accent/50 text-accent-foreground font-semibold"
+              )}
+            >
+              {wordTiming.translit}
+            </span>
+          );
+        })}
       </p>
     </div>
   );
