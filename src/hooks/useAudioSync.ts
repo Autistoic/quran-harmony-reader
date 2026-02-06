@@ -1,12 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Surah, WordTiming } from '@/data/surahs';
 
 interface CurrentWord {
   verseIndex: number;
   wordIndex: number;
 }
 
-export const useAudioSync = (surah: Surah) => {
+// Generic interface — any data with audioUrl + verses + wordTimings works
+export interface AudioSyncData {
+  audioUrl: string;
+  verses: { wordTimings: { start: number; end: number }[] }[];
+}
+
+export const useAudioSync = (data: AudioSyncData) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -16,7 +21,7 @@ export const useAudioSync = (surah: Surah) => {
 
   // Initialize audio
   useEffect(() => {
-    const audio = new Audio(surah.audioUrl);
+    const audio = new Audio(data.audioUrl);
     audioRef.current = audio;
 
     audio.addEventListener('loadedmetadata', () => {
@@ -35,12 +40,12 @@ export const useAudioSync = (surah: Surah) => {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [surah.audioUrl]);
+  }, [data.audioUrl]);
 
   // Find current word based on time
   const findCurrentWord = useCallback((time: number): CurrentWord | null => {
-    for (let verseIndex = 0; verseIndex < surah.verses.length; verseIndex++) {
-      const verse = surah.verses[verseIndex];
+    for (let verseIndex = 0; verseIndex < data.verses.length; verseIndex++) {
+      const verse = data.verses[verseIndex];
       for (let wordIndex = 0; wordIndex < verse.wordTimings.length; wordIndex++) {
         const timing = verse.wordTimings[wordIndex];
         if (time >= timing.start && time < timing.end) {
@@ -49,7 +54,7 @@ export const useAudioSync = (surah: Surah) => {
       }
     }
     return null;
-  }, [surah.verses]);
+  }, [data.verses]);
 
   // Update loop
   const updateTime = useCallback(() => {
@@ -111,13 +116,13 @@ export const useAudioSync = (surah: Surah) => {
   }, [seek, play]);
 
   const playFromVerse = useCallback((verseIndex: number) => {
-    const verse = surah.verses[verseIndex];
+    const verse = data.verses[verseIndex];
     if (verse && verse.wordTimings.length > 0) {
       const startTime = verse.wordTimings[0].start;
       seek(startTime);
       play();
     }
-  }, [surah.verses, seek, play]);
+  }, [data.verses, seek, play]);
 
   return {
     isPlaying,
