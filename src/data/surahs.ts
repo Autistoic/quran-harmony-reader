@@ -25,7 +25,7 @@ export const surahAlFatiha: Surah = {
   id: 1,
   name: "Al-Fatiha",
   arabicName: "الفاتحة",
-  audioUrl: "", // TODO: Add MP3 URL
+  audioUrl: "https://archive.org/download/00.-fatiha-suresi/00.Fatiha%20suresi.mp3",
   verses: [
     {
       arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
@@ -34,8 +34,8 @@ export const surahAlFatiha: Surah = {
       wordTimings: [
         { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0.8 },
         { word: "ٱللَّهِ", translit: "llāhi", start: 0.8, end: 1.5 },
-        { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 2.5 },
-        { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 2.5, end: 3.5 }
+        { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 3.5 },
+        { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 3.5, end: 4.5 } // Fin del verso y pausa
       ]
     },
     {
@@ -43,10 +43,10 @@ export const surahAlFatiha: Surah = {
       transliteration: "al-ḥamdu lillāhi rabbi l-ʿālamīn",
       verseNumber: 2,
       wordTimings: [
-        { word: "ٱلْحَمْدُ", translit: "al-ḥamdu", start: 3.5, end: 4.2 },
-        { word: "لِلَّهِ", translit: "lillāhi", start: 4.2, end: 4.8 },
-        { word: "رَبِّ", translit: "rabbi", start: 4.8, end: 5.3 },
-        { word: "ٱلْعَـٰلَمِينَ", translit: "l-ʿālamīn", start: 5.3, end: 6.5 }
+        { word: "ٱلْحَمْدُ", translit: "al-ḥamdu", start: 7.0, end: 7.9 },
+        { word: "لِلَّهِ", translit: "lillāhi", start: 7.9, end: 9.0 },
+        { word: "رَبِّ", translit: "rabbi", start: 9.0, end: 9.8 },
+        { word: "ٱلْعَـٰلَمِينَ", translit: "l-ʿālamīn", start: 9.8, end: 11.0 }
       ]
     },
     {
@@ -54,8 +54,8 @@ export const surahAlFatiha: Surah = {
       transliteration: "ar-raḥmāni r-raḥīm",
       verseNumber: 3,
       wordTimings: [
-        { word: "ٱلرَّحْمَـٰنِ", translit: "ar-raḥmāni", start: 6.5, end: 7.5 },
-        { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 7.5, end: 8.5 }
+        { word: "ٱلرَّحْمَـٰنِ", translit: "ar-raḥmāni", start: 13.5, end: 14.8 },
+        { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 14.8, end: 16.5 }
       ]
     },
     {
@@ -63,30 +63,30 @@ export const surahAlFatiha: Surah = {
       transliteration: "māliki yawmi d-dīn",
       verseNumber: 4,
       wordTimings: [
-        { word: "مَـٰلِكِ", translit: "māliki", start: 8.5, end: 9.2 },
-        { word: "يَوْمِ", translit: "yawmi", start: 9.2, end: 9.8 },
-        { word: "ٱلدِّينِ", translit: "d-dīn", start: 9.8, end: 10.8 }
+        { word: "مَـٰلِكِ", translit: "māliki", start: 16.5, end: 17.0 },
+        { word: "يَوْمِ", translit: "yawmi", start: 17.0, end: 17.6 },
+        { word: "ٱلدِّينِ", translit: "d-dīn", start: 17.6, end: 21.0 }
       ]
     },
     {
       arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
       transliteration: "iyyāka naʿbudu wa-iyyāka nastaʿīn",
-      verseNumber: 5,
-      wordTimings: [
-        { word: "إِيَّاكَ", translit: "iyyāka", start: 10.8, end: 11.5 },
-        { word: "نَعْبُدُ", translit: "naʿbudu", start: 11.5, end: 12.2 },
-        { word: "وَإِيَّاكَ", translit: "wa-iyyāka", start: 12.2, end: 13.0 },
-        { word: "نَسْتَعِينُ", translit: "nastaʿīn", start: 13.0, end: 14.2 }
+      "verseNumber": 5,
+      "wordTimings": [
+        { "word": "إِيَّاكَ", "translit": "iyyāka", "start": 21.0, "end": 22.0 },
+        { "word": "نَعْبُدُ", "translit": "naʿbudu", "start": 22.0, "end": 23.0 },
+        { "word": "وَإِيَّاكَ", "translit": "wa-iyyāka", "start": 23.0, "end": 24.3 },
+        { "word": "نَسْتَعِينُ", "translit": "nastaʿīn", "start": 24.3, "end": 27.0 }
       ]
     },
     {
       arabic: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
       transliteration: "ihdinā ṣ-ṣirāṭa l-mustaqīm",
-      verseNumber: 6,
-      wordTimings: [
-        { word: "ٱهْدِنَا", translit: "ihdinā", start: 14.2, end: 15.0 },
-        { word: "ٱلصِّرَٰطَ", translit: "ṣ-ṣirāṭa", start: 15.0, end: 15.8 },
-        { word: "ٱلْمُسْتَقِيمَ", translit: "l-mustaqīm", start: 15.8, end: 17.0 }
+      "verseNumber": 6,
+      "wordTimings": [
+        { "word": "ٱهْدِنَا", "translit": "ihdinā", "start": 30.5, "end": 31.3 },
+        { "word": "ٱلصِّرَٰطَ", "translit": "ṣ-ṣirāṭa", "start": 31.3, "end": 32.7 },
+        { "word": "ٱلْمُسْتَقِيمَ", "translit": "l-mustaqīm", "start": 32.7, "end": 35.5 }
       ]
     },
     {
@@ -94,15 +94,15 @@ export const surahAlFatiha: Surah = {
       transliteration: "ṣirāṭa lladhīna anʿamta ʿalayhim ghayri l-maghḍūbi ʿalayhim wa-lā ḍ-ḍāllīn",
       verseNumber: 7,
       wordTimings: [
-        { word: "صِرَٰطَ", translit: "ṣirāṭa", start: 17.0, end: 17.6 },
-        { word: "ٱلَّذِينَ", translit: "lladhīna", start: 17.6, end: 18.3 },
-        { word: "أَنْعَمْتَ", translit: "anʿamta", start: 18.3, end: 19.0 },
-        { word: "عَلَيْهِمْ", translit: "ʿalayhim", start: 19.0, end: 19.7 },
-        { word: "غَيْرِ", translit: "ghayri", start: 19.7, end: 20.3 },
-        { word: "ٱلْمَغْضُوبِ", translit: "l-maghḍūbi", start: 20.3, end: 21.2 },
-        { word: "عَلَيْهِمْ", translit: "ʿalayhim", start: 21.2, end: 21.9 },
-        { word: "وَلَا", translit: "wa-lā", start: 21.9, end: 22.4 },
-        { word: "ٱلضَّآلِّينَ", translit: "ḍ-ḍāllīn", start: 22.4, end: 23.5 }
+        { "word": "صِرَٰطَ", "translit": "ṣirāṭa", "start": 38.1, "end": 39.0 },
+        { "word": "ٱلَّذِينَ", "translit": "lladhīna", "start": 39.0, "end": 40.5 },
+        { "word": "أَنْعَمْتَ", "translit": "anʿamta", "start": 40.5, "end": 41.8 },
+        { "word": "عَلَيْهِمْ", "translit": "ʿalayhim", "start": 41.8, "end": 42.9 },
+        { "word": "غَيْرِ", "translit": "ghayri", "start": 42.6, "end": 44.3 },
+        { "word": "ٱلْمَغْضُوبِ", "translit": "l-maghḍūbi", "start": 44.3, "end": 45.9 },
+        { "word": "عَلَيْهِمْ", "translit": "ʿalayhim", "start": 45.9, "end": 46.8 },
+        { "word": "وَلَا", "translit": "wa-lā", "start": 46.8, "end": 48.4 },
+        { "word": "ٱلضَّآلِّينَ", "translit": "ḍ-ḍāllīn", "start": 48.4, "end": 54.0 }
       ]
     }
   ]
