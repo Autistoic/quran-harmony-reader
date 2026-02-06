@@ -8,9 +8,10 @@ interface WirdVerseLineProps {
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
   onPlayVerse?: (verseIndex: number) => void;
+  onPlayWord?: (verseIndex: number, wordIndex: number) => void;
 }
 
-export const WirdVerseLine = ({ verse, verseIndex, currentWord, onPlayVerse }: WirdVerseLineProps) => {
+export const WirdVerseLine = ({ verse, verseIndex, currentWord, onPlayVerse, onPlayWord }: WirdVerseLineProps) => {
   return (
     <div className="py-6 border-b border-border/50 last:border-b-0 group">
       {/* Header: play button + repetition badge */}
@@ -42,8 +43,9 @@ export const WirdVerseLine = ({ verse, verseIndex, currentWord, onPlayVerse }: W
           return (
             <span
               key={wordIndex}
+              onClick={() => onPlayWord?.(verseIndex, wordIndex)}
               className={cn(
-                "inline-block mx-1 px-1 rounded transition-all duration-200",
+                "inline-block mx-1 px-1 rounded transition-all duration-200 cursor-pointer hover:bg-accent/30",
                 isHighlighted && "bg-accent text-accent-foreground font-bold scale-110 shadow-lg"
               )}
             >

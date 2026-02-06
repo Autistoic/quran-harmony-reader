@@ -20,6 +20,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
     seek,
     restart,
     playFromVerse,
+    playFromWord,
   } = useAudioSync(wird);
 
   return (
@@ -68,6 +69,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
               verseIndex={index}
               currentWord={currentWord}
               onPlayVerse={playFromVerse}
+              onPlayWord={playFromWord}
             />
           ))}
         </div>
