@@ -124,6 +124,14 @@ export const useAudioSync = (data: AudioSyncData) => {
     }
   }, [data.verses, seek, play]);
 
+  const playFromWord = useCallback((verseIndex: number, wordIndex: number) => {
+    const verse = data.verses[verseIndex];
+    if (verse && verse.wordTimings[wordIndex]) {
+      seek(verse.wordTimings[wordIndex].start);
+      play();
+    }
+  }, [data.verses, seek, play]);
+
   return {
     isPlaying,
     currentTime,
@@ -135,5 +143,6 @@ export const useAudioSync = (data: AudioSyncData) => {
     seek,
     restart,
     playFromVerse,
+    playFromWord,
   };
 };
