@@ -9,10 +9,12 @@ interface WirdVerseLineProps {
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
   onPlayVerse?: (verseIndex: number) => void;
+  onPause?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
 }
 
-export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPlayWord }: WirdVerseLineProps) => {
+export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPause, onPlayWord }: WirdVerseLineProps) => {
+  const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   return (
     <div className="py-6 border-b border-border/50 last:border-b-0 group">
       {/* Header: play button + repetition badge */}
@@ -21,13 +23,19 @@ export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPla
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onPlayVerse(verseIndex)}
+            onClick={() => {
+              if (isThisVersePlaying) {
+                onPause?.();
+              } else {
+                onPlayVerse(verseIndex);
+              }
+            }}
             className="h-8 w-8 rounded-full opacity-50 group-hover:opacity-100 transition-opacity text-primary hover:bg-primary/10"
           >
-            {isPlaying ? (
-            <Pause className="h-6 w-6" />
+            {isThisVersePlaying ? (
+              <Pause className="h-6 w-6" />
             ) : (
-            <Play className="h-6 w-6 ml-1" />
+              <Play className="h-6 w-6 ml-1" />
             )}
           </Button>
         )}
