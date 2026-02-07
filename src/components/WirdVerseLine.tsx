@@ -1,9 +1,10 @@
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
-import { Play } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface WirdVerseLineProps {
+interface WirdVerseLineProps {    
+  isPlaying: boolean;
   verse: WirdVerse;
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
@@ -11,7 +12,7 @@ interface WirdVerseLineProps {
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
 }
 
-export const WirdVerseLine = ({ verse, verseIndex, currentWord, onPlayVerse, onPlayWord }: WirdVerseLineProps) => {
+export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPlayWord }: WirdVerseLineProps) => {
   return (
     <div className="py-6 border-b border-border/50 last:border-b-0 group">
       {/* Header: play button + repetition badge */}
@@ -23,7 +24,11 @@ export const WirdVerseLine = ({ verse, verseIndex, currentWord, onPlayVerse, onP
             onClick={() => onPlayVerse(verseIndex)}
             className="h-8 w-8 rounded-full opacity-50 group-hover:opacity-100 transition-opacity text-primary hover:bg-primary/10"
           >
-            <Play className="h-4 w-4" />
+            {isPlaying ? (
+            <Pause className="h-6 w-6" />
+            ) : (
+            <Play className="h-6 w-6 ml-1" />
+            )}
           </Button>
         )}
         {verse.repetitions && (

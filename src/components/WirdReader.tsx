@@ -64,6 +64,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
           {wird.verses.map((verse, index) => (
             <WirdVerseLine
+              isPlaying={isPlaying}
               key={index}
               verse={verse}
               verseIndex={index}
