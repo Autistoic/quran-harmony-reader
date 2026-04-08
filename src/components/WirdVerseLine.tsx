@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface WirdVerseLineProps {    
   isPlaying: boolean;
@@ -11,10 +13,25 @@ interface WirdVerseLineProps {
   onPlayVerse?: (verseIndex: number) => void;
   onPause?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
+  onAddToPractice?: (word: string) => void;
 }
 
-export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPause, onPlayWord }: WirdVerseLineProps) => {
+export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPause, onPlayWord, onAddToPractice }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
+  const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
+
+  const handleWordClick = (wordIndex: number) => {
+    onPlayWord?.(verseIndex, wordIndex);
+    setActiveWordIndex(prev => (prev === wordIndex ? null : wordIndex));
+  };
+
+  const handleAddWord = (word: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToPractice?.(word);
+    setActiveWordIndex(null);
+    toast.success(`"${word}" agregada a práctica`);
+  };
+
   return (
     <div className="py-6 border-b border-border/50 last:border-b-0 group">
       {/* Header: play button + repetition badge */}
@@ -52,23 +69,33 @@ export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPla
           const isHighlighted =
             currentWord?.verseIndex === verseIndex &&
             currentWord?.wordIndex === wordIndex;
+          const showAddButton = activeWordIndex === wordIndex && onAddToPractice;
 
           return (
-            <span
-              key={wordIndex}
-              onClick={() => onPlayWord?.(verseIndex, wordIndex)}
-              className={cn(
-                "inline-block mx-1 px-1 rounded transition-all duration-200 cursor-pointer hover:bg-accent/30",
-                isHighlighted && "bg-accent text-accent-foreground font-bold scale-110 shadow-lg"
+            <span key={wordIndex} className="relative inline-block">
+              <span
+                onClick={() => handleWordClick(wordIndex)}
+                className={cn(
+                  "inline-block mx-1 px-1 rounded transition-all duration-200 cursor-pointer hover:bg-accent/30",
+                  isHighlighted && "bg-accent text-accent-foreground font-bold scale-110 shadow-lg"
+                )}
+              >
+                {wordTiming.word}
+              </span>
+              {showAddButton && (
+                <button
+                  onClick={(e) => handleAddWord(wordTiming.word, e)}
+                  className="absolute -top-7 left-1/2 -translate-x-1/2 z-10 h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:scale-110 transition-transform animate-in fade-in zoom-in-50 duration-150"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
               )}
-            >
-              {wordTiming.word}
             </span>
           );
         })}
       </p>
 
-      {/* Note (e.g. "cruzar los brazos sobre el pecho") */}
+      {/* Note */}
       {verse.note && (
         <p className="text-center text-sm text-muted-foreground italic mt-2">
           ({verse.note})

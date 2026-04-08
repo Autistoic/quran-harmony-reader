@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { WirdData } from '@/data/wirdSharif';
 import { useAudioSync } from '@/hooks/useAudioSync';
+import { usePimsleur } from '@/hooks/usePimsleur';
 import { WirdVerseLine } from './WirdVerseLine';
 import { AudioPlayer } from './AudioPlayer';
+import { PimsleurModal } from './PimsleurModal';
 import { Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Brain } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface WirdReaderProps {
@@ -24,6 +27,9 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
     playFromWord,
   } = useAudioSync(wird);
 
+  const { items, dueItems, addItem, reviewItem, removeItem } = usePimsleur();
+  const [practiceOpen, setPracticeOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Background pattern */}
@@ -32,13 +38,27 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
       </div>
 
       <div className="relative max-w-3xl mx-auto px-4 py-8 md:py-12">
-        {/* Back navigation */}
-        <div className="mb-6">
+        {/* Back navigation + Practice button */}
+        <div className="mb-6 flex items-center justify-between">
           <Button variant="outline" size="sm" asChild>
             <Link to="/" className="flex items-center gap-2">
               <ChevronLeft className="h-4 w-4" />
               <span>Volver a Surahs</span>
             </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPracticeOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Brain className="h-4 w-4" />
+            <span>Práctica</span>
+            {dueItems.length > 0 && (
+              <span className="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                {dueItems.length}
+              </span>
+            )}
           </Button>
         </div>
 
@@ -73,6 +93,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
               onPlayVerse={playFromVerse}
               onPause={pause}
               onPlayWord={playFromWord}
+              onAddToPractice={addItem}
             />
           ))}
         </div>
@@ -91,9 +112,20 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
 
         {/* Instructions */}
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio.
+          Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio. Tocá una palabra para practicarla.
         </p>
       </div>
+
+      {/* Pimsleur Practice Modal */}
+      <PimsleurModal
+        open={practiceOpen}
+        onOpenChange={setPracticeOpen}
+        items={items}
+        dueItems={dueItems}
+        onAdd={addItem}
+        onReview={reviewItem}
+        onRemove={removeItem}
+      />
     </div>
   );
 };
