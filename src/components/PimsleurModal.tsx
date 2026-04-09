@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PracticeItem } from '@/hooks/usePimsleur';
+import { useNotifications } from '@/hooks/useNotifications';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Check, X, Trash2, Plus, Clock } from 'lucide-react';
+import { Check, X, Trash2, Plus, Clock, Bell, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PimsleurModalProps {
@@ -49,6 +50,7 @@ export const PimsleurModal = ({
   onClearPrefill,
 }: PimsleurModalProps) => {
   const [newWord, setNewWord] = useState('');
+  const { enabled: notifEnabled, supported: notifSupported, toggleEnabled } = useNotifications();
 
   useEffect(() => {
     if (open && prefillWord) {
@@ -76,6 +78,26 @@ export const PimsleurModal = ({
           <DialogDescription>
             Repetición espaciada: 5min → 25min → 2h → 1 día
           </DialogDescription>
+          {notifSupported && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleEnabled}
+              className="flex items-center gap-1.5 text-xs mt-1"
+            >
+              {notifEnabled ? (
+                <>
+                  <Bell className="h-3.5 w-3.5 text-primary" />
+                  Notificaciones activas
+                </>
+              ) : (
+                <>
+                  <BellOff className="h-3.5 w-3.5 text-muted-foreground" />
+                  Activar notificaciones
+                </>
+              )}
+            </Button>
+          )}
         </DialogHeader>
 
         {/* Add new word */}
