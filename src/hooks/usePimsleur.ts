@@ -27,6 +27,18 @@ function saveItems(items: PracticeItem[]) {
 export const usePimsleur = () => {
   const [items, setItems] = useState<PracticeItem[]>(loadItems);
 
+  // On mount, reschedule notifications for pending items
+  useEffect(() => {
+    const notifEnabled = localStorage.getItem('notifications-enabled') === 'true';
+    if (notifEnabled) {
+      items.forEach(item => {
+        if (item.level < INTERVALS.length && item.nextReview > Date.now()) {
+          scheduleReviewNotification(item.id, item.word, item.nextReview);
+        }
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const persist = useCallback((next: PracticeItem[]) => {
     setItems(next);
     saveItems(next);
@@ -38,16 +50,20 @@ export const usePimsleur = () => {
     setItems(prev => {
       if (prev.some(i => i.word === trimmed)) return prev;
       const now = Date.now();
-      const next = [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          word: trimmed,
-          addedAt: now,
-          nextReview: now + INTERVALS[0] * 60_000,
-          level: 0,
-        },
-      ];
+      const nextReview = now + INTERVALS[0] * 60_000;
+      const newItem: PracticeItem = {
+        id: crypto.randomUUID(),
+        word: trimmed,
+        addedAt: now,
+        nextReview,
+        level: 0,
+      };
+      const next = [...prev, newItem];
+      saveItems(next);
+      if (localStorage.getItem('notifications-enabled') === 'true') {
+        scheduleReviewNotification(newItem.id, newItem.word, nextReview);
+      }
+      return next;
       saveItems(next);
       return next;
     });
@@ -61,11 +77,11 @@ export const usePimsleur = () => {
         if (newLevel >= INTERVALS.length) {
           return { ...item, level: newLevel, nextReview: Infinity };
         }
-        return {
-          ...item,
-          level: newLevel,
-          nextReview: Date.now() + INTERVALS[newLevel] * 60_000,
-        };
+        const nextReview = Date.now() + INTERVALS[newLevel] * 60_000;
+        if (localStorage.getItem('notifications-enabled') === 'true') {
+          scheduleReviewNotification(id, item.word, nextReview);
+        }
+        return { ...item, level: newLevel, nextReview };
       });
       saveItems(next);
       return next;
