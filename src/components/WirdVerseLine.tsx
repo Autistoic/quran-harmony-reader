@@ -3,7 +3,6 @@ import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
 import { Play, Pause, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 
 interface WirdVerseLineProps {    
   isPlaying: boolean;
