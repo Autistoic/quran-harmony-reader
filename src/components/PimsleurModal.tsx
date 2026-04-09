@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PracticeItem } from '@/hooks/usePimsleur';
 import {
   Dialog,
@@ -20,6 +20,8 @@ interface PimsleurModalProps {
   onAdd: (word: string) => void;
   onReview: (id: string, success: boolean) => void;
   onRemove: (id: string) => void;
+  prefillWord?: string;
+  onClearPrefill?: () => void;
 }
 
 const LEVEL_LABELS = ['5 min', '25 min', '2 h', '1 día', '✓'];
@@ -43,8 +45,17 @@ export const PimsleurModal = ({
   onAdd,
   onReview,
   onRemove,
+  prefillWord,
+  onClearPrefill,
 }: PimsleurModalProps) => {
   const [newWord, setNewWord] = useState('');
+
+  useEffect(() => {
+    if (open && prefillWord) {
+      setNewWord(prefillWord);
+      onClearPrefill?.();
+    }
+  }, [open, prefillWord]);
 
   const handleAdd = () => {
     if (newWord.trim()) {

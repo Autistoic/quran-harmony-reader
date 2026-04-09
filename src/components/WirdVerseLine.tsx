@@ -13,10 +13,10 @@ interface WirdVerseLineProps {
   onPlayVerse?: (verseIndex: number) => void;
   onPause?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
-  onAddToPractice?: (word: string) => void;
+  onPrepareForPractice?: (word: string) => void;
 }
 
-export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPause, onPlayWord, onAddToPractice }: WirdVerseLineProps) => {
+export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPause, onPlayWord, onPrepareForPractice }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
 
@@ -27,9 +27,8 @@ export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPla
 
   const handleAddWord = (word: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToPractice?.(word);
+    onPrepareForPractice?.(word);
     setActiveWordIndex(null);
-    toast.success(`"${word}" agregada a práctica`);
   };
 
   return (
@@ -69,7 +68,7 @@ export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPla
           const isHighlighted =
             currentWord?.verseIndex === verseIndex &&
             currentWord?.wordIndex === wordIndex;
-          const showAddButton = activeWordIndex === wordIndex && onAddToPractice;
+          const showAddButton = activeWordIndex === wordIndex && onPrepareForPractice;
 
           return (
             <span key={wordIndex} className="relative inline-block">
