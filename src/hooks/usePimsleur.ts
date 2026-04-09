@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { scheduleReviewNotification } from './useNotifications';
 
 export interface PracticeItem {
   id: string;
