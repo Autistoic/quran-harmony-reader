@@ -29,6 +29,12 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
 
   const { items, dueItems, addItem, reviewItem, removeItem } = usePimsleur();
   const [practiceOpen, setPracticeOpen] = useState(false);
+  const [prefillWord, setPrefillWord] = useState('');
+
+  const handlePrepareForPractice = (word: string) => {
+    setPrefillWord(word);
+    setPracticeOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,7 +99,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
               onPlayVerse={playFromVerse}
               onPause={pause}
               onPlayWord={playFromWord}
-              onAddToPractice={addItem}
+              onPrepareForPractice={handlePrepareForPractice}
             />
           ))}
         </div>
@@ -119,12 +125,17 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
       {/* Pimsleur Practice Modal */}
       <PimsleurModal
         open={practiceOpen}
-        onOpenChange={setPracticeOpen}
+        onOpenChange={(open) => {
+          setPracticeOpen(open);
+          if (!open) setPrefillWord('');
+        }}
         items={items}
         dueItems={dueItems}
         onAdd={addItem}
         onReview={reviewItem}
         onRemove={removeItem}
+        prefillWord={prefillWord}
+        onClearPrefill={() => setPrefillWord('')}
       />
     </div>
   );
