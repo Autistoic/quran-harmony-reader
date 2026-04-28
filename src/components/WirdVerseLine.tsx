@@ -231,9 +231,18 @@ const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFr
       </div>
 
       <div className="flex items-center justify-between gap-2 pt-1">
-        <Button type="button" size="sm" variant="ghost" onClick={onPlay} className="gap-1 text-xs">
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={() => {
+            const s = parseFloat(start);
+            if (!isNaN(s)) onPlayFromTime?.(s);
+          }}
+          className="gap-1 text-xs"
+        >
           <Play className="h-3 w-3" />
-          Reproducir
+          Reproducir desde start
         </Button>
         <Button type="button" size="sm" onClick={handleSave} className="text-xs">
           Guardar
