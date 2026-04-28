@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Pencil, Download, RotateCcw, Copy, Check } from 'lucide-react';
+import { Pencil, Download, RotateCcw, Copy, Check, Save, Upload } from 'lucide-react';
 import type { WirdData } from '@/data/wirdSharif';
 import { formatWirdVerses } from '@/hooks/useTimingOverrides';
 import { toast } from 'sonner';
@@ -21,7 +21,10 @@ interface TimingEditorPanelProps {
   onEditModeChange: (value: boolean) => void;
   effectiveWird: WirdData;
   hasOverrides: boolean;
+  overrideCount: number;
   onReset: () => void;
+  onExportBackup: () => void;
+  onImportBackup: (file: File) => Promise<{ count: number }>;
 }
 
 export const TimingEditorPanel = ({
@@ -29,18 +32,23 @@ export const TimingEditorPanel = ({
   onEditModeChange,
   effectiveWird,
   hasOverrides,
+  overrideCount,
   onReset,
+  onExportBackup,
+  onImportBackup,
 }: TimingEditorPanelProps) => {
   const [exportOpen, setExportOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const exportText = formatWirdVerses(effectiveWird);
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(exportText);
       setCopied(true);
-      toast.success('Copiado al portapapeles');
+      toast.success('Copiado. Pegalo en src/data/wirdSharif.ts para guardarlo definitivamente.');
       setTimeout(() => setCopied(false), 1500);
     } catch {
       toast.error('No se pudo copiar');
@@ -51,6 +59,21 @@ export const TimingEditorPanel = ({
     if (confirm('¿Descartar todos los cambios de timing?')) {
       onReset();
       toast.success('Timings restaurados');
+    }
+  };
+
+  const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { count } = await onImportBackup(file);
+      toast.success(`Importados ${count} cambios`);
+    } catch {
+      toast.error('Archivo inválido');
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -69,34 +92,43 @@ export const TimingEditorPanel = ({
           />
           {hasOverrides && (
             <span className="text-xs text-accent-foreground bg-accent/30 rounded-full px-2 py-0.5">
-              con cambios
+              {overrideCount} cambios
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setExportOpen(true)}
-            className="gap-1.5"
-          >
-            <Download className="h-3.5 w-3.5" />
-            Exportar
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button variant="outline" size="sm" onClick={onExportBackup} disabled={!hasOverrides} className="gap-1.5">
+            <Save className="h-3.5 w-3.5" />
+            Backup
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleReset}
-            disabled={!hasOverrides}
-            className="gap-1.5"
-          >
+          <Button variant="outline" size="sm" onClick={handleImportClick} className="gap-1.5">
+            <Upload className="h-3.5 w-3.5" />
+            Importar
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <Button variant="outline" size="sm" onClick={() => setExportOpen(true)} className="gap-1.5">
+            <Download className="h-3.5 w-3.5" />
+            Exportar código
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleReset} disabled={!hasOverrides} className="gap-1.5">
             <RotateCcw className="h-3.5 w-3.5" />
             Resetear
           </Button>
         </div>
       </div>
+
+      <p className="text-[11px] text-muted-foreground mt-2">
+        Guardado local en <code className="text-foreground/80">{hostname}</code>. Los cambios viven solo en este navegador/dominio. Para que persistan en todos lados: <strong>Exportar código</strong> y pegarlo en <code>src/data/wirdSharif.ts</code>.
+      </p>
+
       {editMode && (
-        <p className="text-xs text-muted-foreground mt-2">
+        <p className="text-xs text-muted-foreground mt-1">
           Tocá una palabra para editar sus tiempos. Usá "tiempo actual" para capturar desde el reproductor.
         </p>
       )}
