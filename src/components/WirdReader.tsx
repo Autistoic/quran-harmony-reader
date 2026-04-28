@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { WirdData } from '@/data/wirdSharif';
 import { useAudioSync } from '@/hooks/useAudioSync';
 import { usePimsleur } from '@/hooks/usePimsleur';
+import { useTimingOverrides } from '@/hooks/useTimingOverrides';
 import { WirdVerseLine } from './WirdVerseLine';
 import { AudioPlayer } from './AudioPlayer';
 import { PimsleurModal } from './PimsleurModal';
+import { TimingEditorPanel } from './TimingEditorPanel';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, Brain } from 'lucide-react';
 import { Button } from './ui/button';
@@ -14,6 +16,8 @@ interface WirdReaderProps {
 }
 
 export const WirdReader = ({ wird }: WirdReaderProps) => {
+  const { effectiveWird, setWordTiming, resetAll, hasOverrides } = useTimingOverrides(wird);
+
   const {
     isPlaying,
     currentTime,
@@ -25,11 +29,18 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
     pause,
     playFromVerse,
     playFromWord,
-  } = useAudioSync(wird);
+  } = useAudioSync(effectiveWird);
+
+  // Keep a live ref to currentTime so the edit popover can read it on demand
+  const currentTimeRef = useRef(currentTime);
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
 
   const { items, dueItems, addItem, reviewItem, removeItem } = usePimsleur();
   const [practiceOpen, setPracticeOpen] = useState(false);
   const [prefillWord, setPrefillWord] = useState('');
+  const [editMode, setEditMode] = useState(false);
 
   const handlePrepareForPractice = (word: string) => {
     setPrefillWord(word);
@@ -87,9 +98,18 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
           </div>
         </div>
 
+        {/* Timing editor panel */}
+        <TimingEditorPanel
+          editMode={editMode}
+          onEditModeChange={setEditMode}
+          effectiveWird={effectiveWird}
+          hasOverrides={hasOverrides}
+          onReset={resetAll}
+        />
+
         {/* Verses */}
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
-          {wird.verses.map((verse, index) => (
+          {effectiveWird.verses.map((verse, index) => (
             <WirdVerseLine
               isPlaying={isPlaying}
               key={index}
@@ -100,6 +120,9 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
               onPause={pause}
               onPlayWord={playFromWord}
               onPrepareForPractice={handlePrepareForPractice}
+              editMode={editMode}
+              getCurrentTime={() => currentTimeRef.current}
+              onUpdateTiming={setWordTiming}
             />
           ))}
         </div>
@@ -118,7 +141,9 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
 
         {/* Instructions */}
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio. Tocá una palabra para practicarla.
+          {editMode
+            ? 'Modo edición activo: tocá una palabra para ajustar sus tiempos.'
+            : 'Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio. Tocá una palabra para practicarla.'}
         </p>
       </div>
 
