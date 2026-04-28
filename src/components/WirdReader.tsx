@@ -16,7 +16,7 @@ interface WirdReaderProps {
 }
 
 export const WirdReader = ({ wird }: WirdReaderProps) => {
-  const { effectiveWird, setWordTiming, resetAll, hasOverrides } = useTimingOverrides(wird);
+  const { effectiveWird, setWordTiming, resetAll, hasOverrides, overrideCount, exportBackup, importBackup } = useTimingOverrides(wird);
 
   const {
     isPlaying,
@@ -104,7 +104,10 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
           onEditModeChange={setEditMode}
           effectiveWird={effectiveWird}
           hasOverrides={hasOverrides}
+          overrideCount={overrideCount}
           onReset={resetAll}
+          onExportBackup={exportBackup}
+          onImportBackup={importBackup}
         />
 
         {/* Verses */}
