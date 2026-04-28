@@ -132,6 +132,12 @@ export const useAudioSync = (data: AudioSyncData) => {
     }
   }, [data.verses, seek, play]);
 
+  const playFromTime = useCallback((time: number) => {
+    if (isNaN(time) || time < 0) return;
+    seek(time);
+    play();
+  }, [seek, play]);
+
   return {
     isPlaying,
     currentTime,
@@ -144,5 +150,6 @@ export const useAudioSync = (data: AudioSyncData) => {
     restart,
     playFromVerse,
     playFromWord,
+    playFromTime,
   };
 };

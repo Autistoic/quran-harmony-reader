@@ -19,6 +19,7 @@ interface WirdVerseLineProps {
   editMode?: boolean;
   getCurrentTime?: () => number;
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
+  onPlayFromTime?: (time: number) => void;
 }
 
 export const WirdVerseLine = ({
@@ -33,6 +34,7 @@ export const WirdVerseLine = ({
   editMode = false,
   getCurrentTime,
   onUpdateTiming,
+  onPlayFromTime,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
@@ -112,7 +114,7 @@ export const WirdVerseLine = ({
                       initialStart={wordTiming.start}
                       initialEnd={wordTiming.end}
                       getCurrentTime={getCurrentTime}
-                      onPlay={() => onPlayWord?.(verseIndex, wordIndex)}
+                      onPlayFromTime={onPlayFromTime}
                       onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
                     />
                   </PopoverContent>
@@ -155,11 +157,11 @@ interface TimingEditorProps {
   initialStart: number;
   initialEnd: number;
   getCurrentTime?: () => number;
-  onPlay?: () => void;
+  onPlayFromTime?: (time: number) => void;
   onSave: (start: number, end: number) => void;
 }
 
-const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlay, onSave }: TimingEditorProps) => {
+const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFromTime, onSave }: TimingEditorProps) => {
   const [start, setStart] = useState(initialStart.toString());
   const [end, setEnd] = useState(initialEnd.toString());
 
@@ -229,9 +231,18 @@ const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlay, 
       </div>
 
       <div className="flex items-center justify-between gap-2 pt-1">
-        <Button type="button" size="sm" variant="ghost" onClick={onPlay} className="gap-1 text-xs">
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={() => {
+            const s = parseFloat(start);
+            if (!isNaN(s)) onPlayFromTime?.(s);
+          }}
+          className="gap-1 text-xs"
+        >
           <Play className="h-3 w-3" />
-          Reproducir
+          Reproducir desde start
         </Button>
         <Button type="button" size="sm" onClick={handleSave} className="text-xs">
           Guardar
