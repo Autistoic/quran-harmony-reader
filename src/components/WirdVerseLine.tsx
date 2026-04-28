@@ -19,6 +19,7 @@ interface WirdVerseLineProps {
   editMode?: boolean;
   getCurrentTime?: () => number;
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
+  onPlayFromTime?: (time: number) => void;
 }
 
 export const WirdVerseLine = ({
@@ -33,6 +34,7 @@ export const WirdVerseLine = ({
   editMode = false,
   getCurrentTime,
   onUpdateTiming,
+  onPlayFromTime,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
