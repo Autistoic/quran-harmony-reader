@@ -157,11 +157,11 @@ interface TimingEditorProps {
   initialStart: number;
   initialEnd: number;
   getCurrentTime?: () => number;
-  onPlay?: () => void;
+  onPlayFromTime?: (time: number) => void;
   onSave: (start: number, end: number) => void;
 }
 
-const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlay, onSave }: TimingEditorProps) => {
+const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFromTime, onSave }: TimingEditorProps) => {
   const [start, setStart] = useState(initialStart.toString());
   const [end, setEnd] = useState(initialEnd.toString());
 
