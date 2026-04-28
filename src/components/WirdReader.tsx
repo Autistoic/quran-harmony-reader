@@ -29,6 +29,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
     pause,
     playFromVerse,
     playFromWord,
+    playFromTime,
   } = useAudioSync(effectiveWird);
 
   // Keep a live ref to currentTime so the edit popover can read it on demand
