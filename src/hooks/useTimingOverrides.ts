@@ -89,6 +89,52 @@ export function useTimingOverrides(wird: WirdData) {
 
   const hasOverrides = useMemo(() => Object.keys(overrides).length > 0, [overrides]);
 
+  const overrideCount = useMemo(() => {
+    let n = 0;
+    for (const v of Object.values(overrides)) n += Object.keys(v).length;
+    return n;
+  }, [overrides]);
+
+  const exportBackup = useCallback(() => {
+    const payload = {
+      wirdId: wird.id,
+      exportedAt: new Date().toISOString(),
+      overrides,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `timing-overrides-${wird.id}-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [wird.id, overrides]);
+
+  const importBackup = useCallback(
+    async (file: File): Promise<{ count: number }> => {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const incoming: OverridesMap = data.overrides ?? data;
+      // shallow validation
+      if (typeof incoming !== 'object' || incoming === null) {
+        throw new Error('Formato inválido');
+      }
+      setOverrides(prev => {
+        const merged: OverridesMap = { ...prev };
+        for (const [vIdx, words] of Object.entries(incoming)) {
+          merged[Number(vIdx)] = { ...(merged[Number(vIdx)] ?? {}), ...(words as Record<number, TimingOverride>) };
+        }
+        return merged;
+      });
+      let count = 0;
+      for (const v of Object.values(incoming)) count += Object.keys(v as object).length;
+      return { count };
+    },
+    []
+  );
+
   return {
     overrides,
     effectiveWird,
@@ -96,6 +142,9 @@ export function useTimingOverrides(wird: WirdData) {
     clearWordOverride,
     resetAll,
     hasOverrides,
+    overrideCount,
+    exportBackup,
+    importBackup,
   };
 }
 
