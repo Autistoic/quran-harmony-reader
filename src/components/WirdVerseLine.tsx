@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
 import { Play, Pause, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-interface WirdVerseLineProps {    
+interface WirdVerseLineProps {
   isPlaying: boolean;
   verse: WirdVerse;
   verseIndex: number;
@@ -13,13 +15,30 @@ interface WirdVerseLineProps {
   onPause?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
   onPrepareForPractice?: (word: string) => void;
+  // Edit-mode props
+  editMode?: boolean;
+  getCurrentTime?: () => number;
+  onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
 }
 
-export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPlayVerse, onPause, onPlayWord, onPrepareForPractice }: WirdVerseLineProps) => {
+export const WirdVerseLine = ({
+  isPlaying,
+  verse,
+  verseIndex,
+  currentWord,
+  onPlayVerse,
+  onPause,
+  onPlayWord,
+  onPrepareForPractice,
+  editMode = false,
+  getCurrentTime,
+  onUpdateTiming,
+}: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
 
   const handleWordClick = (wordIndex: number) => {
+    if (editMode) return; // clicks handled by popover trigger
     onPlayWord?.(verseIndex, wordIndex);
     setActiveWordIndex(prev => (prev === wordIndex ? null : wordIndex));
   };
@@ -67,19 +86,47 @@ export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPla
           const isHighlighted =
             currentWord?.verseIndex === verseIndex &&
             currentWord?.wordIndex === wordIndex;
-          const showAddButton = activeWordIndex === wordIndex && onPrepareForPractice;
+          const showAddButton = !editMode && activeWordIndex === wordIndex && onPrepareForPractice;
+
+          const wordSpan = (
+            <span
+              onClick={() => handleWordClick(wordIndex)}
+              className={cn(
+                'inline-block mx-1 px-1 rounded transition-all duration-200 cursor-pointer hover:bg-accent/30',
+                isHighlighted && 'bg-accent text-accent-foreground font-bold scale-110 shadow-lg',
+                editMode && 'ring-1 ring-border/60'
+              )}
+            >
+              {wordTiming.word}
+            </span>
+          );
 
           return (
-            <span key={wordIndex} className="relative inline-block">
-              <span
-                onClick={() => handleWordClick(wordIndex)}
-                className={cn(
-                  "inline-block mx-1 px-1 rounded transition-all duration-200 cursor-pointer hover:bg-accent/30",
-                  isHighlighted && "bg-accent text-accent-foreground font-bold scale-110 shadow-lg"
-                )}
-              >
-                {wordTiming.word}
-              </span>
+            <span key={wordIndex} className="relative inline-flex flex-col items-center align-middle">
+              {editMode ? (
+                <Popover>
+                  <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
+                  <PopoverContent className="w-72" align="center">
+                    <TimingEditor
+                      word={wordTiming.word}
+                      initialStart={wordTiming.start}
+                      initialEnd={wordTiming.end}
+                      getCurrentTime={getCurrentTime}
+                      onPlay={() => onPlayWord?.(verseIndex, wordIndex)}
+                      onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
+                    />
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                wordSpan
+              )}
+
+              {editMode && (
+                <span className="font-mono text-[10px] leading-none text-muted-foreground mt-0.5">
+                  {wordTiming.start.toFixed(2)}→{wordTiming.end.toFixed(2)}
+                </span>
+              )}
+
               {showAddButton && (
                 <button
                   onClick={(e) => handleAddWord(wordTiming.word, e)}
@@ -99,6 +146,97 @@ export const WirdVerseLine = ({ isPlaying, verse, verseIndex, currentWord, onPla
           ({verse.note})
         </p>
       )}
+    </div>
+  );
+};
+
+interface TimingEditorProps {
+  word: string;
+  initialStart: number;
+  initialEnd: number;
+  getCurrentTime?: () => number;
+  onPlay?: () => void;
+  onSave: (start: number, end: number) => void;
+}
+
+const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlay, onSave }: TimingEditorProps) => {
+  const [start, setStart] = useState(initialStart.toString());
+  const [end, setEnd] = useState(initialEnd.toString());
+
+  useEffect(() => {
+    setStart(initialStart.toString());
+    setEnd(initialEnd.toString());
+  }, [initialStart, initialEnd]);
+
+  const applyCurrentTo = (field: 'start' | 'end') => {
+    const t = getCurrentTime?.();
+    if (t === undefined) return;
+    const v = (Math.round(t * 100) / 100).toString();
+    if (field === 'start') setStart(v);
+    else setEnd(v);
+  };
+
+  const handleSave = () => {
+    const s = parseFloat(start);
+    const e = parseFloat(end);
+    if (isNaN(s) || isNaN(e)) return;
+    onSave(s, e);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="text-sm font-semibold text-center break-all">{word}</div>
+
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs w-10 text-muted-foreground">start</span>
+          <Input
+            type="number"
+            step="0.1"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+            className="h-8 text-sm"
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs px-2 whitespace-nowrap"
+            onClick={() => applyCurrentTo('start')}
+          >
+            ahora
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs w-10 text-muted-foreground">end</span>
+          <Input
+            type="number"
+            step="0.1"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+            className="h-8 text-sm"
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs px-2 whitespace-nowrap"
+            onClick={() => applyCurrentTo('end')}
+          >
+            ahora
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-2 pt-1">
+        <Button type="button" size="sm" variant="ghost" onClick={onPlay} className="gap-1 text-xs">
+          <Play className="h-3 w-3" />
+          Reproducir
+        </Button>
+        <Button type="button" size="sm" onClick={handleSave} className="text-xs">
+          Guardar
+        </Button>
+      </div>
     </div>
   );
 };
