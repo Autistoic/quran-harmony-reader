@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
 import { Play, Pause, Plus } from 'lucide-react';
@@ -20,6 +20,7 @@ interface WirdVerseLineProps {
   getCurrentTime?: () => number;
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
   onPlayFromTime?: (time: number) => void;
+  onPauseAudio?: () => void;
 }
 
 export const WirdVerseLine = ({
@@ -35,6 +36,7 @@ export const WirdVerseLine = ({
   getCurrentTime,
   onUpdateTiming,
   onPlayFromTime,
+  onPauseAudio,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
@@ -114,7 +116,9 @@ export const WirdVerseLine = ({
                       initialStart={wordTiming.start}
                       initialEnd={wordTiming.end}
                       getCurrentTime={getCurrentTime}
+                      isPlaying={isPlaying}
                       onPlayFromTime={onPlayFromTime}
+                      onPauseAudio={onPauseAudio}
                       onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
                     />
                   </PopoverContent>
@@ -157,18 +161,49 @@ interface TimingEditorProps {
   initialStart: number;
   initialEnd: number;
   getCurrentTime?: () => number;
+  isPlaying?: boolean;
   onPlayFromTime?: (time: number) => void;
+  onPauseAudio?: () => void;
   onSave: (start: number, end: number) => void;
 }
 
-const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFromTime, onSave }: TimingEditorProps) => {
+const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, isPlaying, onPlayFromTime, onPauseAudio, onSave }: TimingEditorProps) => {
   const [start, setStart] = useState(initialStart.toString());
   const [end, setEnd] = useState(initialEnd.toString());
+  // Track whether *this* editor triggered playback so we don't show pause for other audio
+  const [isOwningPlayback, setIsOwningPlayback] = useState(false);
+  const stopAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     setStart(initialStart.toString());
     setEnd(initialEnd.toString());
   }, [initialStart, initialEnd]);
+
+  // If audio stops externally, release ownership
+  useEffect(() => {
+    if (!isPlaying) {
+      setIsOwningPlayback(false);
+      stopAtRef.current = null;
+    }
+  }, [isPlaying]);
+
+  // Auto-pause when reaching `end`
+  useEffect(() => {
+    if (!isOwningPlayback || stopAtRef.current === null) return;
+    let raf: number;
+    const tick = () => {
+      const t = getCurrentTime?.();
+      if (t !== undefined && stopAtRef.current !== null && t >= stopAtRef.current) {
+        onPauseAudio?.();
+        setIsOwningPlayback(false);
+        stopAtRef.current = null;
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isOwningPlayback, getCurrentTime, onPauseAudio]);
 
   const applyCurrentTo = (field: 'start' | 'end') => {
     const t = getCurrentTime?.();
@@ -184,6 +219,23 @@ const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFr
     if (isNaN(s) || isNaN(e)) return;
     onSave(s, e);
   };
+
+  const handlePlayPause = () => {
+    if (isOwningPlayback && isPlaying) {
+      onPauseAudio?.();
+      setIsOwningPlayback(false);
+      stopAtRef.current = null;
+      return;
+    }
+    const s = parseFloat(start);
+    const e = parseFloat(end);
+    if (isNaN(s)) return;
+    stopAtRef.current = !isNaN(e) && e > s ? e : null;
+    setIsOwningPlayback(true);
+    onPlayFromTime?.(s);
+  };
+
+  const showPause = isOwningPlayback && isPlaying;
 
   return (
     <div className="space-y-3">
@@ -235,14 +287,11 @@ const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFr
           type="button"
           size="sm"
           variant="ghost"
-          onClick={() => {
-            const s = parseFloat(start);
-            if (!isNaN(s)) onPlayFromTime?.(s);
-          }}
+          onClick={handlePlayPause}
           className="gap-1 text-xs"
         >
-          <Play className="h-3 w-3" />
-          Reproducir desde start
+          {showPause ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          {showPause ? 'Pausar' : 'Reproducir'}
         </Button>
         <Button type="button" size="sm" onClick={handleSave} className="text-xs">
           Guardar
@@ -251,3 +300,4 @@ const TimingEditor = ({ word, initialStart, initialEnd, getCurrentTime, onPlayFr
     </div>
   );
 };
+
