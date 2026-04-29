@@ -128,6 +128,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
               getCurrentTime={() => currentTimeRef.current}
               onUpdateTiming={setWordTiming}
               onPlayFromTime={playFromTime}
+              onPauseAudio={pause}
             />
           ))}
         </div>
