@@ -116,7 +116,9 @@ export const WirdVerseLine = ({
                       initialStart={wordTiming.start}
                       initialEnd={wordTiming.end}
                       getCurrentTime={getCurrentTime}
+                      isPlaying={isPlaying}
                       onPlayFromTime={onPlayFromTime}
+                      onPauseAudio={onPauseAudio}
                       onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
                     />
                   </PopoverContent>
