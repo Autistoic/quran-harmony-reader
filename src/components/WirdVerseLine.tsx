@@ -20,6 +20,7 @@ interface WirdVerseLineProps {
   getCurrentTime?: () => number;
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
   onPlayFromTime?: (time: number) => void;
+  onPauseAudio?: () => void;
 }
 
 export const WirdVerseLine = ({
