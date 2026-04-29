@@ -36,6 +36,7 @@ export const WirdVerseLine = ({
   getCurrentTime,
   onUpdateTiming,
   onPlayFromTime,
+  onPauseAudio,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
