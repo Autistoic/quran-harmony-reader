@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
 import { Play, Pause, Plus } from 'lucide-react';
