@@ -60,19 +60,6 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
         {/* Header */}
         <SurahHeader surah={effectiveSurah} />
 
-        {/* Timing editor panel */}
-        <TimingEditorPanel
-          kind="surah"
-          editMode={editMode}
-          onEditModeChange={setEditMode}
-          effectiveData={effectiveSurah}
-          hasOverrides={hasOverrides}
-          overrideCount={overrideCount}
-          onReset={resetAll}
-          onExportBackup={exportBackup}
-          onImportBackup={importBackup}
-        />
-
         {/* Verses */}
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
           {effectiveSurah.verses.map((verse, index) => (
@@ -103,7 +90,18 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
             onRestart={restart}
           />
         </div>
-
+        {/* Timing editor panel */}
+        <TimingEditorPanel
+          kind="surah"
+          editMode={editMode}
+          onEditModeChange={setEditMode}
+          effectiveData={effectiveSurah}
+          hasOverrides={hasOverrides}
+          overrideCount={overrideCount}
+          onReset={resetAll}
+          onExportBackup={exportBackup}
+          onImportBackup={importBackup}
+        />
         {/* Instructions */}
         <p className="text-center text-sm text-muted-foreground mt-8">
           {editMode
