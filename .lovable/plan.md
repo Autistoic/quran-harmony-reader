@@ -1,67 +1,54 @@
-## Modo edición de timings
+## Extender el modo edición de timings a las Surahs
 
-### Idea
-Un modo que activás con un toggle en la página del Wird. Mientras está activo:
-- Cada palabra muestra sus tiempos actuales (`start` / `end`) debajo.
-- Al hacer click en una palabra, se abre un pequeño editor inline con dos inputs (start, end) prellenados con los valores actuales.
-- Hay botones rápidos: **"Usar tiempo actual"** (toma el `currentTime` del audio para start o end), **"Reproducir desde aquí"**, y **"Guardar"**.
-- Los cambios se guardan en memoria (estado local) + `localStorage` para no perderlos al refrescar.
-- Un panel flotante muestra el **output final** como texto listo para copiar, con el formato exacto del código (`{ word: "...", start: X, end: Y },`) — podés copiar solo una verse o todo el array.
+Ahora mismo el editor de timings vive solo en `WirdReader`. Lo voy a generalizar para que también funcione en `QuranReader` (Al-Fatiha, Al-Ikhlas, etc.), respetando la diferencia clave: las surahs tienen palabras en **árabe + transliteración por palabra** (`word` + `translit`), mientras que el wird solo tiene transliteración.
 
-Todo esto es una herramienta de autor, **no modifica `wirdSharif.ts`** — el código fuente sigue siendo la fuente de verdad. Vos pegás el output cuando estés conforme.
+### Cambios
 
-### Flujo de uso
-1. Activás "Modo edición" (toggle arriba).
-2. Reproducís el audio normalmente.
-3. Cuando escuchás que una palabra está desincronizada, pausás, clickeás la palabra y ajustás. El botón "Usar tiempo actual" toma el `currentTime` del reproductor — así no tenés que tipear números.
-4. Cuando terminás, abrís el panel "Exportar", copiás el bloque y lo pegás en `src/data/wirdSharif.ts`.
-5. Un botón "Resetear overrides" vuelve a los tiempos originales del archivo.
+**1. `useTimingOverrides` — volverlo genérico**
+- Actualmente está tipado a `WirdData`. Lo refactorizo para aceptar cualquier objeto con `{ id, audioUrl, verses: [{ wordTimings: [...] }] }` (genéricos en TS).
+- El merge de overrides ya solo toca `start`/`end`, así que sirve igual para `WordTiming` (surah) y `WirdWordTiming` (wird) sin perder los campos extra (`translit`, `word`).
+- `formatWirdVerses` se separa en dos formatters:
+  - `formatWirdVerses(wird)` — sin cambios, formato actual del wird.
+  - `formatSurahVerses(surah)` — incluye `arabic`, `verseNumber`, y cada `wordTiming` con `word`, `translit`, `start`, `end`, replicando el estilo de `src/data/surahs.ts`.
+- Las claves de `localStorage` ya usan `wird.id`; para surahs uso `surah-${id}` para no colisionar (ej: `wird-timing-overrides:surah-1`).
 
-### Detalles técnicos
+**2. `TimingEditorPanel` — genérico**
+- Acepta una prop `kind: 'wird' | 'surah'` y `effectiveData` (en vez de `effectiveWird`).
+- Internamente elige el formatter correcto y muestra la ruta del archivo destino correcta en el dialog (`src/data/wirdSharif.ts` o `src/data/surahs.ts`).
+- Aclaración en el texto de export para surahs: "pegá este bloque reemplazando el `verses: [...]` de la surah correspondiente en `src/data/surahs.ts`".
 
-**Estado de overrides**
-- Nuevo hook `useTimingOverrides(wirdId)` que mantiene un objeto `{ [verseIndex]: { [wordIndex]: { start, end } } }` persistido en `localStorage` con key `wird-timing-overrides:{wirdId}`.
-- Función `getEffectiveTimings(verse, verseIndex)` que mergea los overrides sobre los timings originales. El reader usa esto para sincronizar el audio con los valores editados en tiempo real.
+**3. `QuranVerse` — soportar `editMode`**
+Agregar las mismas capacidades que tiene `WirdVerseLine`:
+- Nuevas props: `editMode`, `getCurrentTime`, `onUpdateTiming(verseIndex, wordIndex, {start, end})`, `onPlayFromTime`, `onPauseAudio`, `isPlaying`.
+- En modo edición: debajo de cada palabra árabe (y su translit) muestro `start → end` en mono pequeño. Click en palabra abre el mismo popover de edición (start/end, "usar tiempo actual", reproducir/pausar segmento).
+- Reutilizo el sub-componente `TimingEditor` que ya está en `WirdVerseLine.tsx` extrayéndolo a su propio archivo `src/components/TimingEditor.tsx` para que ambos lo usen sin duplicar código.
+- En modo edición, el click NO dispara `onPlayVerse` (consistente con el wird).
 
-**Integración con `useAudioSync`**
-- `WirdReader` arma un `effectiveWird` (clon del wird con los overrides aplicados en `wordTimings`) y se lo pasa al `useAudioSync`. Así editar un tiempo actualiza el highlight inmediatamente.
+**4. `QuranReader` — integrar editor**
+- Llamar `useTimingOverrides(surah)`, pasar `effectiveSurah` a `useAudioSync` (los highlights se actualizan en vivo al editar, igual que en el wird).
+- Renderizar `<TimingEditorPanel kind="surah" ... />` arriba de los versos.
+- Mantener `currentTimeRef` vivo para que el popover lea el tiempo actual del audio.
+- Pasar `editMode` y handlers a `QuranVerse`.
 
-**Nuevo componente `TimingEditorPanel`**
-- Toggle "Modo edición" (Switch del design system).
-- Cuando activo: pasa `editMode=true` a `WirdVerseLine`.
-- Botón "Exportar" abre un `Dialog` con un `<textarea readOnly>` que contiene el array `verses` formateado tal como está en `wirdSharif.ts`, y un botón "Copiar al portapapeles".
-- Botón "Resetear" con confirmación.
-
-**Cambios en `WirdVerseLine`**
-- Nueva prop `editMode: boolean` y `onUpdateTiming(verseIndex, wordIndex, { start, end })`.
-- En modo edición:
-  - Debajo de cada palabra renderiza un pequeño texto monoespaciado `0.00 → 0.00`.
-  - Click en palabra abre un popover con dos inputs numéricos (step 0.1), botones "← usar tiempo actual" junto a cada input, "▶ reproducir desde start", "Guardar", "Cancelar".
-  - El click en modo edición NO dispara `onPrepareForPractice` (se desactiva ese comportamiento mientras editás).
-
-**Formato de export**
-Genera exactamente:
-```
-{
-  transliteration: "...",
-  repetitions: 3,
-  wordTimings: [
-    { word: "aLLAHUMma", start: 375.0, end: 376.2 },
-    ...
-  ],
-},
-```
-Preserva campos existentes (`repetitions`, `note`, `transliteration`) y solo reemplaza los números de timing.
+**5. `TimingEditor` (extraído)**
+- Mover el sub-componente `TimingEditor` que vive dentro de `WirdVerseLine.tsx` a `src/components/TimingEditor.tsx` sin cambios funcionales.
+- `WirdVerseLine` y `QuranVerse` lo importan desde ahí.
 
 ### Archivos
 
 | Archivo | Acción |
 |---|---|
-| `src/hooks/useTimingOverrides.ts` | Crear — estado + persistencia + merge + export formatter |
-| `src/components/TimingEditorPanel.tsx` | Crear — toggle, botón exportar, dialog de copiar, reset |
-| `src/components/WirdVerseLine.tsx` | Modificar — prop `editMode`, mostrar tiempos, popover de edición por palabra |
-| `src/components/WirdReader.tsx` | Modificar — estado de editMode, aplicar overrides al wird antes de useAudioSync, render del panel |
+| `src/hooks/useTimingOverrides.ts` | Refactor genérico + agregar `formatSurahVerses` |
+| `src/components/TimingEditor.tsx` | Crear (extraído de WirdVerseLine) |
+| `src/components/TimingEditorPanel.tsx` | Aceptar `kind` y data genérica |
+| `src/components/WirdVerseLine.tsx` | Importar `TimingEditor` desde el nuevo archivo |
+| `src/components/WirdReader.tsx` | Pasar `kind="wird"` al panel |
+| `src/components/QuranVerse.tsx` | Soportar editMode + popover por palabra |
+| `src/components/QuranReader.tsx` | Integrar `useTimingOverrides` + panel + handlers |
 
-### Fuera de alcance
-- No se edita automáticamente `wirdSharif.ts` (es lo que pediste: generar texto para pegar).
-- No se agrega al Quran Reader todavía — primero probamos en el Wird. Si funciona bien, lo extendemos.
+### Notas
+
+- Los overrides de surahs y del wird viven en localStorage keys separadas, así que editar una no afecta a la otra.
+- El export de surah preserva `arabic`, `verseNumber`, `transliteration`, y por cada palabra su `word` + `translit` originales (solo cambian los números).
+- Backup/Importar JSON sigue funcionando igual (cada surah/wird tiene su propio archivo de backup con su id).
+- Fuera de alcance: editar el `translit` o el `word` mismo desde la UI — solo se editan los timings, igual que en el wird.
