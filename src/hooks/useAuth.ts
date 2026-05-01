@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const ADMIN_PASSWORD = 'basmala123';
+const AN_PS = 'basmala123';
 const AUTH_KEY = 'auth';
 
 export const useAuth = () => {
@@ -9,7 +9,7 @@ export const useAuth = () => {
   );
 
   const login = useCallback((password: string) => {
-    if (password === ADMIN_PASSWORD) {
+    if (password === AN_PS) {
       localStorage.setItem(AUTH_KEY, 'true');
       setIsAuthenticated(true);
       return true;
