@@ -1,9 +1,12 @@
+import { useState, useRef, useEffect } from 'react';
 import { Surah } from '@/data/surahs';
 import { useAudioSync } from '@/hooks/useAudioSync';
+import { useTimingOverrides } from '@/hooks/useTimingOverrides';
 import { QuranVerse } from './QuranVerse';
 import { AudioPlayer } from './AudioPlayer';
 import { SurahHeader } from './SurahHeader';
 import { SurahNavigation } from './SurahNavigation';
+import { TimingEditorPanel } from './TimingEditorPanel';
 
 interface QuranReaderProps {
   surah: Surah;
@@ -12,6 +15,16 @@ interface QuranReaderProps {
 
 export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
   const {
+    effectiveData: effectiveSurah,
+    setWordTiming,
+    resetAll,
+    hasOverrides,
+    overrideCount,
+    exportBackup,
+    importBackup,
+  } = useTimingOverrides(surah, 'surah-');
+
+  const {
     isPlaying,
     currentTime,
     duration,
@@ -19,8 +32,17 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
     toggle,
     seek,
     restart,
+    pause,
     playFromVerse,
-  } = useAudioSync(surah);
+    playFromTime,
+  } = useAudioSync(effectiveSurah);
+
+  const currentTimeRef = useRef(currentTime);
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  const [editMode, setEditMode] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,21 +54,40 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
       <div className="relative max-w-3xl mx-auto px-4 py-8 md:py-12">
         {/* Navigation */}
         {onNavigate && (
-          <SurahNavigation currentSurah={surah} onNavigate={onNavigate} />
+          <SurahNavigation currentSurah={effectiveSurah} onNavigate={onNavigate} />
         )}
 
         {/* Header */}
-        <SurahHeader surah={surah} />
+        <SurahHeader surah={effectiveSurah} />
+
+        {/* Timing editor panel */}
+        <TimingEditorPanel
+          kind="surah"
+          editMode={editMode}
+          onEditModeChange={setEditMode}
+          effectiveData={effectiveSurah}
+          hasOverrides={hasOverrides}
+          overrideCount={overrideCount}
+          onReset={resetAll}
+          onExportBackup={exportBackup}
+          onImportBackup={importBackup}
+        />
 
         {/* Verses */}
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
-          {surah.verses.map((verse, index) => (
+          {effectiveSurah.verses.map((verse, index) => (
             <QuranVerse
               key={index}
               verse={verse}
               verseIndex={index}
               currentWord={currentWord}
               onPlayVerse={playFromVerse}
+              editMode={editMode}
+              isPlaying={isPlaying}
+              getCurrentTime={() => currentTimeRef.current}
+              onUpdateTiming={setWordTiming}
+              onPlayFromTime={playFromTime}
+              onPauseAudio={pause}
             />
           ))}
         </div>
@@ -65,7 +106,9 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
 
         {/* Instructions */}
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio.
+          {editMode
+            ? 'Modo edición activo: tocá una palabra árabe para ajustar sus tiempos.'
+            : 'Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio.'}
         </p>
       </div>
     </div>
