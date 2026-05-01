@@ -13,13 +13,17 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Pencil, Download, RotateCcw, Copy, Check, Save, Upload } from 'lucide-react';
 import type { WirdData } from '@/data/wirdSharif';
-import { formatWirdVerses } from '@/hooks/useTimingOverrides';
+import type { Surah } from '@/data/surahs';
+import { formatWirdVerses, formatSurahVerses } from '@/hooks/useTimingOverrides';
 import { toast } from 'sonner';
 
+type Kind = 'wird' | 'surah';
+
 interface TimingEditorPanelProps {
+  kind: Kind;
   editMode: boolean;
   onEditModeChange: (value: boolean) => void;
-  effectiveWird: WirdData;
+  effectiveData: WirdData | Surah;
   hasOverrides: boolean;
   overrideCount: number;
   onReset: () => void;
@@ -28,9 +32,10 @@ interface TimingEditorPanelProps {
 }
 
 export const TimingEditorPanel = ({
+  kind,
   editMode,
   onEditModeChange,
-  effectiveWird,
+  effectiveData,
   hasOverrides,
   overrideCount,
   onReset,
@@ -41,14 +46,18 @@ export const TimingEditorPanel = ({
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const exportText = formatWirdVerses(effectiveWird);
+  const targetFile = kind === 'wird' ? 'src/data/wirdSharif.ts' : 'src/data/surahs.ts';
+  const exportText =
+    kind === 'wird'
+      ? formatWirdVerses(effectiveData as WirdData)
+      : formatSurahVerses(effectiveData as Surah);
   const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(exportText);
       setCopied(true);
-      toast.success('Copiado. Pegalo en src/data/wirdSharif.ts para guardarlo definitivamente.');
+      toast.success(`Copiado. Pegalo en ${targetFile} para guardarlo definitivamente.`);
       setTimeout(() => setCopied(false), 1500);
     } catch {
       toast.error('No se pudo copiar');
@@ -124,12 +133,12 @@ export const TimingEditorPanel = ({
       </div>
 
       <p className="text-[11px] text-muted-foreground mt-2">
-        Guardado local en <code className="text-foreground/80">{hostname}</code>. Los cambios viven solo en este navegador/dominio. Para que persistan en todos lados: <strong>Exportar código</strong> y pegarlo en <code>src/data/wirdSharif.ts</code>.
+        Guardado local en <code className="text-foreground/80">{hostname}</code>. Los cambios viven solo en este navegador/dominio. Para que persistan en todos lados: <strong>Exportar código</strong> y pegarlo en <code>{targetFile}</code>.
       </p>
 
       {editMode && (
         <p className="text-xs text-muted-foreground mt-1">
-          Tocá una palabra para editar sus tiempos. Usá "tiempo actual" para capturar desde el reproductor.
+          Tocá una palabra para editar sus tiempos. Usá "ahora" para capturar desde el reproductor.
         </p>
       )}
 
@@ -138,7 +147,11 @@ export const TimingEditorPanel = ({
           <DialogHeader>
             <DialogTitle>Exportar timings</DialogTitle>
             <DialogDescription>
-              Copiá este bloque y pegalo reemplazando el array <code>verses: [...]</code> en <code>src/data/wirdSharif.ts</code>.
+              {kind === 'wird' ? (
+                <>Copiá este bloque y pegalo reemplazando el array <code>verses: [...]</code> en <code>{targetFile}</code>.</>
+              ) : (
+                <>Copiá este bloque y pegalo reemplazando el <code>verses: [...]</code> de la surah correspondiente en <code>{targetFile}</code>.</>
+              )}
             </DialogDescription>
           </DialogHeader>
           <Textarea

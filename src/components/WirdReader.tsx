@@ -16,7 +16,7 @@ interface WirdReaderProps {
 }
 
 export const WirdReader = ({ wird }: WirdReaderProps) => {
-  const { effectiveWird, setWordTiming, resetAll, hasOverrides, overrideCount, exportBackup, importBackup } = useTimingOverrides(wird);
+  const { effectiveData: effectiveWird, setWordTiming, resetAll, hasOverrides, overrideCount, exportBackup, importBackup } = useTimingOverrides(wird);
 
   const {
     isPlaying,
@@ -101,9 +101,10 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
 
         {/* Timing editor panel */}
         <TimingEditorPanel
+          kind="wird"
           editMode={editMode}
           onEditModeChange={setEditMode}
-          effectiveWird={effectiveWird}
+          effectiveData={effectiveWird}
           hasOverrides={hasOverrides}
           overrideCount={overrideCount}
           onReset={resetAll}
