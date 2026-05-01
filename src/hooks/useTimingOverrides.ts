@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import type { WirdData, WirdVerse, WirdWordTiming } from '@/data/wirdSharif';
+import type { WirdData } from '@/data/wirdSharif';
+import type { Surah } from '@/data/surahs';
 
 export interface TimingOverride {
   start: number;
@@ -9,11 +10,17 @@ export interface TimingOverride {
 // { [verseIndex]: { [wordIndex]: { start, end } } }
 export type OverridesMap = Record<number, Record<number, TimingOverride>>;
 
-const storageKey = (wirdId: string) => `wird-timing-overrides:${wirdId}`;
+// Generic shape any data needs to satisfy
+interface OverridableData {
+  id: string | number;
+  verses: { wordTimings: { start: number; end: number }[] }[];
+}
 
-const loadOverrides = (wirdId: string): OverridesMap => {
+const storageKey = (id: string) => `wird-timing-overrides:${id}`;
+
+const loadOverrides = (id: string): OverridesMap => {
   try {
-    const raw = localStorage.getItem(storageKey(wirdId));
+    const raw = localStorage.getItem(storageKey(id));
     if (!raw) return {};
     return JSON.parse(raw) as OverridesMap;
   } catch {
@@ -21,24 +28,25 @@ const loadOverrides = (wirdId: string): OverridesMap => {
   }
 };
 
-const saveOverrides = (wirdId: string, overrides: OverridesMap) => {
+const saveOverrides = (id: string, overrides: OverridesMap) => {
   try {
-    localStorage.setItem(storageKey(wirdId), JSON.stringify(overrides));
+    localStorage.setItem(storageKey(id), JSON.stringify(overrides));
   } catch {
     // ignore
   }
 };
 
-export function useTimingOverrides(wird: WirdData) {
-  const [overrides, setOverrides] = useState<OverridesMap>(() => loadOverrides(wird.id));
+export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix = '') {
+  const fullId = `${idPrefix}${data.id}`;
+  const [overrides, setOverrides] = useState<OverridesMap>(() => loadOverrides(fullId));
 
   useEffect(() => {
-    setOverrides(loadOverrides(wird.id));
-  }, [wird.id]);
+    setOverrides(loadOverrides(fullId));
+  }, [fullId]);
 
   useEffect(() => {
-    saveOverrides(wird.id, overrides);
-  }, [wird.id, overrides]);
+    saveOverrides(fullId, overrides);
+  }, [fullId, overrides]);
 
   const setWordTiming = useCallback(
     (verseIndex: number, wordIndex: number, timing: TimingOverride) => {
@@ -72,20 +80,20 @@ export function useTimingOverrides(wird: WirdData) {
     setOverrides({});
   }, []);
 
-  // Build an effective wird with overrides merged in
-  const effectiveWird: WirdData = useMemo(() => {
-    const verses: WirdVerse[] = wird.verses.map((verse, vIdx) => {
+  // Build an effective data object with overrides merged into wordTimings
+  const effectiveData: T = useMemo(() => {
+    const verses = data.verses.map((verse, vIdx) => {
       const verseOverrides = overrides[vIdx];
       if (!verseOverrides) return verse;
-      const wordTimings: WirdWordTiming[] = verse.wordTimings.map((wt, wIdx) => {
+      const wordTimings = verse.wordTimings.map((wt, wIdx) => {
         const o = verseOverrides[wIdx];
         if (!o) return wt;
         return { ...wt, start: o.start, end: o.end };
       });
       return { ...verse, wordTimings };
     });
-    return { ...wird, verses };
-  }, [wird, overrides]);
+    return { ...data, verses } as T;
+  }, [data, overrides]);
 
   const hasOverrides = useMemo(() => Object.keys(overrides).length > 0, [overrides]);
 
@@ -97,7 +105,7 @@ export function useTimingOverrides(wird: WirdData) {
 
   const exportBackup = useCallback(() => {
     const payload = {
-      wirdId: wird.id,
+      id: fullId,
       exportedAt: new Date().toISOString(),
       overrides,
     };
@@ -105,19 +113,18 @@ export function useTimingOverrides(wird: WirdData) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `timing-overrides-${wird.id}-${Date.now()}.json`;
+    a.download = `timing-overrides-${fullId}-${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [wird.id, overrides]);
+  }, [fullId, overrides]);
 
   const importBackup = useCallback(
     async (file: File): Promise<{ count: number }> => {
       const text = await file.text();
-      const data = JSON.parse(text);
-      const incoming: OverridesMap = data.overrides ?? data;
-      // shallow validation
+      const parsed = JSON.parse(text);
+      const incoming: OverridesMap = parsed.overrides ?? parsed;
       if (typeof incoming !== 'object' || incoming === null) {
         throw new Error('Formato inválido');
       }
@@ -137,7 +144,7 @@ export function useTimingOverrides(wird: WirdData) {
 
   return {
     overrides,
-    effectiveWird,
+    effectiveData,
     setWordTiming,
     clearWordOverride,
     resetAll,
@@ -148,9 +155,9 @@ export function useTimingOverrides(wird: WirdData) {
   };
 }
 
-// Format a number like the source file: minimal trailing zero but keep one decimal
+// ---------- Formatters ----------
+
 const fmt = (n: number): string => {
-  // round to 2 decimals, drop trailing zeros but keep at least 1 decimal
   const rounded = Math.round(n * 100) / 100;
   const s = rounded.toString();
   return s.includes('.') ? s : `${s}.0`;
@@ -174,6 +181,29 @@ export function formatWirdVerses(wird: WirdData): string {
     verse.wordTimings.forEach(wt => {
       lines.push(
         `      { word: ${jsString(wt.word)}, start: ${fmt(wt.start)}, end: ${fmt(wt.end)} },`
+      );
+    });
+    lines.push('    ],');
+    lines.push('  },');
+  });
+  lines.push('],');
+  return lines.join('\n');
+}
+
+export function formatSurahVerses(surah: Surah): string {
+  const lines: string[] = [];
+  lines.push('verses: [');
+  surah.verses.forEach(verse => {
+    lines.push('  {');
+    lines.push(`    arabic: ${jsString(verse.arabic)},`);
+    lines.push(`    transliteration: ${jsString(verse.transliteration)},`);
+    if (verse.verseNumber !== undefined) {
+      lines.push(`    verseNumber: ${verse.verseNumber},`);
+    }
+    lines.push('    wordTimings: [');
+    verse.wordTimings.forEach(wt => {
+      lines.push(
+        `      { word: ${jsString(wt.word)}, translit: ${jsString(wt.translit)}, start: ${fmt(wt.start)}, end: ${fmt(wt.end)} },`
       );
     });
     lines.push('    ],');
