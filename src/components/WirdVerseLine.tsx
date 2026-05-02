@@ -21,6 +21,11 @@ interface WirdVerseLineProps {
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
   onPlayFromTime?: (time: number) => void;
   onPauseAudio?: () => void;
+  openCursor?: { verseIndex: number; wordIndex: number } | null;
+  onOpenCursorChange?: (cursor: { verseIndex: number; wordIndex: number } | null) => void;
+  onNavCursor?: (dir: 'prev' | 'next') => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 }
 
 export const WirdVerseLine = ({
