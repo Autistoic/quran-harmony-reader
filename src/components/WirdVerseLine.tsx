@@ -118,7 +118,12 @@ export const WirdVerseLine = ({
           return (
             <span key={wordIndex} className="relative inline-flex flex-col items-center align-middle">
               {editMode ? (
-                <Popover>
+                <Popover
+                  open={openCursor?.verseIndex === verseIndex && openCursor?.wordIndex === wordIndex}
+                  onOpenChange={(open) =>
+                    onOpenCursorChange?.(open ? { verseIndex, wordIndex } : null)
+                  }
+                >
                   <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
                   <PopoverContent className="w-72" align="center">
                     <TimingEditor
@@ -130,6 +135,10 @@ export const WirdVerseLine = ({
                       onPlayFromTime={onPlayFromTime}
                       onPauseAudio={onPauseAudio}
                       onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
+                      onPrev={() => onNavCursor?.('prev')}
+                      onNext={() => onNavCursor?.('next')}
+                      hasPrev={hasPrev}
+                      hasNext={hasNext}
                     />
                   </PopoverContent>
                 </Popover>
