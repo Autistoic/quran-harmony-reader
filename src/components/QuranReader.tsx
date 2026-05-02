@@ -43,6 +43,29 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
   }, [currentTime]);
 
   const [editMode, setEditMode] = useState(false);
+  const [openCursor, setOpenCursor] = useState<{ verseIndex: number; wordIndex: number } | null>(null);
+
+  const navCursor = (dir: 'prev' | 'next') => {
+    if (!openCursor) return;
+    const verses = effectiveSurah.verses;
+    let { verseIndex, wordIndex } = openCursor;
+    if (dir === 'next') {
+      if (wordIndex + 1 < verses[verseIndex].wordTimings.length) wordIndex += 1;
+      else if (verseIndex + 1 < verses.length) { verseIndex += 1; wordIndex = 0; }
+      else return;
+    } else {
+      if (wordIndex > 0) wordIndex -= 1;
+      else if (verseIndex > 0) { verseIndex -= 1; wordIndex = verses[verseIndex].wordTimings.length - 1; }
+      else return;
+    }
+    setOpenCursor({ verseIndex, wordIndex });
+  };
+
+  const hasPrev = !!openCursor && (openCursor.wordIndex > 0 || openCursor.verseIndex > 0);
+  const hasNext = !!openCursor && (
+    openCursor.wordIndex + 1 < effectiveSurah.verses[openCursor.verseIndex].wordTimings.length ||
+    openCursor.verseIndex + 1 < effectiveSurah.verses.length
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,6 +98,11 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
               onUpdateTiming={setWordTiming}
               onPlayFromTime={playFromTime}
               onPauseAudio={pause}
+              openCursor={openCursor}
+              onOpenCursorChange={setOpenCursor}
+              onNavCursor={navCursor}
+              hasPrev={hasPrev}
+              hasNext={hasNext}
             />
           ))}
         </div>

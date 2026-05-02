@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -12,6 +12,10 @@ interface TimingEditorProps {
   onPlayFromTime?: (time: number) => void;
   onPauseAudio?: () => void;
   onSave: (start: number, end: number) => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 }
 
 export const TimingEditor = ({
@@ -23,6 +27,10 @@ export const TimingEditor = ({
   onPlayFromTime,
   onPauseAudio,
   onSave,
+  onPrev,
+  onNext,
+  hasPrev,
+  hasNext,
 }: TimingEditorProps) => {
   const [start, setStart] = useState(initialStart.toString());
   const [end, setEnd] = useState(initialEnd.toString());
@@ -66,11 +74,26 @@ export const TimingEditor = ({
     else setEnd(v);
   };
 
-  const handleSave = () => {
+  const saveCurrent = () => {
     const s = parseFloat(start);
     const e = parseFloat(end);
     if (isNaN(s) || isNaN(e)) return;
     onSave(s, e);
+  };
+
+  const stopPlayback = () => {
+    if (isOwningPlayback) {
+      onPauseAudio?.();
+      setIsOwningPlayback(false);
+      stopAtRef.current = null;
+    }
+  };
+
+  const handleNav = (dir: 'prev' | 'next') => {
+    saveCurrent();
+    stopPlayback();
+    if (dir === 'prev') onPrev?.();
+    else onNext?.();
   };
 
   const handlePlayPause = () => {
@@ -146,10 +169,37 @@ export const TimingEditor = ({
           {showPause ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
           {showPause ? 'Pausar' : 'Reproducir'}
         </Button>
-        <Button type="button" size="sm" onClick={handleSave} className="text-xs">
+        <Button type="button" size="sm" onClick={saveCurrent} className="text-xs">
           Guardar
         </Button>
       </div>
+
+      {(onPrev || onNext) && (
+        <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/50">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => handleNav('prev')}
+            disabled={!hasPrev}
+            className="gap-1 text-xs flex-1"
+          >
+            <ChevronLeft className="h-3 w-3" />
+            Anterior
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => handleNav('next')}
+            disabled={!hasNext}
+            className="gap-1 text-xs flex-1"
+          >
+            Siguiente
+            <ChevronRight className="h-3 w-3" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

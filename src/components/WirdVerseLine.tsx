@@ -21,6 +21,11 @@ interface WirdVerseLineProps {
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
   onPlayFromTime?: (time: number) => void;
   onPauseAudio?: () => void;
+  openCursor?: { verseIndex: number; wordIndex: number } | null;
+  onOpenCursorChange?: (cursor: { verseIndex: number; wordIndex: number } | null) => void;
+  onNavCursor?: (dir: 'prev' | 'next') => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 }
 
 export const WirdVerseLine = ({
@@ -37,6 +42,11 @@ export const WirdVerseLine = ({
   onUpdateTiming,
   onPlayFromTime,
   onPauseAudio,
+  openCursor,
+  onOpenCursorChange,
+  onNavCursor,
+  hasPrev,
+  hasNext,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
@@ -108,7 +118,12 @@ export const WirdVerseLine = ({
           return (
             <span key={wordIndex} className="relative inline-flex flex-col items-center align-middle">
               {editMode ? (
-                <Popover>
+                <Popover
+                  open={openCursor?.verseIndex === verseIndex && openCursor?.wordIndex === wordIndex}
+                  onOpenChange={(open) =>
+                    onOpenCursorChange?.(open ? { verseIndex, wordIndex } : null)
+                  }
+                >
                   <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
                   <PopoverContent className="w-72" align="center">
                     <TimingEditor
@@ -120,6 +135,10 @@ export const WirdVerseLine = ({
                       onPlayFromTime={onPlayFromTime}
                       onPauseAudio={onPauseAudio}
                       onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
+                      onPrev={() => onNavCursor?.('prev')}
+                      onNext={() => onNavCursor?.('next')}
+                      hasPrev={hasPrev}
+                      hasNext={hasNext}
                     />
                   </PopoverContent>
                 </Popover>
