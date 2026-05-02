@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
 import { Play } from 'lucide-react';
@@ -18,6 +17,11 @@ interface QuranVerseProps {
   onUpdateTiming?: (verseIndex: number, wordIndex: number, timing: { start: number; end: number }) => void;
   onPlayFromTime?: (time: number) => void;
   onPauseAudio?: () => void;
+  openCursor?: { verseIndex: number; wordIndex: number } | null;
+  onOpenCursorChange?: (cursor: { verseIndex: number; wordIndex: number } | null) => void;
+  onNavCursor?: (dir: 'prev' | 'next') => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 }
 
 export const QuranVerse = ({
@@ -31,9 +35,12 @@ export const QuranVerse = ({
   onUpdateTiming,
   onPlayFromTime,
   onPauseAudio,
+  openCursor,
+  onOpenCursorChange,
+  onNavCursor,
+  hasPrev,
+  hasNext,
 }: QuranVerseProps) => {
-  const [openWordIndex, setOpenWordIndex] = useState<number | null>(null);
-
   const renderWord = (
     text: string,
     wordIndex: number,
@@ -43,7 +50,6 @@ export const QuranVerse = ({
     const wt = verse.wordTimings[wordIndex];
     const wordSpan = (
       <span
-        onClick={editMode ? undefined : undefined}
         className={cn(
           'inline-block mx-1 px-1 rounded transition-all duration-200',
           editMode && 'cursor-pointer hover:bg-accent/30 ring-1 ring-border/60',
@@ -57,13 +63,16 @@ export const QuranVerse = ({
 
     if (!editMode) return wordSpan;
 
+    const isOpen =
+      openCursor?.verseIndex === verseIndex && openCursor?.wordIndex === wordIndex;
+
     return (
       <span className="relative inline-flex flex-col items-center align-middle">
         <Popover
-          open={openWordIndex === wordIndex && isArabic}
+          open={isOpen && isArabic}
           onOpenChange={(open) => {
-            if (!isArabic) return; // only the arabic row triggers the popover to avoid duplicates
-            setOpenWordIndex(open ? wordIndex : null);
+            if (!isArabic) return;
+            onOpenCursorChange?.(open ? { verseIndex, wordIndex } : null);
           }}
         >
           <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
@@ -78,6 +87,10 @@ export const QuranVerse = ({
                 onPlayFromTime={onPlayFromTime}
                 onPauseAudio={onPauseAudio}
                 onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
+                onPrev={() => onNavCursor?.('prev')}
+                onNext={() => onNavCursor?.('next')}
+                hasPrev={hasPrev}
+                hasNext={hasNext}
               />
             </PopoverContent>
           )}
