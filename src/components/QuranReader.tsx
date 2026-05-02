@@ -111,6 +111,11 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
               onUpdateTiming={setWordTiming}
               onPlayFromTime={playFromTime}
               onPauseAudio={pause}
+              openCursor={openCursor}
+              onOpenCursorChange={setOpenCursor}
+              onNavCursor={navCursor}
+              hasPrev={hasPrev}
+              hasNext={hasNext}
             />
           ))}
         </div>
