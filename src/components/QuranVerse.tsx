@@ -148,6 +148,24 @@ export const QuranVerse = ({
           );
         })}
       </p>
+
+      {/* Spanish translation - per-word, RTL to align with Arabic order */}
+      {verse.wordTimings.some((w) => w.translation) && (
+        <p className="text-center text-sm text-muted-foreground/70 mt-1" dir="rtl">
+          {verse.wordTimings.map((wordTiming, wordIndex) => (
+            <span key={wordIndex} className="inline-block mx-1 px-1">
+              {wordTiming.translation || <span className="opacity-30">—</span>}
+            </span>
+          ))}
+        </p>
+      )}
+
+      {/* Full verse translation in Spanish (LTR) */}
+      {verse.translation && (
+        <p className="text-center text-base text-foreground/80 mt-3 italic max-w-2xl mx-auto" dir="ltr">
+          {verse.translation}
+        </p>
+      )}
     </div>
   );
 };
