@@ -204,8 +204,10 @@ export const surahAlFalaq: Surah = {
             transliteration: "min sharri mā khalaq",
             verseNumber: 2,
             wordTimings: [
-                { word: "مِن شَرِّ", translit: "min sharri", start: 6.7, end: 8.2 },
-                { word: "مَا خَلَقَ", translit: "mā khalaq", start: 8.23, end: 9.5 },
+                { word: "مِن", translit: "min", start: 6.7, end: 7.4 },
+                { word: "شَرِّ", translit: "sharri", start: 7.4, end: 8.2 },
+                { word: "مَا", translit: "mā", start: 8.23, end: 8.9 },
+                { word: "خَلَقَ", translit: "khalaq", start: 8.9, end: 9.5 },
             ],
         },
         {
@@ -213,9 +215,11 @@ export const surahAlFalaq: Surah = {
             transliteration: "wamin sharri ghāsiqin ’idhā waqab",
             verseNumber: 3,
             wordTimings: [
-                { word: "وَمِن شَرِّ", translit: "wamin sharri", start: 9.5, end: 11.1 },
+                { word: "وَمِن", translit: "wamin", start: 9.5, end: 10.3 },
+                { word: "شَرِّ", translit: "sharri", start: 10.3, end: 11.1 },
                 { word: "غَاسِقٍ", translit: "ghāsiqin", start: 11.1, end: 12.2 },
-                { word: "إِذَا وَقَبَ", translit: "’idhā waqab", start: 12.25, end: 13.6 },
+                { word: "إِذَا", translit: "’idhā", start: 12.25, end: 12.9 },
+                { word: "وَقَبَ", translit: "waqab", start: 12.9, end: 13.6 },
             ],
         },
         {
@@ -223,9 +227,11 @@ export const surahAlFalaq: Surah = {
             transliteration: "wamin sharri n-naffāthāti fi l-‘uqad",
             verseNumber: 4,
             wordTimings: [
-                { word: "وَمِن شَرِّ", translit: "wamin sharri", start: 13.8, end: 15.7 },
+                { word: "وَمِن", translit: "wamin", start: 13.8, end: 14.7 },
+                { word: "شَرِّ", translit: "sharri", start: 14.7, end: 15.7 },
                 { word: "ٱلنَّفَّـٰـثَـٰتِ", translit: "n-naffāthāti", start: 15.7, end: 17.6 },
-                { word: "فِى ٱلْعُقَدِ", translit: "fi l-‘uqad", start: 17.55, end: 19.0 },
+                { word: "فِى", translit: "fi", start: 17.55, end: 18.2 },
+                { word: "ٱلْعُقَدِ", translit: "l-‘uqad", start: 18.2, end: 19.0 },
             ],
         },
         {
@@ -233,11 +239,13 @@ export const surahAlFalaq: Surah = {
             transliteration: "wamin sharri ḥāsidin idhā ḥasad",
             verseNumber: 5,
             wordTimings: [
-                { word: "وَمِن شَرِ", translit: "wamin sharri", start: 19.1, end: 20.5 },
+                { word: "وَمِن", translit: "wamin", start: 19.1, end: 19.8 },
+                { word: "شَرِ", translit: "sharri", start: 19.8, end: 20.5 },
                 { word: "حَاسِدٍ", translit: "ḥāsidin", start: 20.6, end: 21.5 },
-                { word: "إِذَا حَسَدَ", translit: "idhā ḥasad", start: 21.7, end: 23.1 },
+                { word: "إِذَا", translit: "idhā", start: 21.7, end: 22.3 },
+                { word: "حَسَدَ", translit: "ḥasad", start: 22.3, end: 23.1 },
             ],
-        },
+        }
     ],
 };
 
