@@ -1,6 +1,7 @@
 export interface WordTiming {
     word: string;
     translit: string; // transliteration for this word
+    translation?: string; // Spanish translation for this word (optional)
     start: number; // in seconds
     end: number;   // in seconds
 }
@@ -8,6 +9,7 @@ export interface WordTiming {
 export interface Verse {
     arabic: string;
     transliteration: string;
+    translation?: string; // Spanish translation for the full verse (optional)
     verseNumber?: number;
     wordTimings: WordTiming[];
 }
