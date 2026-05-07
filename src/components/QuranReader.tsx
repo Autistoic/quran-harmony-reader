@@ -33,7 +33,8 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
     seek,
     restart,
     pause,
-    playFromVerse,
+              playFromVerse,
+    playFromWord,
     playFromTime,
   } = useAudioSync(effectiveSurah);
 
@@ -92,6 +93,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
               verseIndex={index}
               currentWord={currentWord}
               onPlayVerse={playFromVerse}
+              onPlayWord={playFromWord}
               editMode={editMode}
               isPlaying={isPlaying}
               getCurrentTime={() => currentTimeRef.current}

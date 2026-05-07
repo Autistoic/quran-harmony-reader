@@ -10,6 +10,7 @@ interface QuranVerseProps {
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
   onPlayVerse?: (verseIndex: number) => void;
+  onPlayWord?: (verseIndex: number, wordIndex: number) => void;
   // Edit-mode
   editMode?: boolean;
   isPlaying?: boolean;
@@ -29,6 +30,7 @@ export const QuranVerse = ({
   verseIndex,
   currentWord,
   onPlayVerse,
+  onPlayWord,
   editMode = false,
   isPlaying,
   getCurrentTime,
@@ -50,9 +52,11 @@ export const QuranVerse = ({
     const wt = verse.wordTimings[wordIndex];
     const wordSpan = (
       <span
+        onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
         className={cn(
           'inline-block mx-1 px-1 rounded transition-all duration-200',
           editMode && 'cursor-pointer hover:bg-accent/30 ring-1 ring-border/60',
+          !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
           isArabic && isHighlighted && 'bg-accent text-accent-foreground font-bold scale-110 shadow-lg',
           !isArabic && isHighlighted && 'bg-accent/50 text-accent-foreground font-semibold'
         )}
