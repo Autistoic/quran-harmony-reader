@@ -193,6 +193,7 @@ export const surahAlFalaq: Surah = {
         {
             arabic: "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
             transliteration: "qul ’a‘ūdhu birabbi l-falaq",
+            translation: "Di: “Me refugio en el Señor del amanecer",
             verseNumber: 1,
             wordTimings: [
                 { word: "قُلْ", translit: "qul", start: 2.9, end: 3.85 },
@@ -204,6 +205,7 @@ export const surahAlFalaq: Surah = {
         {
             arabic: "مِن شَرِّ مَا خَلَقَ",
             transliteration: "min sharri mā khalaq",
+            translation: "de todo el mal que existe en lo que Él creó",
             verseNumber: 2,
             wordTimings: [
                 { word: "مِن", translit: "min", start: 6.7, end: 7.4 },
@@ -215,6 +217,7 @@ export const surahAlFalaq: Surah = {
         {
             arabic: "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
             transliteration: "wamin sharri ghāsiqin ’idhā waqab",
+            translation: "del mal de la oscuridad de la noche cuando se extiende",
             verseNumber: 3,
             wordTimings: [
                 { word: "وَمِن", translit: "wamin", start: 9.5, end: 10.3 },
@@ -227,6 +230,7 @@ export const surahAlFalaq: Surah = {
         {
             arabic: "وَمِن شَرِّ ٱلنَّفَّـٰـثَـٰتِ فِى ٱلْعُقَدِ",
             transliteration: "wamin sharri n-naffāthāti fi l-‘uqad",
+            translation: "del mal de las [hechiceras] sopladoras de nudos",
             verseNumber: 4,
             wordTimings: [
                 { word: "وَمِن", translit: "wamin", start: 13.8, end: 14.7 },
@@ -239,6 +243,7 @@ export const surahAlFalaq: Surah = {
         {
             arabic: "وَمِن شَرِ حَاسِدٍ إِذَا حَسَدَ",
             transliteration: "wamin sharri ḥāsidin idhā ḥasad",
+            translation: "y del mal del envidioso cuando envidia",
             verseNumber: 5,
             wordTimings: [
                 { word: "وَمِن", translit: "wamin", start: 19.1, end: 19.8 },
