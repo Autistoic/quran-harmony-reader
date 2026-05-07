@@ -33,7 +33,8 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
     seek,
     restart,
     pause,
-    playFromVerse,
+              playFromVerse,
+    playFromWord,
     playFromTime,
   } = useAudioSync(effectiveSurah);
 
