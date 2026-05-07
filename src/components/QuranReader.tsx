@@ -93,6 +93,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
               verseIndex={index}
               currentWord={currentWord}
               onPlayVerse={playFromVerse}
+              onPlayWord={playFromWord}
               editMode={editMode}
               isPlaying={isPlaying}
               getCurrentTime={() => currentTimeRef.current}
