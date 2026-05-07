@@ -30,6 +30,7 @@ export const QuranVerse = ({
   verseIndex,
   currentWord,
   onPlayVerse,
+  onPlayWord,
   editMode = false,
   isPlaying,
   getCurrentTime,
