@@ -93,6 +93,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
               verseIndex={index}
               currentWord={currentWord}
               onPlayVerse={playFromVerse}
+              onPauseVerse={pause}
               onPlayWord={playFromWord}
               editMode={editMode}
               isPlaying={isPlaying}
