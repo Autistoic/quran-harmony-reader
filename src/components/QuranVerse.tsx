@@ -1,6 +1,6 @@
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
-import { Play } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TimingEditor } from './TimingEditor';
@@ -10,6 +10,7 @@ interface QuranVerseProps {
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
   onPlayVerse?: (verseIndex: number) => void;
+  onPauseVerse?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
   // Edit-mode
   editMode?: boolean;
@@ -30,6 +31,7 @@ export const QuranVerse = ({
   verseIndex,
   currentWord,
   onPlayVerse,
+  onPauseVerse,
   onPlayWord,
   editMode = false,
   isPlaying,
@@ -112,16 +114,19 @@ export const QuranVerse = ({
     <div className="py-6 border-b border-border/50 last:border-b-0 group">
       {/* Verse header with number and play button */}
       <div className="flex justify-center items-center gap-3 mb-4">
-        {onPlayVerse && !editMode && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onPlayVerse(verseIndex)}
-            className="h-8 w-8 rounded-full opacity-50 group-hover:opacity-100 transition-opacity text-primary hover:bg-primary/10"
-          >
-            <Play className="h-4 w-4" />
-          </Button>
-        )}
+        {onPlayVerse && !editMode && (() => {
+          const isThisVersePlaying = !!isPlaying && currentWord?.verseIndex === verseIndex;
+          return (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => (isThisVersePlaying ? onPauseVerse?.() : onPlayVerse(verseIndex))}
+              className="h-8 w-8 rounded-full opacity-50 group-hover:opacity-100 transition-opacity text-primary hover:bg-primary/10"
+            >
+              {isThisVersePlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+          );
+        })()}
         {verse.verseNumber && (
           <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
             {verse.verseNumber}
