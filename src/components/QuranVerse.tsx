@@ -1,6 +1,6 @@
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
-import { Play } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TimingEditor } from './TimingEditor';
