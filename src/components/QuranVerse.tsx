@@ -10,6 +10,7 @@ interface QuranVerseProps {
   verseIndex: number;
   currentWord: { verseIndex: number; wordIndex: number } | null;
   onPlayVerse?: (verseIndex: number) => void;
+  onPauseVerse?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
   // Edit-mode
   editMode?: boolean;
