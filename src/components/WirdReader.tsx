@@ -157,31 +157,79 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
           onImportBackup={importBackup}
         />
 
+        {/* Pagination (top) */}
+        {pages.length > 1 && (
+          <div className="mb-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const idx = pages.indexOf(currentPage);
+                      if (idx > 0) setCurrentPage(pages[idx - 1]);
+                    }}
+                    className={pages.indexOf(currentPage) === 0 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {pages.map((p) => (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      isActive={p === currentPage}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(p);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const idx = pages.indexOf(currentPage);
+                      if (idx < pages.length - 1) setCurrentPage(pages[idx + 1]);
+                    }}
+                    className={pages.indexOf(currentPage) === pages.length - 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
         {/* Verses */}
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
-          {effectiveWird.verses.map((verse, index) => (
-            <WirdVerseLine
-              isPlaying={isPlaying}
-              key={index}
-              verse={verse}
-              verseIndex={index}
-              currentWord={currentWord}
-              onPlayVerse={playFromVerse}
-              onPause={pause}
-              onPlayWord={playFromWord}
-              onPrepareForPractice={handlePrepareForPractice}
-              editMode={editMode}
-              getCurrentTime={() => currentTimeRef.current}
-              onUpdateTiming={setWordTiming}
-              onPlayFromTime={playFromTime}
-              onPauseAudio={pause}
-              openCursor={openCursor}
-              onOpenCursorChange={setOpenCursor}
-              onNavCursor={navCursor}
-              hasPrev={hasPrev}
-              hasNext={hasNext}
-            />
-          ))}
+          {effectiveWird.verses.map((verse, index) => {
+            const versePage = verse.page ?? 1;
+            if (versePage !== currentPage) return null;
+            return (
+              <WirdVerseLine
+                isPlaying={isPlaying}
+                key={index}
+                verse={verse}
+                verseIndex={index}
+                currentWord={currentWord}
+                onPlayVerse={playFromVerse}
+                onPause={pause}
+                onPlayWord={playFromWord}
+                onPrepareForPractice={handlePrepareForPractice}
+                editMode={editMode}
+                getCurrentTime={() => currentTimeRef.current}
+                onUpdateTiming={setWordTiming}
+                onPlayFromTime={playFromTime}
+                onPauseAudio={pause}
+                openCursor={openCursor}
+                onOpenCursorChange={setOpenCursor}
+                onNavCursor={navCursor}
+                hasPrev={hasPrev}
+                hasNext={hasNext}
+              />
+            );
+          })}
         </div>
 
         {/* Audio Player */}
