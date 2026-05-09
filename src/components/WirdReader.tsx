@@ -51,6 +51,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
   const [prefillWord, setPrefillWord] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [openCursor, setOpenCursor] = useState<{ verseIndex: number; wordIndex: number } | null>(null);
+  const [showTranslations, setShowTranslations] = useState(false);
 
   // Pagination
   const pages = Array.from(
