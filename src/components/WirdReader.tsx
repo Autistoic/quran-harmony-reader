@@ -8,7 +8,7 @@ import { AudioPlayer } from './AudioPlayer';
 import { PimsleurModal } from './PimsleurModal';
 import { TimingEditorPanel } from './TimingEditorPanel';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, Brain } from 'lucide-react';
+import { ChevronLeft, Brain, Languages } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Pagination,
@@ -51,6 +51,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
   const [prefillWord, setPrefillWord] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [openCursor, setOpenCursor] = useState<{ verseIndex: number; wordIndex: number } | null>(null);
+  const [showTranslations, setShowTranslations] = useState(false);
 
   // Pagination
   const pages = Array.from(
@@ -109,20 +110,32 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
               <span>Volver a Surahs</span>
             </Link>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPracticeOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Brain className="h-4 w-4" />
-            <span>Práctica</span>
-            {dueItems.length > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                {dueItems.length}
-              </span>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTranslations((v) => !v)}
+              className="flex items-center gap-2"
+              aria-pressed={showTranslations}
+            >
+              <Languages className="h-4 w-4" />
+              <span>{showTranslations ? 'Ocultar' : 'Traducción'}</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPracticeOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Brain className="h-4 w-4" />
+              <span>Práctica</span>
+              {dueItems.length > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                  {dueItems.length}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Header */}
@@ -227,6 +240,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                 onNavCursor={navCursor}
                 hasPrev={hasPrev}
                 hasNext={hasNext}
+                showTranslation={showTranslations}
               />
             );
           })}

@@ -26,6 +26,7 @@ interface WirdVerseLineProps {
   onNavCursor?: (dir: 'prev' | 'next') => void;
   hasPrev?: boolean;
   hasNext?: boolean;
+  showTranslation?: boolean;
 }
 
 export const WirdVerseLine = ({
@@ -47,6 +48,7 @@ export const WirdVerseLine = ({
   onNavCursor,
   hasPrev,
   hasNext,
+  showTranslation = false,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
@@ -164,6 +166,13 @@ export const WirdVerseLine = ({
           );
         })}
       </p>
+
+      {/* Translation (full verse) */}
+      {showTranslation && verse.translation && (
+        <p className="text-center text-base md:text-lg text-foreground/80 mt-3 px-2 leading-relaxed">
+          {verse.translation}
+        </p>
+      )}
 
       {/* Note */}
       {verse.note && (
