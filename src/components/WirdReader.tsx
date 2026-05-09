@@ -240,6 +240,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                 onNavCursor={navCursor}
                 hasPrev={hasPrev}
                 hasNext={hasNext}
+                showTranslation={showTranslations}
               />
             );
           })}
