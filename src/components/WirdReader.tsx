@@ -52,6 +52,20 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
   const [editMode, setEditMode] = useState(false);
   const [openCursor, setOpenCursor] = useState<{ verseIndex: number; wordIndex: number } | null>(null);
 
+  // Pagination
+  const pages = Array.from(
+    new Set(effectiveWird.verses.map((v) => v.page ?? 1))
+  ).sort((a, b) => a - b);
+  const [currentPage, setCurrentPage] = useState<number>(pages[0] ?? 1);
+
+  // Auto-jump page when current playing word lands on a different page
+  useEffect(() => {
+    if (!currentWord) return;
+    const versePage = effectiveWird.verses[currentWord.verseIndex]?.page ?? 1;
+    if (versePage !== currentPage) setCurrentPage(versePage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWord?.verseIndex]);
+
   const navCursor = (dir: 'prev' | 'next') => {
     if (!openCursor) return;
     const verses = effectiveWird.verses;
