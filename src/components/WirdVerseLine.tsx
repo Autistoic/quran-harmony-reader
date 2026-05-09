@@ -48,6 +48,7 @@ export const WirdVerseLine = ({
   onNavCursor,
   hasPrev,
   hasNext,
+  showTranslation = false,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
