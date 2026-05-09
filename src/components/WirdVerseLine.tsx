@@ -167,6 +167,13 @@ export const WirdVerseLine = ({
         })}
       </p>
 
+      {/* Translation (full verse) */}
+      {showTranslation && verse.translation && (
+        <p className="text-center text-base md:text-lg text-foreground/80 mt-3 px-2 leading-relaxed">
+          {verse.translation}
+        </p>
+      )}
+
       {/* Note */}
       {verse.note && (
         <p className="text-center text-sm text-muted-foreground italic mt-2">
