@@ -8,7 +8,7 @@ import { AudioPlayer } from './AudioPlayer';
 import { PimsleurModal } from './PimsleurModal';
 import { TimingEditorPanel } from './TimingEditorPanel';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, Brain } from 'lucide-react';
+import { ChevronLeft, Brain, Languages } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Pagination,
