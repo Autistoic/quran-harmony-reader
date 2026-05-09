@@ -9,6 +9,7 @@ export interface WirdVerse {
   wordTimings: WirdWordTiming[];
   repetitions?: number;
   note?: string;
+  page?: number;
 }
 
 export interface WirdData {
