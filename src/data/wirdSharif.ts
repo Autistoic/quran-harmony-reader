@@ -10,6 +10,7 @@ export interface WirdVerse {
   repetitions?: number;
   note?: string;
   page?: number;
+  translation?: string;
 }
 
 export interface WirdData {
