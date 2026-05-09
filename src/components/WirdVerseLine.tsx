@@ -26,6 +26,7 @@ interface WirdVerseLineProps {
   onNavCursor?: (dir: 'prev' | 'next') => void;
   hasPrev?: boolean;
   hasNext?: boolean;
+  showTranslation?: boolean;
 }
 
 export const WirdVerseLine = ({
