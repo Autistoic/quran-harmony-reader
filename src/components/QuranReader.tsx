@@ -8,6 +8,7 @@ import { SurahHeader } from './SurahHeader';
 import { SurahNavigation } from './SurahNavigation';
 import { TimingEditorPanel } from './TimingEditorPanel';
 import { Button } from './ui/button';
+import { Languages } from 'lucide-react';
 
 interface QuranReaderProps {
     surah: Surah;
@@ -87,15 +88,6 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                 {onNavigate && (
                     <SurahNavigation currentSurah={effectiveSurah} onNavigate={onNavigate} />
                 )}
-                 <div className="fixed top-0 z-10">
-                    <Button
-                        variant="ghost"
-                        onClick={toggleShowTranslation}
-                        className="mr-2"
-                    >
-                        {showTranslation ? 'Ocultar' : 'Mostrar'} Traducción
-                    </Button>
-                </div>
                 {/* Header */}
                 <SurahHeader surah={effectiveSurah} />
 
@@ -127,7 +119,18 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                 </div>
 
                 {/* Audio Player - Fixed at bottom on mobile */}
-                <div className="sticky bottom-4 z-10">
+                <div className="sticky bottom-4 z-10 space-y-2">
+                    <div className="flex justify-end">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={toggleShowTranslation}
+                            className="shadow-md rounded-full"
+                        >
+                            <Languages className="h-4 w-4 mr-1" />
+                            {showTranslation ? 'Ocultar' : 'Mostrar'} traducción
+                        </Button>
+                    </div>
                     <AudioPlayer
                         isPlaying={isPlaying}
                         currentTime={currentTime}
