@@ -256,8 +256,91 @@ export const surahAlFalaq: Surah = {
     ],
 };
 
+// Surah An-Nas (114)
+export const surahAnNas: Surah = {
+    id: 114,
+    name: "An-Nas",
+    arabicName: "الناس",
+    audioUrl: "https://archive.org/download/114-an-nas_202605/114%20An-Nas%20%D8%A7%D9%84%D9%86%D8%A7%D8%B3.mp3",
+    verses: [
+        {
+            arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+            transliteration: "bismi l-lāhi r-raḥmāni r-raḥīm",
+            verseNumber: 0,
+            wordTimings: [
+                { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0 },
+                { word: "ٱللَّهِ", translit: "l-lāhi", start: 0, end: 0 },
+                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 0, end: 0 },
+                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 0, end: 0 },
+            ],
+        },
+        {
+            arabic: "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ",
+            transliteration: "qul ʾaʿūdhu birabbi n-nās",
+            verseNumber: 1,
+            wordTimings: [
+                { word: "قُلْ", translit: "qul", start: 3.46, end: 3.76 },
+                { word: "أَعُوذُ", translit: "aʿūdhu", start: 3.86, end: 4.5 },
+                { word: "بِرَبِّ", translit: "birabbi", start: 4.55, end: 5.4 },
+                { word: "ٱلنَّاسِ", translit: "n-nās", start: 5.4, end: 7.6 },
+            ],
+        },
+        {
+            arabic: "مَلِكِ ٱلنَّاسِ",
+            transliteration: "maliki n-nās",
+            verseNumber: 2,
+            wordTimings: [
+                { word: "مَلِكِ", translit: "maliki", start: 7.7, end: 8.5 },
+                { word: "ٱلنَّاسِ", translit: "n-nās", start: 8.5, end: 10.6 },
+            ],
+        },
+        {
+            arabic: "إِلَـٰهِ ٱلنَّاسِ",
+            transliteration: "ʾilāhi n-nās",
+            verseNumber: 3,
+            wordTimings: [
+                { word: "إِلَـٰهِ", translit: "ʾilāhi", start: 10.6, end: 11.6 },
+                { word: "ٱلنَّاسِ", translit: "n-nās", start: 11.6, end: 14.1 },
+            ],
+        },
+        {
+            arabic: "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ",
+            transliteration: "min sharri l-waswāsi l-khannās",
+            verseNumber: 4,
+            wordTimings: [
+                { word: "مِن", translit: "min", start: 14.5, end: 15.3 },
+                { word: "شَرِّ", translit: "sharri", start: 15.3, end: 15.8 },
+                { word: "ٱلْوَسْوَاسِ", translit: "l-waswāsi", start: 15.9, end: 17.0 },
+                { word: "ٱلْخَنَّاسِ", translit: "l-khannās", start: 16.9, end: 19.8 },
+            ],
+        },
+        {
+            arabic: "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ",
+            transliteration: "alladhī yuwaswisu fī ṣudūri n-nās",
+            verseNumber: 5,
+            wordTimings: [
+                { word: "ٱلَّذِى", translit: "alladhī", start: 20.0, end: 21.1 },
+                { word: "يُوَسْوِسُ", translit: "yuwaswisu", start: 21.0, end: 21.9 },
+                { word: "فِى", translit: "fī", start: 21.9, end: 22.1 },
+                { word: "صُدُورِ", translit: "ṣudūri", start: 22.3, end: 23.0 },
+                { word: "ٱلنَّاسِ", translit: "n-nās", start: 23.1, end: 25.2 },
+            ],
+        },
+        {
+            arabic: "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ",
+            transliteration: "mina l-jinnati wa n-nās",
+            verseNumber: 6,
+            wordTimings: [
+                { word: "مِنَ", translit: "mina", start: 25.5, end: 25.8 },
+                { word: "ٱلْجِنَّةِ", translit: "l-jinnati", start: 25.8, end: 27.7 },
+                { word: "وَٱلنَّاسِ", translit: "wa n-nās", start: 27.8, end: 31.3 },
+            ],
+        },
+    ],
+};
+
 // Export all surahs for easy access
-export const surahs: Surah[] = [surahAlFatiha, surahAlIkhlas, surahAlFalaq];
+export const surahs: Surah[] = [surahAlFatiha, surahAlIkhlas, surahAlFalaq, surahAnNas];
 
 // Helper to get surah by ID
 export const getSurahById = (id: number): Surah | undefined => {
