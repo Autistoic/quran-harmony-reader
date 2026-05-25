@@ -69,7 +69,33 @@ export const QuranVerse = ({
             </span>
         );
 
-        if (!editMode) return wordSpan;
+        if (!editMode) {
+            if (!isArabic) return wordSpan;
+
+            const learnArabicUrl = `https://learn-arab.lovable.app/word?w=${encodeURIComponent(
+                wt.word
+            )}&t=${encodeURIComponent(
+                wt.translit || ''
+            )}&m=${encodeURIComponent(
+                wt.translation || ''
+            )}`;
+
+            return (
+                <Popover>
+                    <PopoverTrigger asChild>
+                        {wordSpan}
+                    </PopoverTrigger>
+
+                    <PopoverContent className="w-56 text-center">
+                        <Button asChild size="sm" className="w-full">
+                            <a href={learnArabicUrl} target="_blank">
+                                Abrir diccionario
+                            </a>
+                        </Button>
+                    </PopoverContent>
+                </Popover>
+            );
+        }
 
         const isOpen =
             openCursor?.verseIndex === verseIndex && openCursor?.wordIndex === wordIndex;
