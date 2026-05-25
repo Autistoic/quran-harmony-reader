@@ -4,6 +4,7 @@ import { QuranReader } from '@/components/QuranReader';
 import { surahs, Surah } from '@/data/surahs';
 import { Button } from '@/components/ui/button';
 import { BookOpen, LogOut } from 'lucide-react';
+import { PrayerTimes } from "@/components/PrayerTimes";
 
 interface IndexProps {
   onLogout?: () => void;
@@ -26,6 +27,7 @@ const Index = ({ onLogout }: IndexProps) => {
           <LogOut className="h-4 w-4" />
         </Button>
       </div>
+      <PrayerTimes />
       <QuranReader
         surah={currentSurah}
         onNavigate={setCurrentSurah}
