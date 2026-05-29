@@ -12,16 +12,16 @@ import { useAuth } from "./hooks/useAuth";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isAuthenticated, login, logout } = useAuth();
+//   const { isAuthenticated, login, logout } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Login onLogin={login} />;
-  }
+//   if (!isAuthenticated) {
+//     return <Login onLogin={login} />;
+//   }
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Index onLogout={logout} />} />
+        <Route path="/" element={<Index />} />
         <Route path="/wird-sharif" element={<WirdSharif />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
