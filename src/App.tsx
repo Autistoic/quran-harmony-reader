@@ -6,8 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WirdSharif from "./pages/WirdSharif";
-import Login from "./pages/Login";
-import { useAuth } from "./hooks/useAuth";
+// import Login from "./pages/Login";
+// import { useAuth } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
 

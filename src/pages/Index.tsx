@@ -3,14 +3,11 @@ import { Link } from 'react-router-dom';
 import { QuranReader } from '@/components/QuranReader';
 import { surahs, Surah } from '@/data/surahs';
 import { Button } from '@/components/ui/button';
-import { BookOpen, LogOut } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { PrayerTimes } from "@/components/PrayerTimes";
 
-interface IndexProps {
-  onLogout?: () => void;
-}
 
-const Index = ({ onLogout }: IndexProps) => {
+const Index = () => {
   const [currentSurah, setCurrentSurah] = useState<Surah>(surahs[0]);
 
   return (
@@ -23,9 +20,9 @@ const Index = ({ onLogout }: IndexProps) => {
             <span>Wird Sharif Saguir</span>
           </Link>
         </Button>
-        <Button variant="ghost" size="sm" onClick={onLogout} className="text-muted-foreground">
+        {/* <Button variant="ghost" size="sm" onClick={onLogout} className="text-muted-foreground">
           <LogOut className="h-4 w-4" />
-        </Button>
+        </Button> */}
       </div>
       <PrayerTimes />
       <QuranReader
