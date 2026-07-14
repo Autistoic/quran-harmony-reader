@@ -145,7 +145,7 @@ export const useAudioSync = (data: AudioSyncData) => {
         if (verse && verse.wordTimings[wordIndex]) {
             const timing = verse.wordTimings[wordIndex];
 
-            stopTimeRef.current = timing.end;
+            stopTimeRef.current = null;
 
             seek(timing.start);
             play();
