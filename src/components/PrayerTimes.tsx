@@ -29,7 +29,7 @@ export const PrayerTimes = () => {
           today.getMonth() + 1
         ).padStart(2, "0")}-${today.getFullYear()}`;
 
-        const url = `https://api.aladhan.com/v1/timingsByCity/${formattedDate}?city=Salta&country=AR&method=3`;
+        const url = `https://api.aladhan.com/v1/timingsByCity/${formattedDate}?city=Salta&country=AR&method=13`;
 
         const response = await fetch(url);
         const data = await response.json();
