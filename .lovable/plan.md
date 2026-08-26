@@ -1,46 +1,45 @@
-## Problema
+## Objetivo
 
-En `QuranReader.tsx` el botón "Mostrar/Ocultar Traducción" está dentro de un `div` con `fixed top-0 z-10`, lo que lo deja pegado arriba a la izquierda, encima del header y la navegación. Queda mal alineado y tapa contenido.
+Cambiar el comportamiento del click en una palabra del Corán:
+- Antes: reproducía solo esa palabra y se detenía.
+- Ahora: reproduce desde esa palabra en adelante sin detenerse.
+- El botón "Abrir diccionario" pasa a ser un ícono pequeño y, al tocarlo, pausa el audio antes de abrir el enlace.
 
-## Solución propuesta
+## Cambios
 
-Integrar el botón dentro del contenedor sticky del `AudioPlayer` (que ya está siempre visible abajo), como un pequeño botón flotante alineado a la derecha, justo encima del reproductor.
+### 1. `src/hooks/useAudioSync.ts`
+En `playFromWord`, no fijar `stopTimeRef`. Reproducir desde `timing.start` sin auto-pause.
 
-### Cambios en `src/components/QuranReader.tsx`
+```ts
+const playFromWord = useCallback((verseIndex, wordIndex) => {
+  const verse = data.verses[verseIndex];
+  if (verse && verse.wordTimings[wordIndex]) {
+    stopTimeRef.current = null; // antes: timing.end
+    seek(verse.wordTimings[wordIndex].start);
+    play();
+  }
+}, [data.verses, seek, play]);
+```
 
-1. **Eliminar** el bloque actual:
-   ```jsx
-   <div className="fixed top-0 z-10">
-     <Button ...>...</Button>
-   </div>
-   ```
+### 2. `src/components/QuranVerse.tsx`
+- Reemplazar el botón "Abrir diccionario" dentro del `PopoverContent` por un botón chico solo con ícono (`BookOpen` de `lucide-react`), con `size="icon"` y `variant="ghost"` o `"secondary"`.
+- Al hacer click en el ícono, llamar a `onPauseAudio?.()` antes de abrir el enlace (`onClick` en el `<a>` o wrapper).
+- Reducir el ancho del `PopoverContent` (`w-auto` o `w-fit`) ya que solo lleva un ícono.
 
-2. **Agregar** el botón dentro del contenedor `sticky bottom-4`, encima del `<AudioPlayer />`:
-   ```jsx
-   <div className="sticky bottom-4 z-10 space-y-2">
-     <div className="flex justify-end">
-       <Button
-         variant="secondary"
-         size="sm"
-         onClick={toggleShowTranslation}
-         className="shadow-md rounded-full"
-       >
-         <Languages className="h-4 w-4 mr-1" />
-         {showTranslation ? 'Ocultar' : 'Mostrar'} traducción
-       </Button>
-     </div>
-     <AudioPlayer ... />
-   </div>
-   ```
+```jsx
+<PopoverContent className="w-auto p-2" align="center">
+  <Button asChild size="icon" variant="ghost" className="h-8 w-8"
+          onClick={() => onPauseAudio?.()}>
+    <a href={learnArabicUrl} target="_blank" aria-label="Abrir diccionario">
+      <BookOpen className="h-4 w-4" />
+    </a>
+  </Button>
+</PopoverContent>
+```
 
-3. Importar el icono `Languages` de `lucide-react` (mismo patrón ya usado en `WirdReader.tsx`).
-
-## Resultado
-
-- El botón queda siempre visible (sticky junto al reproductor).
-- Alineado a la derecha, sin tapar el header ni la navegación.
-- Estilo consistente con el resto de la app (mismo icono `Languages` que en Wird Sharif).
+- `QuranVerse` ya recibe `onPauseAudio` desde `QuranReader` (usado en modo edición), así que se reutiliza sin cambios en props.
 
 ## Archivos a modificar
 
-- `src/components/QuranReader.tsx`
+- `src/hooks/useAudioSync.ts`
+- `src/components/QuranVerse.tsx`

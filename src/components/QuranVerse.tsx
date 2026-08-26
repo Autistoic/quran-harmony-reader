@@ -1,6 +1,6 @@
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TimingEditor } from './TimingEditor';
@@ -86,10 +86,16 @@ export const QuranVerse = ({
                         {wordSpan}
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-56 text-center">
-                        <Button asChild size="sm" className="w-full">
-                            <a href={learnArabicUrl} target="_blank">
-                                Abrir diccionario
+                    <PopoverContent className="w-auto p-2" align="center">
+                        <Button
+                            asChild
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={() => onPauseAudio?.()}
+                        >
+                            <a href={learnArabicUrl} target="_blank" aria-label="Abrir diccionario">
+                                <BookOpen className="h-4 w-4" />
                             </a>
                         </Button>
                     </PopoverContent>
