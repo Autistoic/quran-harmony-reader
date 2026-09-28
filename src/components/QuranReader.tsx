@@ -92,7 +92,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                 <SurahHeader surah={effectiveSurah} />
 
                 {/* Verses */}
-                <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
+                <div className="bg-card rounded-3xl border border-border/60 px-5 py-4 md:px-12 md:py-8 shadow-sm mb-8">
                     {effectiveSurah.verses.map((verse, index) => (
                         <QuranVerse
                             key={index}

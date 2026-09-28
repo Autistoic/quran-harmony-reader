@@ -129,7 +129,7 @@ export const QuranVerse = ({
     const hasAnyTranslation = verse.wordTimings.some((w) => w.translation);
 
     return (
-        <div className="py-6 border-b border-border/50 last:border-b-0 group">
+        <div className="py-8 border-b border-border/40 last:border-b-0 group">
             {/* Verse header with number and play button */}
             <div className="flex justify-center items-center gap-3 mb-4">
                 {onPlayVerse && !editMode && (() => {
@@ -146,9 +146,9 @@ export const QuranVerse = ({
                     );
                 })()}
                 {verse.verseNumber && (
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rotate-45 rounded-md border border-gold/60 text-primary text-sm font-medium"><span className="-rotate-45">
                         {verse.verseNumber}
-                    </span>
+                    </span></span>
                 )}
             </div>
 
