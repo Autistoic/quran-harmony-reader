@@ -158,7 +158,7 @@ export const QuranVerse = ({
             <div
                 dir="rtl"
                 style={{ direction: 'rtl' }}
-                className="flex flex-wrap justify-center items-start gap-x-2 gap-y-4"
+                className="flex flex-wrap justify-start items-start gap-x-2 gap-y-5"
             >
                 {verse.wordTimings.map((wordTiming, wordIndex) => {
                     const isHighlighted =
@@ -179,7 +179,7 @@ export const QuranVerse = ({
                             <span
                                 onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
                                 className={cn(
-                                    'font-transliteration text-sm md:text-base text-muted-foreground italic leading-snug break-words rounded transition-all duration-200',
+                                    'mt-2 font-transliteration text-sm md:text-base text-muted-foreground italic leading-snug break-words rounded transition-all duration-200',
                                     !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
                                     editMode && 'ring-1 ring-border/60 px-1',
                                     isHighlighted && 'bg-accent/50 text-accent-foreground font-semibold not-italic'
