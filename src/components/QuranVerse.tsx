@@ -47,12 +47,7 @@ export const QuranVerse = ({
     hasNext,
     showTranslation,
 }: QuranVerseProps) => {
-    const renderWord = (
-        text: string,
-        wordIndex: number,
-        isHighlighted: boolean,
-        isArabic: boolean
-    ) => {
+    const renderArabicWord = (text: string, wordIndex: number, isHighlighted: boolean) => {
         const wt = verse.wordTimings[wordIndex];
         const wordSpan = (
             <span
@@ -61,8 +56,7 @@ export const QuranVerse = ({
                     'inline-block mx-1 px-1 rounded transition-all duration-200',
                     editMode && 'cursor-pointer hover:bg-accent/30 ring-1 ring-border/60',
                     !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
-                    isArabic && isHighlighted && 'bg-accent text-accent-foreground font-bold scale-110 shadow-lg',
-                    !isArabic && isHighlighted && 'bg-accent/50 text-accent-foreground font-semibold'
+                    isHighlighted && 'bg-accent text-accent-foreground font-bold scale-110 shadow-lg'
                 )}
             >
                 {text}
@@ -70,8 +64,6 @@ export const QuranVerse = ({
         );
 
         if (!editMode) {
-            if (!isArabic) return wordSpan;
-
             const learnArabicUrl = `https://learn-arab.lovable.app/word?w=${encodeURIComponent(
                 wt.word
             )}&t=${encodeURIComponent(
@@ -107,42 +99,34 @@ export const QuranVerse = ({
             openCursor?.verseIndex === verseIndex && openCursor?.wordIndex === wordIndex;
 
         return (
-            <span className="relative inline-flex flex-col items-center align-middle">
-                <Popover
-                    open={isOpen && isArabic}
-                    onOpenChange={(open) => {
-                        if (!isArabic) return;
-                        onOpenCursorChange?.(open ? { verseIndex, wordIndex } : null);
-                    }}
-                >
-                    <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
-                    {isArabic && (
-                        <PopoverContent className="w-72" align="center">
-                            <TimingEditor
-                                word={`${wt.word}  (${wt.translit})`}
-                                initialStart={wt.start}
-                                initialEnd={wt.end}
-                                getCurrentTime={getCurrentTime}
-                                isPlaying={isPlaying}
-                                onPlayFromTime={onPlayFromTime}
-                                onPauseAudio={onPauseAudio}
-                                onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
-                                onPrev={() => onNavCursor?.('prev')}
-                                onNext={() => onNavCursor?.('next')}
-                                hasPrev={hasPrev}
-                                hasNext={hasNext}
-                            />
-                        </PopoverContent>
-                    )}
-                </Popover>
-                {isArabic && (
-                    <span className="font-mono text-[10px] leading-none text-muted-foreground mt-0.5">
-                        {wt.start.toFixed(2)}→{wt.end.toFixed(2)}
-                    </span>
-                )}
-            </span>
+            <Popover
+                open={isOpen}
+                onOpenChange={(open) => {
+                    onOpenCursorChange?.(open ? { verseIndex, wordIndex } : null);
+                }}
+            >
+                <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
+                <PopoverContent className="w-72" align="center">
+                    <TimingEditor
+                        word={`${wt.word}  (${wt.translit})`}
+                        initialStart={wt.start}
+                        initialEnd={wt.end}
+                        getCurrentTime={getCurrentTime}
+                        isPlaying={isPlaying}
+                        onPlayFromTime={onPlayFromTime}
+                        onPauseAudio={onPauseAudio}
+                        onSave={(start, end) => onUpdateTiming?.(verseIndex, wordIndex, { start, end })}
+                        onPrev={() => onNavCursor?.('prev')}
+                        onNext={() => onNavCursor?.('next')}
+                        hasPrev={hasPrev}
+                        hasNext={hasNext}
+                    />
+                </PopoverContent>
+            </Popover>
         );
     };
+
+    const hasAnyTranslation = verse.wordTimings.some((w) => w.translation);
 
     return (
         <div className="py-6 border-b border-border/50 last:border-b-0 group">
@@ -168,44 +152,63 @@ export const QuranVerse = ({
                 )}
             </div>
 
-            {/* Arabic text */}
-            <p className="text-center font-arabic text-3xl md:text-4xl leading-loose mb-4 text-foreground" dir="rtl">
+            {/* Word-by-word columns (quran.com style): RTL flow, each word is a
+                self-contained column with Arabic on top, transliteration in the
+                middle and translation at the bottom. */}
+            <div
+                dir="rtl"
+                style={{ direction: 'rtl' }}
+                className="flex flex-wrap justify-center items-start gap-x-2 gap-y-4"
+            >
                 {verse.wordTimings.map((wordTiming, wordIndex) => {
                     const isHighlighted =
                         currentWord?.verseIndex === verseIndex &&
                         currentWord?.wordIndex === wordIndex;
-                    return (
-                        <span key={wordIndex}>{renderWord(wordTiming.word, wordIndex, isHighlighted, true)}</span>
-                    );
-                })}
-            </p>
 
-            {/* Transliteration - highlights sync with Arabic */}
-            <p className="text-center font-transliteration text-lg text-muted-foreground italic" dir="rtl">
-                {verse.wordTimings.map((wordTiming, wordIndex) => {
-                    const isHighlighted =
-                        currentWord?.verseIndex === verseIndex &&
-                        currentWord?.wordIndex === wordIndex;
                     return (
-                        <span key={wordIndex}>{renderWord(wordTiming.translit, wordIndex, isHighlighted, false)}</span>
-                    );
-                })}
-            </p>
+                        <span
+                            key={wordIndex}
+                            className="flex flex-col items-center max-w-[10rem] text-center"
+                        >
+                            {/* Top: Arabic text */}
+                            <span className="font-arabic text-3xl md:text-4xl leading-loose text-foreground">
+                                {renderArabicWord(wordTiming.word, wordIndex, isHighlighted)}
+                            </span>
 
-            {/* Spanish translation - per-word, RTL to align with Arabic order */}
-            {verse.wordTimings.some((w) => w.translation) && (
-                <p className="text-center text-sm text-muted-foreground/70 mt-1" dir="rtl">
-                    {verse.wordTimings.map((wordTiming, wordIndex) => (
-                        <span key={wordIndex} className="inline-block mx-1 px-1">
-                            {wordTiming.translation || <span className="opacity-30">—</span>}
+                            {/* Middle: transliteration (highlights sync with Arabic) */}
+                            <span
+                                onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
+                                className={cn(
+                                    'font-transliteration text-sm md:text-base text-muted-foreground italic leading-snug break-words rounded transition-all duration-200',
+                                    !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
+                                    editMode && 'ring-1 ring-border/60 px-1',
+                                    isHighlighted && 'bg-accent/50 text-accent-foreground font-semibold not-italic'
+                                )}
+                            >
+                                {wordTiming.translit}
+                            </span>
+
+                            {/* Bottom: per-word translation */}
+                            {hasAnyTranslation && (
+                                <span className="text-xs text-muted-foreground/70 leading-snug break-words mt-0.5">
+                                    {wordTiming.translation || <span className="opacity-30">—</span>}
+                                </span>
+                            )}
+
+                            {/* Edit-mode timing labels */}
+                            {editMode && (
+                                <span className="font-mono text-[10px] leading-none text-muted-foreground mt-1">
+                                    {wordTiming.start.toFixed(2)}→{wordTiming.end.toFixed(2)}
+                                </span>
+                            )}
                         </span>
-                    ))}
-                </p>
-            )}
+                    );
+                })}
+            </div>
 
             {/* Full verse translation in Spanish (LTR) */}
             {showTranslation && verse.translation && (
-                <p className="text-center text-base text-foreground/80 mt-3 italic max-w-2xl mx-auto" dir="ltr">
+                <p className="text-center text-base text-foreground/80 mt-4 italic max-w-2xl mx-auto" dir="ltr">
                     {verse.translation}
                 </p>
             )}
