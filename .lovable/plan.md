@@ -1,45 +1,34 @@
-## Objetivo
+## Refactor: word-by-word layout in Quran verses (quran.com style)
 
-Cambiar el comportamiento del click en una palabra del Corán:
-- Antes: reproducía solo esa palabra y se detenía.
-- Ahora: reproduce desde esa palabra en adelante sin detenerse.
-- El botón "Abrir diccionario" pasa a ser un ícono pequeño y, al tocarlo, pausa el audio antes de abrir el enlace.
+### Summary
+Restructure the verse body in `src/components/QuranVerse.tsx` so each word becomes a self-contained vertical column (Arabic on top, transliteration in the middle, translation at the bottom), laid out RTL from the top-right corner — matching quran.com's word-by-word layout. No logic, state, audio, or data changes.
 
-## Cambios
+### Current state
+The verse currently renders three separate stacked paragraphs: one Arabic line, one transliteration line, one translation line (each RTL). Word popovers (play/dictionary), edit-mode timing popovers, and highlighting all already work per-word.
 
-### 1. `src/hooks/useAudioSync.ts`
-En `playFromWord`, no fijar `stopTimeRef`. Reproducir desde `timing.start` sin auto-pause.
+### Changes (single file: `src/components/QuranVerse.tsx`)
 
-```ts
-const playFromWord = useCallback((verseIndex, wordIndex) => {
-  const verse = data.verses[verseIndex];
-  if (verse && verse.wordTimings[wordIndex]) {
-    stopTimeRef.current = null; // antes: timing.end
-    seek(verse.wordTimings[wordIndex].start);
-    play();
-  }
-}, [data.verses, seek, play]);
-```
+1. **Replace the three paragraphs with one word-columns container**
+   - One flex-wrap container with `dir="rtl"` (`style={{ direction: 'rtl' }}` plus `flex flex-wrap justify-center items-start gap-x-2 gap-y-3`).
+   - Words flow naturally right-to-left and wrap to the next line, starting from the top-right.
 
-### 2. `src/components/QuranVerse.tsx`
-- Reemplazar el botón "Abrir diccionario" dentro del `PopoverContent` por un botón chico solo con ícono (`BookOpen` de `lucide-react`), con `size="icon"` y `variant="ghost"` o `"secondary"`.
-- Al hacer click en el ícono, llamar a `onPauseAudio?.()` antes de abrir el enlace (`onClick` en el `<a>` o wrapper).
-- Reducir el ancho del `PopoverContent` (`w-auto` o `w-fit`) ya que solo lleva un ícono.
+2. **Per-word column block**
+   - Each word is wrapped in `flex flex-col items-center` (column layout, centered).
+   - Stack order inside each column:
+     1. Arabic word (`font-arabic`, larger size) — wrapped in the existing Popover (play + dictionary icon in normal mode, TimingEditor in edit mode).
+     2. Transliteration (`font-transliteration`, smaller, muted).
+     3. Per-word translation (small, muted) — only when data exists.
+   - Edit-mode timing labels (`start→end`) move inside the column, under the other elements.
 
-```jsx
-<PopoverContent className="w-auto p-2" align="center">
-  <Button asChild size="icon" variant="ghost" className="h-8 w-8"
-          onClick={() => onPauseAudio?.()}>
-    <a href={learnArabicUrl} target="_blank" aria-label="Abrir diccionario">
-      <BookOpen className="h-4 w-4" />
-    </a>
-  </Button>
-</PopoverContent>
-```
+3. **Prevent overlap between columns**
+   - Constrain long transliterations/translations with `max-w-[10rem]` (approx.) and `break-words` so a long word can't push into or overlap neighbors; adjust the value so typical words fit on one line.
+   - Consistent horizontal gap between columns; keep per-word padding/hover behavior as-is.
 
-- `QuranVerse` ya recibe `onPauseAudio` desde `QuranReader` (usado en modo edición), así que se reutiliza sin cambios en props.
+4. **Keep everything else intact**
+   - Play/pause verse button, verse number badge, currentWord highlighting, click-to-play, dictionary popover (pauses audio), edit-mode popover + cursor navigation, full-verse Spanish translation (LTR) toggle, and the per-word data bindings — all unchanged.
+   - Wird section (`WirdVerseLine`) is not touched.
 
-## Archivos a modificar
-
-- `src/hooks/useAudioSync.ts`
-- `src/components/QuranVerse.tsx`
+### Files
+| File | Action |
+|---|---|
+| `src/components/QuranVerse.tsx` | Modify (layout/markup/CSS only) |
