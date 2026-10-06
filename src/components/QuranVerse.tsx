@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Play, Pause, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Link } from 'react-router-dom';
 import { TimingEditor } from './TimingEditor';
 
 interface QuranVerseProps {
@@ -64,13 +65,11 @@ export const QuranVerse = ({
         );
 
         if (!editMode) {
-            const learnArabicUrl = `https://learn-arab.lovable.app/word?w=${encodeURIComponent(
-                wt.word
-            )}&t=${encodeURIComponent(
-                wt.translit || ''
-            )}&m=${encodeURIComponent(
-                wt.translation || ''
-            )}`;
+            const wordAnalysisQuery = new URLSearchParams({
+                w: wt.word,
+                t: wt.translit || '',
+                m: wt.translation || '',
+            });
 
             return (
                 <Popover>
@@ -86,9 +85,9 @@ export const QuranVerse = ({
                             className="h-8 w-8"
                             onClick={() => onPauseAudio?.()}
                         >
-                            <a href={learnArabicUrl} target="_blank" aria-label="Abrir diccionario">
+                            <Link to={`/?${wordAnalysisQuery.toString()}`} aria-label="Analizar palabra">
                                 <BookOpen className="h-4 w-4" />
-                            </a>
+                            </Link>
                         </Button>
                     </PopoverContent>
                 </Popover>

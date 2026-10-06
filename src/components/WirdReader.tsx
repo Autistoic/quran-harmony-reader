@@ -1,14 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { WirdData } from '@/data/wirdSharif';
 import { useAudioSync } from '@/hooks/useAudioSync';
-import { usePimsleur } from '@/hooks/usePimsleur';
 import { useTimingOverrides } from '@/hooks/useTimingOverrides';
+import { useReaderState } from '@/hooks/useReaderState';
 import { WirdVerseLine } from './WirdVerseLine';
 import { AudioPlayer } from './AudioPlayer';
-import { PimsleurModal } from './PimsleurModal';
 import { TimingEditorPanel } from './TimingEditorPanel';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, Brain, Languages } from 'lucide-react';
+import { ChevronLeft, Languages } from 'lucide-react';
 import { Button } from './ui/button';
 import {
     Pagination,
@@ -40,18 +39,18 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
         playFromTime,
     } = useAudioSync(effectiveWird);
 
-    // Keep a live ref to currentTime so the edit popover can read it on demand
-    const currentTimeRef = useRef(currentTime);
-    useEffect(() => {
-        currentTimeRef.current = currentTime;
-    }, [currentTime]);
-
-    const { items, dueItems, addItem, reviewItem, removeItem } = usePimsleur();
-    const [practiceOpen, setPracticeOpen] = useState(false);
-    const [prefillWord, setPrefillWord] = useState('');
-    const [editMode, setEditMode] = useState(false);
-    const [openCursor, setOpenCursor] = useState<{ verseIndex: number; wordIndex: number } | null>(null);
-    const [showTranslations, setShowTranslations] = useState(false);
+    const {
+        getCurrentTime,
+        editMode,
+        setEditMode,
+        openCursor,
+        setOpenCursor,
+        navCursor,
+        hasPrev,
+        hasNext,
+        showTranslation: showTranslations,
+        toggleTranslation,
+    } = useReaderState(effectiveWird.verses, currentTime, effectiveWird.id);
 
     // Pagination
     const pages = Array.from(
@@ -66,33 +65,6 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
         if (versePage !== currentPage) setCurrentPage(versePage);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentWord?.verseIndex]);
-
-    const navCursor = (dir: 'prev' | 'next') => {
-        if (!openCursor) return;
-        const verses = effectiveWird.verses;
-        let { verseIndex, wordIndex } = openCursor;
-        if (dir === 'next') {
-            if (wordIndex + 1 < verses[verseIndex].wordTimings.length) wordIndex += 1;
-            else if (verseIndex + 1 < verses.length) { verseIndex += 1; wordIndex = 0; }
-            else return;
-        } else {
-            if (wordIndex > 0) wordIndex -= 1;
-            else if (verseIndex > 0) { verseIndex -= 1; wordIndex = verses[verseIndex].wordTimings.length - 1; }
-            else return;
-        }
-        setOpenCursor({ verseIndex, wordIndex });
-    };
-
-    const hasPrev = !!openCursor && (openCursor.wordIndex > 0 || openCursor.verseIndex > 0);
-    const hasNext = !!openCursor && (
-        openCursor.wordIndex + 1 < effectiveWird.verses[openCursor.verseIndex].wordTimings.length ||
-        openCursor.verseIndex + 1 < effectiveWird.verses.length
-    );
-
-    const handlePrepareForPractice = (word: string) => {
-        setPrefillWord(word);
-        setPracticeOpen(true);
-    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -114,26 +86,12 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setShowTranslations((v) => !v)}
+                            onClick={toggleTranslation}
                             className="flex items-center gap-2"
                             aria-pressed={showTranslations}
                         >
                             <Languages className="h-4 w-4" />
                             <span>{showTranslations ? 'Ocultar' : 'Traducción'}</span>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPracticeOpen(true)}
-                            className="flex items-center gap-2"
-                        >
-                            <Brain className="h-4 w-4" />
-                            <span>Práctica</span>
-                            {dueItems.length > 0 && (
-                                <span className="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                                    {dueItems.length}
-                                </span>
-                            )}
                         </Button>
                     </div>
                 </div>
@@ -216,9 +174,8 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                                 onPlayVerse={playFromVerse}
                                 onPause={pause}
                                 onPlayWord={playFromWord}
-                                onPrepareForPractice={handlePrepareForPractice}
                                 editMode={editMode}
-                                getCurrentTime={() => currentTimeRef.current}
+                                getCurrentTime={getCurrentTime}
                                 onUpdateTiming={setWordTiming}
                                 onPlayFromTime={playFromTime}
                                 onPauseAudio={pause}
@@ -262,25 +219,9 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                 <p className="text-center text-sm text-muted-foreground mt-8">
                     {editMode
                         ? 'Modo edición activo: tocá una palabra para ajustar sus tiempos.'
-                        : 'Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio. Tocá una palabra para practicarla.'}
+                        : 'Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio.'}
                 </p>
             </div>
-
-            {/* Pimsleur Practice Modal */}
-            <PimsleurModal
-                open={practiceOpen}
-                onOpenChange={(open) => {
-                    setPracticeOpen(open);
-                    if (!open) setPrefillWord('');
-                }}
-                items={items}
-                dueItems={dueItems}
-                onAdd={addItem}
-                onReview={reviewItem}
-                onRemove={removeItem}
-                prefillWord={prefillWord}
-                onClearPrefill={() => setPrefillWord('')}
-            />
         </div>
     );
 };

@@ -5,6 +5,7 @@ import { surahs, Surah } from '@/data/surahs';
 import { Button } from '@/components/ui/button';
 import { BookOpen } from 'lucide-react';
 import { PrayerTimes } from "@/components/PrayerTimes";
+import { WordAnalysisOverlay } from "@/features/word-analysis/components/WordAnalysisOverlay";
 
 
 const Index = () => {
@@ -29,6 +30,7 @@ const Index = () => {
         surah={currentSurah}
         onNavigate={setCurrentSurah}
       />
+      <WordAnalysisOverlay />
     </div>
   );
 };
