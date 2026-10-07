@@ -89,24 +89,31 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
         </div>
       </div>
 
-      {/* Joining */}
-      <div className="flex items-center justify-center gap-1.5 pt-1" style={{ direction: "ltr" }}>
-        <ArrowLeft size={12} className="text-muted-foreground/60" />
-        {letter.joining.right ? (
-          <Link2 size={14} className="text-primary" />
-        ) : (
-          <Unlink2 size={14} className="text-muted-foreground/50" />
-        )}
-        <span className="mx-1 text-base text-foreground font-arabic">
-          {letter.base}
-        </span>
-        {letter.joining.left ? (
-          <Link2 size={14} className="text-primary" />
-        ) : (
-          <Unlink2 size={14} className="text-muted-foreground/50" />
-        )}
-        <ArrowRight size={12} className="text-muted-foreground/60" />
-      </div>
+      {/* Joining — actual connection state derived from position, not intrinsic capability.
+           Visual left = next letter (left in RTL), visual right = previous letter (right in RTL). */}
+      {(() => {
+        const connectedLeft = letter.position === "Medial" || letter.position === "Initial";
+        const connectedRight = letter.position === "Medial" || letter.position === "Final";
+        return (
+          <div className="flex items-center justify-center gap-1.5 pt-1" style={{ direction: "ltr" }}>
+            <ArrowLeft size={12} className="text-muted-foreground/60" />
+            {connectedLeft ? (
+              <Link2 size={14} className="text-primary" />
+            ) : (
+              <Unlink2 size={14} className="text-muted-foreground/50" />
+            )}
+            <span className="mx-1 text-base text-foreground font-arabic">
+              {letter.base}
+            </span>
+            {connectedRight ? (
+              <Link2 size={14} className="text-primary" />
+            ) : (
+              <Unlink2 size={14} className="text-muted-foreground/50" />
+            )}
+            <ArrowRight size={12} className="text-muted-foreground/60" />
+          </div>
+        );
+      })()}
     </button>
   );
 };
