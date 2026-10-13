@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { getFullSound } from './phonetics';
+import { getFullSound, hasShadda } from './phonetics';
 import { parseArabicWord } from './parser';
 
 describe('parseArabicWord', () => {
@@ -24,7 +24,25 @@ describe('parseArabicWord', () => {
     const [letter] = parseArabicWord('بَّـ');
 
     expect(letter.display).toBe('بَّ');
+    expect(hasShadda(letter)).toBe(true);
     expect(getFullSound(letter)).toBe('bba');
+  });
+
+  it('correctly identifies hasShadda on words like ar-Rahman and iyyaka', () => {
+    const rahmanLetters = parseArabicWord('ٱلرَّحْمَـٰنِ');
+    const alifWasla = rahmanLetters[0];
+    const lam = rahmanLetters[1];
+    const ra = rahmanLetters[2];
+
+    expect(hasShadda(alifWasla)).toBe(false);
+    expect(hasShadda(lam)).toBe(false);
+    expect(hasShadda(ra)).toBe(true);
+
+    const iyyakaLetters = parseArabicWord('وَإِيَّاكَ');
+    const ya = iyyakaLetters.find((l) => l.base === 'ي');
+    expect(ya).toBeDefined();
+    expect(hasShadda(ya!)).toBe(true);
+    expect(getFullSound(ya!)).toBe('yya');
   });
 
   it('returns UTF-16 offsets into the original word for heavily marked text', () => {

@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, Link2, Unlink2 } from "lucide-react";
 import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
-import { getFullSound } from "../lib/arabic/phonetics";
+import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
 import { getContextualForms } from "../lib/arabic/forms";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +53,11 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
         <span className="rounded bg-secondary px-2 py-0.5 text-[10px] text-secondary-foreground">
           {letter.position}
         </span>
+        {hasShadda(letter) && (
+          <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] text-accent">
+            Shaddah → Doubled
+          </span>
+        )}
         {letter.vowel && (
           <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] text-accent">
             {letter.vowel.type}

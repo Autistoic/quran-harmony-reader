@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import LetterDetailCard from "./LetterDetailCard";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
+import { cn } from "@/lib/utils";
 
 interface Props {
     open: boolean;
@@ -23,6 +24,8 @@ interface HighlightRect {
     top: number;
     width: number;
     height: number;
+    containerWidth: number;
+    containerHeight: number;
 }
 
 const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning, letters, onOpenReference, selectedIndex: controlledSelected, onSelectedIndexChange, hideDetails, setHideDetails }: Props) => {
@@ -90,13 +93,15 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                 top = Math.min(top, r.top);
                 bottom = Math.max(bottom, r.bottom);
             }
-            const padX = 4;
-            const padY = 2;
+            const padX = 1;
+            const padY = 3;
             setRect({
                 left: left - containerBox.left - padX,
                 top: top - containerBox.top - padY,
                 width: right - left + padX * 2,
                 height: bottom - top + padY * 2,
+                containerWidth: containerBox.width,
+                containerHeight: containerBox.height,
             });
         };
 
@@ -152,13 +157,14 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         )}
                         <div
                             ref={containerRef}
-                            className="relative font-arabic text-6xl sm:text-7xl text-primary leading-relaxed"
+                            className="relative font-arabic text-7xl sm:text-8xl md:text-9xl leading-relaxed select-none"
                             style={{ direction: "rtl" }}
                         >
+                            {/* Precision highlight background pill */}
                             {rect && (
                                 <span
                                     aria-hidden
-                                    className="pointer-events-none absolute rounded-md bg-primary/20 transition-all duration-200"
+                                    className="pointer-events-none absolute rounded-md bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
                                     style={{
                                         left: rect.left,
                                         top: rect.top,
@@ -168,9 +174,30 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                     }}
                                 />
                             )}
-                            <span ref={textRef} className="relative z-[1]">
+
+                            {/* Base text layer: full word preserved for unbroken shaping, dimmed when letter active */}
+                            <span
+                                ref={textRef}
+                                className={cn(
+                                    "relative z-[1] transition-colors duration-200",
+                                    selectedIndex !== null ? "text-muted-foreground/35" : "text-primary"
+                                )}
+                            >
                                 {word}
                             </span>
+
+                            {/* Active text layer: intact word clipped to active letter bounds */}
+                            {rect && (
+                                <span
+                                    aria-hidden
+                                    className="pointer-events-none absolute inset-0 z-[2] font-arabic text-primary transition-all duration-200"
+                                    style={{
+                                        clipPath: `inset(${Math.max(0, rect.top)}px ${Math.max(0, rect.containerWidth - (rect.left + rect.width))}px ${Math.max(0, rect.containerHeight - (rect.top + rect.height))}px ${Math.max(0, rect.left)}px round 4px)`,
+                                    }}
+                                >
+                                    {word}
+                                </span>
+                            )}
                         </div>
                         {!hideDetails && (
                             <p className="text-sm italic text-muted-foreground">"{meaning}"</p>
