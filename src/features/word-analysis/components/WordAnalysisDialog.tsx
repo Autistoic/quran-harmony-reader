@@ -66,35 +66,95 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             const letter = letters[selectedIndex];
             if (!letter) return;
 
-            const range = document.createRange();
+            const len = textNode.data.length;
+            const start = Math.min(letter.startOffset, len);
+            const end = Math.min(letter.endOffset, len);
+            if (start >= end) {
+                setRect(null);
+                return;
+            }
+
+            // 1. Measure the base letter independently to determine its visual body anchor
+            const baseLen = Math.min(letter.base.length || 1, end - start);
+            let baseLeft = Infinity;
+            let baseRight = -Infinity;
             try {
-                const len = textNode.data.length;
-                const start = Math.min(letter.startOffset, len);
-                const end = Math.min(letter.endOffset, len);
-                range.setStart(textNode, start);
-                range.setEnd(textNode, end);
+                const baseRange = document.createRange();
+                baseRange.setStart(textNode, start);
+                baseRange.setEnd(textNode, Math.min(start + baseLen, len));
+                for (const r of Array.from(baseRange.getClientRects())) {
+                    if (r.width > 0 || r.height > 0) {
+                        baseLeft = Math.min(baseLeft, r.left);
+                        baseRight = Math.max(baseRight, r.right);
+                    }
+                }
+            } catch {
+                // Ignore baseRange measurement errors if any
+            }
+
+            // 2. Measure the full cluster including attached diacritics (harakat, shaddah, dagger alif)
+            const fullRange = document.createRange();
+            try {
+                fullRange.setStart(textNode, start);
+                fullRange.setEnd(textNode, end);
             } catch {
                 setRect(null);
                 return;
             }
-            const rects = range.getClientRects();
-            if (rects.length === 0) {
+
+            const rects = fullRange.getClientRects();
+            const unionBounding = fullRange.getBoundingClientRect();
+            const allRects = Array.from(rects);
+            if (unionBounding.width > 0 && unionBounding.height > 0) {
+                allRects.push(unionBounding);
+            }
+
+            if (allRects.length === 0 && (baseLeft === Infinity || baseRight === -Infinity)) {
                 setRect(null);
                 return;
             }
-            const containerBox = container.getBoundingClientRect();
+
             let left = Infinity;
             let right = -Infinity;
             let top = Infinity;
             let bottom = -Infinity;
-            for (const r of Array.from(rects)) {
+
+            for (const r of allRects) {
+                if (r.width === 0 && r.height === 0) continue;
                 left = Math.min(left, r.left);
                 right = Math.max(right, r.right);
                 top = Math.min(top, r.top);
                 bottom = Math.max(bottom, r.bottom);
             }
-            const padX = 1;
-            const padY = 3;
+
+            if (left === Infinity || right === -Infinity) {
+                if (baseLeft !== Infinity && baseRight !== -Infinity) {
+                    left = baseLeft;
+                    right = baseRight;
+                } else {
+                    setRect(null);
+                    return;
+                }
+            }
+
+            // 3. Compensate for skew from attached elongation/diacritics (e.g. Dagger Alif or exit ligation)
+            // In Arabic RTL, exit strokes and superscripts extend to the left (towards the next letter).
+            // For closed-loop glyphs like Mim (م), if marks pull the cluster's center to the left,
+            // we expand the right edge to fully embrace the head/loop of the character.
+            if (baseLeft !== Infinity && baseRight !== -Infinity && baseRight > baseLeft) {
+                const baseCenter = (baseLeft + baseRight) / 2;
+                const fullCenter = (left + right) / 2;
+                const leftwardSkew = baseCenter - fullCenter;
+                if (leftwardSkew > 0) {
+                    right = Math.max(right, right + leftwardSkew);
+                }
+            }
+
+            const containerBox = container.getBoundingClientRect();
+            // 4. Bounding box buffer: +3.5px horizontal padding, +5px vertical padding
+            const padX = 3.5;
+            const padY = 5;
+
             setRect({
                 left: left - containerBox.left - padX,
                 top: top - containerBox.top - padY,
@@ -192,7 +252,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                     aria-hidden
                                     className="pointer-events-none absolute inset-0 z-[2] font-arabic text-primary transition-all duration-200"
                                     style={{
-                                        clipPath: `inset(${Math.max(0, rect.top)}px ${Math.max(0, rect.containerWidth - (rect.left + rect.width))}px ${Math.max(0, rect.containerHeight - (rect.top + rect.height))}px ${Math.max(0, rect.left)}px round 4px)`,
+                                        clipPath: `inset(${Math.max(0, rect.top)}px ${Math.max(0, rect.containerWidth - (rect.left + rect.width))}px ${Math.max(0, rect.containerHeight - (rect.top + rect.height))}px ${Math.max(0, rect.left)}px round 6px)`,
                                     }}
                                 >
                                     {word}
