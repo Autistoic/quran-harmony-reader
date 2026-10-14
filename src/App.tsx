@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WirdSharif from "./pages/WirdSharif";
 
+import { I18nProvider } from "@/i18n";
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -24,11 +26,13 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AppContent />
-    </TooltipProvider>
+    <I18nProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AppContent />
+      </TooltipProvider>
+    </I18nProvider>
   </QueryClientProvider>
 );
 

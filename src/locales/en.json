@@ -1,0 +1,56 @@
+{
+  "common": {
+    "reference": "Reference",
+    "back": "Back",
+    "backToWord": "Back to word",
+    "letters": "Letters",
+    "readingOrder": "Letters (reading order, right → left) — tap a card to highlight",
+    "tapCard": "Tap a card to highlight",
+    "toggleDetails": "Toggle details",
+    "empty": "∅"
+  },
+  "nav": {
+    "wirdSharif": "Wird Sharif Saguir",
+    "quranReader": "Quran Reader",
+    "language": "Language",
+    "english": "English",
+    "spanish": "Spanish"
+  },
+  "wordAnalysis": {
+    "referenceTitle": "Arabic Letters Reference",
+    "referenceDescription": "All letters with isolated, initial, medial, and final forms.",
+    "table": {
+      "name": "Name",
+      "sound": "Sound",
+      "isolated": "ISO",
+      "initial": "INI",
+      "medial": "MED",
+      "final": "FIN"
+    },
+    "positions": {
+      "Initial": "Initial",
+      "Medial": "Medial",
+      "Final": "Final",
+      "Isolated": "Isolated"
+    },
+    "forms": {
+      "iso": "iso",
+      "ini": "ini",
+      "med": "med",
+      "fin": "fin"
+    },
+    "chips": {
+      "shaddah": "Shaddah → Doubled"
+    },
+    "vowels": {
+      "Fatha": "Fatha",
+      "Kasra": "Kasra",
+      "Damma": "Damma",
+      "Sukun": "Sukun",
+      "TanweenFatha": "Tanween Fatha",
+      "TanweenKasra": "Tanween Kasra",
+      "TanweenDamma": "Tanween Damma",
+      "SuperscriptAlif": "Dagger Alif"
+    }
+  }
+}

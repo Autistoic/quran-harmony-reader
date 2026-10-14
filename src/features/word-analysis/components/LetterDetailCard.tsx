@@ -4,6 +4,7 @@ import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
 import { getContextualForms } from "../lib/arabic/forms";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n";
 
 const FORM_ORDER: { key: keyof ReturnType<typeof getContextualForms>; pos: Position; label: string }[] = [
   { key: "final", pos: "Final", label: "fin" },  
@@ -22,6 +23,7 @@ interface Props {
 
 const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Props) => {
   const forms = getContextualForms(letter.base);
+  const { t } = useTranslation();
 
   return (
     <button
@@ -58,16 +60,16 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
       {/* Chips: Position + Shaddah + Vowel */}
       <div className="flex flex-wrap gap-1.5 items-center">
         <span className="rounded bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
-          {letter.position}
+          {t(`wordAnalysis.positions.${letter.position}`)}
         </span>
         {hasShadda(letter) && (
           <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent">
-            Shaddah → Doubled
+            {t("wordAnalysis.chips.shaddah")}
           </span>
         )}
         {letter.vowel && (
           <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent">
-            {letter.vowel.type}
+            {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
             {letter.vowel.sound ? ` → ${letter.vowel.sound}` : " → ∅"}
           </span>
         )}
@@ -91,7 +93,9 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
                     {forms[key]}
                   </span>
                 </div>
-                <span className="text-[9px] uppercase tracking-wider opacity-70 mt-0.5">{label}</span>
+                <span className="text-[9px] uppercase tracking-wider opacity-70 mt-0.5">
+                  {t(`wordAnalysis.forms.${label}`)}
+                </span>
               </div>
             );
           })}

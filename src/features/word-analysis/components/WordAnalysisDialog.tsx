@@ -4,6 +4,7 @@ import { BookOpen, Eye, EyeOff } from "lucide-react";
 import LetterDetailCard from "./LetterDetailCard";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n";
 
 interface Props {
     open: boolean;
@@ -29,6 +30,7 @@ interface HighlightRect {
 }
 
 const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning, letters, onOpenReference, selectedIndex: controlledSelected, onSelectedIndexChange, hideDetails, setHideDetails }: Props) => {
+    const { t } = useTranslation();
     const [internalSelected, setInternalSelected] = useState<number | null>(null);
     const isControlled = controlledSelected !== undefined;
     const selectedIndex = isControlled ? controlledSelected : internalSelected;
@@ -189,16 +191,17 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                 type="button"
                                 onClick={onOpenReference}
                                 className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-                                aria-label="Open letter reference"
+                                aria-label={t("common.reference")}
                             >
                                 <BookOpen className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Reference</span>
+                                <span className="hidden sm:inline">{t("common.reference")}</span>
                             </button>
                         )}
 
                         <button
                             type="button"
                             onClick={toggleHideDetails}
+                            aria-label={t("common.toggleDetails")}
                             className="inline-flex items-center justify-center rounded-md border border-border px-2 py-1"
                         >
                             {hideDetails ? (
@@ -268,9 +271,9 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                 {/* Scrollable body */}
                 <div className="overflow-y-auto px-6 py-4">
                     <div className="flex flex-col gap-2">
-                        {/* <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Letters (reading order, right → left) — tap a card to highlight
-            </span> */}
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground px-1" dir="rtl">
+                            {t("common.readingOrder")}
+                        </span>
                         <div dir="rtl" className="grid gap-3 sm:grid-cols-2">
                             {letters.map((letter, i) => (
                                 <LetterDetailCard

@@ -4,21 +4,24 @@ import { LETTER_TABLE } from "../lib/arabic/constants";
 import { getContextualForms } from "../lib/arabic/forms";
 import { cn } from "@/lib/utils";
 
+import { useTranslation } from "@/i18n";
+
 interface AlphabetReferenceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onBackToWord?: () => void;
 }
 
-const FORM_KEYS: { key: "isolated" | "initial" | "medial" | "final"; label: string }[] = [
-  { key: "isolated", label: "ISO" },
-  { key: "initial", label: "INI" },
-  { key: "medial", label: "MED" },
-  { key: "final", label: "FIN" },
+const FORM_KEYS: { key: "isolated" | "initial" | "medial" | "final"; labelKey: string }[] = [
+  { key: "isolated", labelKey: "wordAnalysis.table.isolated" },
+  { key: "initial", labelKey: "wordAnalysis.table.initial" },
+  { key: "medial", labelKey: "wordAnalysis.table.medial" },
+  { key: "final", labelKey: "wordAnalysis.table.final" },
 ];
 
 const AlphabetReferenceDialog = ({ open, onOpenChange, onBackToWord }: AlphabetReferenceDialogProps) => {
   const entries = Object.entries(LETTER_TABLE);
+  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -31,12 +34,12 @@ const AlphabetReferenceDialog = ({ open, onOpenChange, onBackToWord }: AlphabetR
               className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Back to word
+              {t("common.backToWord")}
             </button>
           )}
-          <DialogTitle className="text-lg font-semibold">Arabic Letters Reference</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">{t("wordAnalysis.referenceTitle")}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-1">
-            All letters with isolated, initial, medial, and final forms.
+            {t("wordAnalysis.referenceDescription")}
           </DialogDescription>
         </div>
 
@@ -46,10 +49,10 @@ const AlphabetReferenceDialog = ({ open, onOpenChange, onBackToWord }: AlphabetR
             className="sticky top-0 z-[5] grid items-center gap-2 border-b border-border bg-muted/40 px-4 py-2 text-[10px] uppercase tracking-wider text-muted-foreground"
             style={{ gridTemplateColumns: "minmax(64px,1fr) minmax(48px,0.8fr) repeat(4, minmax(48px,1fr))", direction: "ltr" }}
           >
-            <span>Name</span>
-            <span>Sound</span>
-            {FORM_KEYS.map(({ label }) => (
-              <span key={label} className="text-center">{label}</span>
+            <span>{t("wordAnalysis.table.name")}</span>
+            <span>{t("wordAnalysis.table.sound")}</span>
+            {FORM_KEYS.map(({ key, labelKey }) => (
+              <span key={key} className="text-center">{t(labelKey)}</span>
             ))}
           </div>
 
