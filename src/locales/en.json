@@ -24,6 +24,13 @@
     "hideForms": "Hide forms",
     "referenceGlyph": "Reference (Isolated)",
     "contextGlyph": "In context ({position})",
+    "connection": {
+      "both": "Connects on both sides",
+      "previousOnly": "Connects to previous only",
+      "nextOnly": "Connects to next only",
+      "none": "Does not connect",
+      "whyPrevious": "{{position}} because {{previous}} does not connect to it."
+    },
     "referenceTitle": "Arabic Letters Reference",
     "referenceDescription": "All letters with isolated, initial, medial, and final forms.",
     "table": {

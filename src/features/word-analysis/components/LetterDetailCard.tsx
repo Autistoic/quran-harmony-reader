@@ -4,6 +4,8 @@ import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
 import { getContextualForms } from "../lib/arabic/forms";
+import type { LetterConnectionState } from "../lib/arabic/joining";
+import ConnectionStrip from "./ConnectionStrip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -16,6 +18,7 @@ const FORM_ORDER: { key: keyof ReturnType<typeof getContextualForms>; pos: Posit
 
 interface Props {
   letter: WordAnalysisLetter;
+  connection: LetterConnectionState;
   index: number;
   selected?: boolean;
   onSelect?: () => void;
@@ -24,9 +27,9 @@ interface Props {
   navigationFocused?: boolean;
 }
 
-const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, cardRef, navigationFocused }: Props) => {
+const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideDetails, cardRef, navigationFocused }: Props) => {
   const forms = getContextualForms(letter.base);
-  const activeForm = forms[letter.position.toLowerCase() as keyof typeof forms];
+  const activeForm = forms[connection.position.toLowerCase() as keyof typeof forms];
   const { t } = useTranslation();
   const [showForms, setShowForms] = useState(false);
   const formsId = useId();
@@ -46,59 +49,60 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
         type="button"
         onClick={onSelect}
         aria-pressed={selected}
-        className="grid w-full grid-cols-1 gap-4 rounded-t-2xl p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[minmax(0,1fr)_minmax(14rem,0.9fr)] sm:items-center sm:gap-6 sm:p-5"
+        className="grid w-full grid-cols-1 gap-4 rounded-t-2xl p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[minmax(0,1fr)_minmax(8rem,0.65fr)_minmax(14rem,0.9fr)] sm:items-center sm:gap-5 sm:p-5"
       >
         <div className="flex min-w-0 flex-col items-start gap-2.5">
-            <div className="flex min-w-0 items-center gap-2 text-muted-foreground/70">
-              <span className="shrink-0 text-xs font-mono tracking-wider">#{index + 1}</span>
-              <span className="text-muted-foreground/40">•</span>
-              <span className="truncate text-sm font-medium text-muted-foreground sm:text-base">{letter.name}</span>
-            </div>
-            {!hideDetails && (
-              <span className="inline-flex w-fit items-center rounded-md border border-border/50 bg-secondary/60 px-3 py-1 font-mono text-base font-bold tracking-tight text-foreground shadow-2xs sm:text-lg">
-                /{getFullSound(letter) || "∅"}/
+          <div className="flex min-w-0 items-center gap-2 text-muted-foreground/70">
+            <span className="shrink-0 text-xs font-mono tracking-wider">#{index + 1}</span>
+            <span className="text-muted-foreground/40">•</span>
+            <span className="truncate text-sm font-medium text-muted-foreground sm:text-base">{letter.name}</span>
+          </div>
+          {!hideDetails && (
+            <span className="inline-flex w-fit items-center rounded-md border border-border/50 bg-secondary/60 px-3 py-1 font-mono text-base font-bold tracking-tight text-foreground shadow-2xs sm:text-lg">
+              /{getFullSound(letter) || "∅"}/
+            </span>
+          )}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="rounded-md border border-border/30 bg-secondary/80 px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+              {t(`wordAnalysis.positions.${connection.position}`)}
+            </span>
+            {hasShadda(letter) && (
+              <span className="rounded-md border border-accent/30 bg-accent/25 px-2.5 py-1 text-xs font-semibold text-accent-foreground">
+                {t("wordAnalysis.chips.shaddah")}
               </span>
             )}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="rounded-md border border-border/30 bg-secondary/80 px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-                {t(`wordAnalysis.positions.${letter.position}`)}
+            {letter.vowel && (
+              <span className="rounded-md border border-accent/20 bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent">
+                {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
+                {letter.vowel.sound ? ` → ${letter.vowel.sound}` : " → ∅"}
               </span>
-              {hasShadda(letter) && (
-                <span className="rounded-md border border-accent/30 bg-accent/25 px-2.5 py-1 text-xs font-semibold text-accent-foreground">
-                  {t("wordAnalysis.chips.shaddah")}
-                </span>
-              )}
-              {letter.vowel && (
-                <span className="rounded-md border border-accent/20 bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent">
-                  {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
-                  {letter.vowel.sound ? ` → ${letter.vowel.sound}` : " → ∅"}
-                </span>
-              )}
-            </div>
+            )}
+          </div>
         </div>
+        <ConnectionStrip className="w-full sm:justify-self-center" connection={connection} />
         <span
-            role="img"
-            aria-label={`${t("wordAnalysis.positions.Isolated")}: ${forms.isolated}; ${t(`wordAnalysis.positions.${letter.position}`)}: ${activeForm}`}
-            className="grid w-full grid-cols-2 gap-3 sm:max-w-[18rem] sm:justify-self-end sm:gap-4"
-            style={{ direction: "rtl" }}
-          >
-            <span className="flex min-h-[7.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-lg px-2 py-2 text-center sm:min-h-[8rem] sm:px-3">
-              <span aria-hidden="true" className="font-arabic text-5xl leading-normal text-muted-foreground/65 sm:text-6xl">
-                {forms.isolated}
-              </span>
-              <span className="w-full text-[10px] leading-snug text-muted-foreground sm:text-xs">
-                {t("wordAnalysis.referenceGlyph")}
-              </span>
+          role="img"
+          aria-label={`${t("wordAnalysis.positions.Isolated")}: ${forms.isolated}; ${t(`wordAnalysis.positions.${connection.position}`)}: ${activeForm}`}
+          className="grid w-full grid-cols-2 gap-3 sm:max-w-[18rem] sm:justify-self-end sm:gap-4"
+          style={{ direction: "rtl" }}
+        >
+          <span className="flex min-h-[7.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-lg px-2 py-2 text-center sm:min-h-[8rem] sm:px-3">
+            <span aria-hidden="true" className="font-arabic text-5xl leading-normal text-muted-foreground/65 sm:text-6xl">
+              {forms.isolated}
             </span>
-            <span className="flex min-h-[7.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-lg border border-primary/30 border-r-2 bg-primary/10 px-2 py-2 text-center shadow-xs sm:min-h-[8rem] sm:px-3">
-              <span aria-hidden="true" className="font-arabic text-6xl leading-normal text-primary drop-shadow-2xs transition-transform duration-200 group-hover:scale-105 sm:text-7xl">
-                {activeForm}
-              </span>
-              <span className="w-full text-[10px] leading-snug text-primary sm:text-xs">
-                {t("wordAnalysis.contextGlyph", { position: t(`wordAnalysis.positions.${letter.position}`) })}
-              </span>
+            <span className="w-full text-[10px] leading-snug text-muted-foreground sm:text-xs">
+              {t("wordAnalysis.referenceGlyph")}
             </span>
           </span>
+          <span className="flex min-h-[7.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-lg border border-primary/30 border-r-2 bg-primary/10 px-2 py-2 text-center shadow-xs sm:min-h-[8rem] sm:px-3">
+            <span aria-hidden="true" className="font-arabic text-6xl leading-normal text-primary drop-shadow-2xs transition-transform duration-200 group-hover:scale-105 sm:text-7xl">
+              {activeForm}
+            </span>
+            <span className="w-full text-[10px] leading-snug text-primary sm:text-xs">
+              {t("wordAnalysis.contextGlyph", { position: t(`wordAnalysis.positions.${connection.position}`) })}
+            </span>
+          </span>
+        </span>
       </button>
 
       <div className="flex justify-end px-2 pb-1">
@@ -129,7 +133,7 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
           <div className={cn("px-3", showForms && "border-t border-border/50 pb-3 pt-2 sm:px-3.5")}>
             <div className="flex w-full justify-between gap-1" style={{ direction: "ltr" }}>
               {FORM_ORDER.map(({ key, pos, label }) => {
-                const active = letter.position === pos;
+                const active = connection.position === pos;
                 return (
                   <div
                     key={key}
