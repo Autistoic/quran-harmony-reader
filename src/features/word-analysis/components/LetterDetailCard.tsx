@@ -1,5 +1,4 @@
 import type { Ref } from "react";
-import { ArrowLeft, ArrowRight, Link2, Unlink2 } from "lucide-react";
 import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
@@ -36,7 +35,7 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
       onClick={onSelect}
       aria-pressed={selected}
       className={cn(
-        "group flex flex-col gap-3 rounded-2xl border bg-card/75 p-4 text-left transition-all duration-200 overflow-visible",
+        "group flex flex-col gap-2 rounded-2xl border bg-card/75 p-3 sm:p-3.5 text-left transition-all duration-200 overflow-visible",
         "hover:shadow-md hover:border-primary/50 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         navigationFocused && "letter-card-focus-flash",
         selected
@@ -45,9 +44,9 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
       )}
     >
       {/* 1. Header: Dominant Hero Glyph (~2x Scale) + Elevated Phonetics */}
-      <div className="flex items-center justify-between gap-4 w-full">
+      <div className="flex items-center justify-between gap-3 w-full">
         {/* Left Column: Subdued Sequence + Prominent Phonetic Pronunciation + Secondary Letter Name */}
-        <div className="flex flex-col gap-1.5 min-w-0">
+        <div className="flex flex-col gap-1 min-w-0">
           {/* Demoted Index and Letter Name */}
           <div className="flex items-center gap-1.5 text-muted-foreground/70">
             <span className="text-[10px] font-mono tracking-wider">#{index + 1}</span>
@@ -66,15 +65,15 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
         </div>
 
         {/* Right Column: Hero Arabic Letter Glyph (~2x Scale, 48px-60px) */}
-        <div className="flex items-center justify-end min-h-[4.25rem] sm:min-h-[4.75rem] px-2 py-0.5 overflow-visible">
-          <span className="font-arabic text-5xl sm:text-6xl text-primary leading-normal select-none drop-shadow-2xs transition-transform duration-200 group-hover:scale-105">
+        <div className="flex items-center justify-end min-h-[3.5rem] sm:min-h-[4rem] px-1.5 py-0.5 overflow-visible">
+          <span className="font-arabic text-4xl sm:text-5xl text-primary leading-normal select-none drop-shadow-2xs transition-transform duration-200 group-hover:scale-105">
             {letter.display}
           </span>
         </div>
       </div>
 
       {/* 2. Metadata Chips: Position + Shaddah + Vowel */}
-      <div className="flex flex-wrap gap-1.5 items-center">
+      <div className="flex flex-wrap gap-1 items-center">
         <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[10px] font-medium text-secondary-foreground border border-border/30">
           {t(`wordAnalysis.positions.${letter.position}`)}
         </span>
@@ -92,7 +91,7 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
       </div>
 
       {/* 3. Forms strip: Isolated, Initial, Medial, Final representations */}
-      <div className="flex flex-col gap-1 w-full pt-0.5">
+      <div className="flex flex-col gap-1 w-full pt-0">
         <div className="flex justify-between gap-1" style={{ direction: "ltr" }}>
           {FORM_ORDER.map(({ key, pos, label }) => {
             const active = letter.position === pos;
@@ -100,14 +99,14 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, card
               <div
                 key={key}
                 className={cn(
-                  "flex flex-1 flex-col items-center justify-between rounded-lg px-1 py-1.5 transition-colors min-h-[3.75rem]",
+                  "flex flex-1 flex-col items-center justify-between rounded-lg px-1 py-1 transition-colors min-h-[3.1rem]",
                   active
                     ? "bg-primary/15 text-primary ring-1 ring-primary/40 font-medium"
                     : "bg-secondary/30 text-foreground/75 hover:bg-secondary/50",
                 )}
               >
                 <div className="flex-1 flex items-center justify-center w-full overflow-visible py-0.5">
-                  <span className="font-arabic text-2xl leading-normal">
+                  <span className="font-arabic text-xl leading-normal">
                     {forms[key]}
                   </span>
                 </div>

@@ -260,7 +260,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         </button>
                     </div> */}
 
-                    <div className="relative z-10 flex min-w-0 flex-col items-center gap-2 px-12 text-center sm:px-20">
+                    <div className="relative z-10 flex min-w-0 flex-col items-center gap-5 px-12 text-center sm:gap-6 sm:px-20">
                         {!hideDetails && (
                             <DialogDescription className="text-xs uppercase tracking-widest text-muted-foreground">
                                 {transliteration}
@@ -268,7 +268,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         )}
                         <div
                             ref={containerRef}
-                            className="relative font-arabic text-7xl sm:text-8xl md:text-9xl leading-relaxed select-none"
+                            className="relative mt-8 font-arabic text-7xl sm:text-8xl md:text-9xl leading-[1.6] select-none"
                             style={{ direction: "rtl" }}
                         >
                             {/* Precision highlight background pill */}
