@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
-import { Play, Pause, Plus } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TimingEditor } from './TimingEditor';
@@ -14,7 +13,6 @@ interface WirdVerseLineProps {
   onPlayVerse?: (verseIndex: number) => void;
   onPause?: () => void;
   onPlayWord?: (verseIndex: number, wordIndex: number) => void;
-  onPrepareForPractice?: (word: string) => void;
   // Edit-mode props
   editMode?: boolean;
   getCurrentTime?: () => number;
@@ -37,7 +35,6 @@ export const WirdVerseLine = ({
   onPlayVerse,
   onPause,
   onPlayWord,
-  onPrepareForPractice,
   editMode = false,
   getCurrentTime,
   onUpdateTiming,
@@ -51,18 +48,9 @@ export const WirdVerseLine = ({
   showTranslation = false,
 }: WirdVerseLineProps) => {
   const isThisVersePlaying = isPlaying && currentWord?.verseIndex === verseIndex;
-  const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
-
   const handleWordClick = (wordIndex: number) => {
     if (editMode) return; // clicks handled by popover trigger
     onPlayWord?.(verseIndex, wordIndex);
-    setActiveWordIndex(prev => (prev === wordIndex ? null : wordIndex));
-  };
-
-  const handleAddWord = (word: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPrepareForPractice?.(word);
-    setActiveWordIndex(null);
   };
 
   return (
@@ -102,7 +90,6 @@ export const WirdVerseLine = ({
           const isHighlighted =
             currentWord?.verseIndex === verseIndex &&
             currentWord?.wordIndex === wordIndex;
-          const showAddButton = !editMode && activeWordIndex === wordIndex && onPrepareForPractice;
 
           const wordSpan = (
             <span
@@ -154,14 +141,6 @@ export const WirdVerseLine = ({
                 </span>
               )}
 
-              {showAddButton && (
-                <button
-                  onClick={(e) => handleAddWord(wordTiming.word, e)}
-                  className="absolute -top-7 left-1/2 -translate-x-1/2 z-10 h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:scale-110 transition-transform animate-in fade-in zoom-in-50 duration-150"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </button>
-              )}
             </span>
           );
         })}

@@ -1,0 +1,63 @@
+{
+  "common": {
+    "reference": "Referencia",
+    "back": "Volver",
+    "backToWord": "Volver a la palabra",
+    "letters": "Letras",
+    "readingOrder": "Letras (orden de lectura, derecha → izquierda) — toca una tarjeta para resaltar",
+    "tapCard": "Toca una tarjeta para resaltar",
+    "toggleDetails": "Alternar detalles",
+    "empty": "∅"
+  },
+  "nav": {
+    "wirdSharif": "Wird Sharif Saguir",
+    "quranReader": "Lector del Corán",
+    "language": "Idioma",
+    "english": "Inglés",
+    "spanish": "Español"
+  },
+  "wordAnalysis": {
+    "letterNavigation": "Navegación por letras",
+    "nextLetter": "Siguiente letra",
+    "previousLetter": "Anterior letra",
+    "viewForms": "Ver todas las formas",
+    "hideForms": "Ocultar formas",
+    "referenceGlyph": "Aislada (Referencia)",
+    "contextGlyph": "En contexto ({position})",
+    "referenceTitle": "Referencia del Alfabeto Árabe",
+    "referenceDescription": "Todas las letras con sus formas aislada, inicial, medial y final.",
+    "table": {
+      "name": "Nombre",
+      "sound": "Sonido",
+      "isolated": "AIS",
+      "initial": "INI",
+      "medial": "MED",
+      "final": "FIN"
+    },
+    "positions": {
+      "Initial": "Inicial",
+      "Medial": "Medial",
+      "Final": "Final",
+      "Isolated": "Aislada"
+    },
+    "forms": {
+      "iso": "ais",
+      "ini": "ini",
+      "med": "med",
+      "fin": "fin"
+    },
+    "chips": {
+      "shaddah": "Shaddah → Duplicada"
+    },
+    "vowels": {
+      "Fatha": "Fatha",
+      "Kasra": "Kasra",
+      "Damma": "Damma",
+      "Sukun": "Sukun",
+      "TanweenFatha": "Tanween Fatha",
+      "TanweenKasra": "Tanween Kasra",
+      "TanweenDamma": "Tanween Damma",
+      "SuperscriptAlif": "Alif Daga"
+    }
+  }
+}

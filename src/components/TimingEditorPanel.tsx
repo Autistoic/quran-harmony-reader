@@ -14,16 +14,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Pencil, Download, RotateCcw, Copy, Check, Save, Upload } from 'lucide-react';
 import type { WirdData } from '@/data/wirdSharif';
 import type { Surah } from '@/data/surahs';
-import { formatWirdVerses, formatSurahVerses } from '@/hooks/useTimingOverrides';
+import { formatWirdVerses, formatSurahVerses } from '@/lib/timingCodeFormatters';
 import { toast } from 'sonner';
 
-type Kind = 'wird' | 'surah';
-
-interface TimingEditorPanelProps {
-  kind: Kind;
+interface TimingEditorPanelCommonProps {
   editMode: boolean;
   onEditModeChange: (value: boolean) => void;
-  effectiveData: WirdData | Surah;
   hasOverrides: boolean;
   overrideCount: number;
   onReset: () => void;
@@ -31,26 +27,29 @@ interface TimingEditorPanelProps {
   onImportBackup: (file: File) => Promise<{ count: number }>;
 }
 
-export const TimingEditorPanel = ({
-  kind,
-  editMode,
-  onEditModeChange,
-  effectiveData,
-  hasOverrides,
-  overrideCount,
-  onReset,
-  onExportBackup,
-  onImportBackup,
-}: TimingEditorPanelProps) => {
+type TimingEditorPanelProps = TimingEditorPanelCommonProps & (
+  | { kind: 'wird'; effectiveData: WirdData }
+  | { kind: 'surah'; effectiveData: Surah }
+);
+
+export const TimingEditorPanel = (props: TimingEditorPanelProps) => {
+  const {
+    editMode,
+    onEditModeChange,
+    hasOverrides,
+    overrideCount,
+    onReset,
+    onExportBackup,
+    onImportBackup,
+  } = props;
   const [exportOpen, setExportOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const targetFile = kind === 'wird' ? 'src/data/wirdSharif.ts' : 'src/data/surahs.ts';
-  const exportText =
-    kind === 'wird'
-      ? formatWirdVerses(effectiveData as WirdData)
-      : formatSurahVerses(effectiveData as Surah);
+  const targetFile = props.kind === 'wird' ? 'src/data/wirdSharif.ts' : 'src/data/surahs.ts';
+  const exportText = props.kind === 'wird'
+    ? formatWirdVerses(props.effectiveData)
+    : formatSurahVerses(props.effectiveData);
   const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
   const handleCopy = async () => {
@@ -147,7 +146,7 @@ export const TimingEditorPanel = ({
           <DialogHeader>
             <DialogTitle>Exportar timings</DialogTitle>
             <DialogDescription>
-              {kind === 'wird' ? (
+              {props.kind === 'wird' ? (
                 <>Copiá este bloque y pegalo reemplazando el array <code>verses: [...]</code> en <code>{targetFile}</code>.</>
               ) : (
                 <>Copiá este bloque y pegalo reemplazando el <code>verses: [...]</code> de la surah correspondiente en <code>{targetFile}</code>.</>

@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Surah } from '@/data/surahs';
 import { useAudioSync } from '@/hooks/useAudioSync';
 import { useTimingOverrides } from '@/hooks/useTimingOverrides';
+import { useReaderState } from '@/hooks/useReaderState';
 import { QuranVerse } from './QuranVerse';
 import { AudioPlayer } from './AudioPlayer';
 import { SurahHeader } from './SurahHeader';
@@ -39,42 +40,18 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
         playFromWord,
         playFromTime,
     } = useAudioSync(effectiveSurah);
-
-    const currentTimeRef = useRef(currentTime);
-    useEffect(() => {
-        currentTimeRef.current = currentTime;
-    }, [currentTime]);
-
-    const [editMode, setEditMode] = useState(false);
-    const [openCursor, setOpenCursor] = useState<{ verseIndex: number; wordIndex: number } | null>(null);
-
-    const navCursor = (dir: 'prev' | 'next') => {
-        if (!openCursor) return;
-        const verses = effectiveSurah.verses;
-        let { verseIndex, wordIndex } = openCursor;
-        if (dir === 'next') {
-            if (wordIndex + 1 < verses[verseIndex].wordTimings.length) wordIndex += 1;
-            else if (verseIndex + 1 < verses.length) { verseIndex += 1; wordIndex = 0; }
-            else return;
-        } else {
-            if (wordIndex > 0) wordIndex -= 1;
-            else if (verseIndex > 0) { verseIndex -= 1; wordIndex = verses[verseIndex].wordTimings.length - 1; }
-            else return;
-        }
-        setOpenCursor({ verseIndex, wordIndex });
-    };
-
-    const hasPrev = !!openCursor && (openCursor.wordIndex > 0 || openCursor.verseIndex > 0);
-    const hasNext = !!openCursor && (
-        openCursor.wordIndex + 1 < effectiveSurah.verses[openCursor.verseIndex].wordTimings.length ||
-        openCursor.verseIndex + 1 < effectiveSurah.verses.length
-    );
-
-    const [showTranslation, setShowTranslation] = useState(false);
-
-    const toggleShowTranslation = () => {
-        setShowTranslation(!showTranslation);
-    };
+    const {
+        getCurrentTime,
+        editMode,
+        setEditMode,
+        openCursor,
+        setOpenCursor,
+        navCursor,
+        hasPrev,
+        hasNext,
+        showTranslation,
+        toggleTranslation,
+    } = useReaderState(effectiveSurah.verses, currentTime, effectiveSurah.id);
 
     return (
         <div className="min-h-screen bg-background">
@@ -104,7 +81,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                             onPlayWord={playFromWord}
                             editMode={editMode}
                             isPlaying={isPlaying}
-                            getCurrentTime={() => currentTimeRef.current}
+                            getCurrentTime={getCurrentTime}
                             onUpdateTiming={setWordTiming}
                             onPlayFromTime={playFromTime}
                             onPauseAudio={pause}
@@ -124,7 +101,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                         <Button
                             variant="secondary"
                             size="sm"
-                            onClick={toggleShowTranslation}
+                            onClick={toggleTranslation}
                             className="shadow-md rounded-full"
                         >
                             <Languages className="h-4 w-4 mr-1" />

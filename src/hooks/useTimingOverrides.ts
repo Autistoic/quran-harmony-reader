@@ -1,56 +1,58 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import type { WirdData } from '@/data/wirdSharif';
-import type { Surah } from '@/data/surahs';
+import type { TimingOverride, OverridesMap } from '@/types/timingOverrides';
+import {
+  downloadTimingOverridesBackup,
+  loadTimingOverrides,
+  readTimingOverridesBackup,
+  saveTimingOverrides,
+} from '@/lib/timingOverridesStorage';
 
-export interface TimingOverride {
-  start: number;
-  end: number;
-}
+export type { TimingOverride, OverridesMap } from '@/types/timingOverrides';
+// Keep formatter exports available for existing imports while the implementations live in lib.
+export { formatSurahVerses, formatWirdVerses } from '@/lib/timingCodeFormatters';
 
-// { [verseIndex]: { [wordIndex]: { start, end } } }
-export type OverridesMap = Record<number, Record<number, TimingOverride>>;
-
-// Generic shape any data needs to satisfy
+// Minimum data shape needed to apply timing overrides.
 interface OverridableData {
   id: string | number;
   verses: { wordTimings: { start: number; end: number }[] }[];
 }
 
-const storageKey = (id: string) => `wird-timing-overrides:${id}`;
-
-const loadOverrides = (id: string): OverridesMap => {
-  try {
-    const raw = localStorage.getItem(storageKey(id));
-    if (!raw) return {};
-    return JSON.parse(raw) as OverridesMap;
-  } catch {
-    return {};
-  }
-};
-
-const saveOverrides = (id: string, overrides: OverridesMap) => {
-  try {
-    localStorage.setItem(storageKey(id), JSON.stringify(overrides));
-  } catch {
-    // ignore
-  }
-};
-
 export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix = '') {
   const fullId = `${idPrefix}${data.id}`;
-  const [overrides, setOverrides] = useState<OverridesMap>(() => loadOverrides(fullId));
+  const [overrideState, setOverrideState] = useState(() => ({
+    id: fullId,
+    overrides: loadTimingOverrides(fullId),
+  }));
 
   useEffect(() => {
-    setOverrides(loadOverrides(fullId));
+    if (overrideState.id !== fullId) {
+      setOverrideState({ id: fullId, overrides: loadTimingOverrides(fullId) });
+    }
+  }, [fullId, overrideState.id]);
+
+  useEffect(() => {
+    if (overrideState.id === fullId) {
+      saveTimingOverrides(fullId, overrideState.overrides);
+    }
+  }, [fullId, overrideState]);
+
+  const overrides = useMemo(
+    () => overrideState.id === fullId ? overrideState.overrides : {},
+    [fullId, overrideState],
+  );
+
+  const updateOverrides = useCallback((update: (current: OverridesMap) => OverridesMap) => {
+    setOverrideState(previous => {
+      const current = previous.id === fullId
+        ? previous.overrides
+        : loadTimingOverrides(fullId);
+      return { id: fullId, overrides: update(current) };
+    });
   }, [fullId]);
-
-  useEffect(() => {
-    saveOverrides(fullId, overrides);
-  }, [fullId, overrides]);
 
   const setWordTiming = useCallback(
     (verseIndex: number, wordIndex: number, timing: TimingOverride) => {
-      setOverrides(prev => ({
+      updateOverrides(prev => ({
         ...prev,
         [verseIndex]: {
           ...(prev[verseIndex] ?? {}),
@@ -58,11 +60,11 @@ export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix 
         },
       }));
     },
-    []
+    [updateOverrides]
   );
 
   const clearWordOverride = useCallback((verseIndex: number, wordIndex: number) => {
-    setOverrides(prev => {
+    updateOverrides(prev => {
       const next = { ...prev };
       if (!next[verseIndex]) return next;
       const verseCopy = { ...next[verseIndex] };
@@ -74,11 +76,11 @@ export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix 
       }
       return next;
     });
-  }, []);
+  }, [updateOverrides]);
 
   const resetAll = useCallback(() => {
-    setOverrides({});
-  }, []);
+    updateOverrides(() => ({}));
+  }, [updateOverrides]);
 
   // Build an effective data object with overrides merged into wordTimings
   const effectiveData: T = useMemo(() => {
@@ -92,7 +94,7 @@ export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix 
       });
       return { ...verse, wordTimings };
     });
-    return { ...data, verses } as T;
+    return Object.assign({}, data, { verses });
   }, [data, overrides]);
 
   const hasOverrides = useMemo(() => Object.keys(overrides).length > 0, [overrides]);
@@ -104,42 +106,22 @@ export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix 
   }, [overrides]);
 
   const exportBackup = useCallback(() => {
-    const payload = {
-      id: fullId,
-      exportedAt: new Date().toISOString(),
-      overrides,
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `timing-overrides-${fullId}-${Date.now()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadTimingOverridesBackup(fullId, overrides);
   }, [fullId, overrides]);
 
   const importBackup = useCallback(
     async (file: File): Promise<{ count: number }> => {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      const incoming: OverridesMap = parsed.overrides ?? parsed;
-      if (typeof incoming !== 'object' || incoming === null) {
-        throw new Error('Formato inválido');
-      }
-      setOverrides(prev => {
+      const { overrides: incoming, count } = await readTimingOverridesBackup(file);
+      updateOverrides(prev => {
         const merged: OverridesMap = { ...prev };
         for (const [vIdx, words] of Object.entries(incoming)) {
-          merged[Number(vIdx)] = { ...(merged[Number(vIdx)] ?? {}), ...(words as Record<number, TimingOverride>) };
+          merged[Number(vIdx)] = { ...(merged[Number(vIdx)] ?? {}), ...words };
         }
         return merged;
       });
-      let count = 0;
-      for (const v of Object.values(incoming)) count += Object.keys(v as object).length;
       return { count };
     },
-    []
+    [updateOverrides]
   );
 
   return {
@@ -153,62 +135,4 @@ export function useTimingOverrides<T extends OverridableData>(data: T, idPrefix 
     exportBackup,
     importBackup,
   };
-}
-
-// ---------- Formatters ----------
-
-const fmt = (n: number): string => {
-  const rounded = Math.round(n * 100) / 100;
-  const s = rounded.toString();
-  return s.includes('.') ? s : `${s}.0`;
-};
-
-const jsString = (s: string) => `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-
-export function formatWirdVerses(wird: WirdData): string {
-  const lines: string[] = [];
-  lines.push('verses: [');
-  wird.verses.forEach(verse => {
-    lines.push('  {');
-    lines.push(`    transliteration: ${jsString(verse.transliteration)},`);
-    if (verse.repetitions !== undefined) {
-      lines.push(`    repetitions: ${verse.repetitions},`);
-    }
-    if (verse.note !== undefined) {
-      lines.push(`    note: ${jsString(verse.note)},`);
-    }
-    lines.push('    wordTimings: [');
-    verse.wordTimings.forEach(wt => {
-      lines.push(
-        `      { word: ${jsString(wt.word)}, start: ${fmt(wt.start)}, end: ${fmt(wt.end)} },`
-      );
-    });
-    lines.push('    ],');
-    lines.push('  },');
-  });
-  lines.push('],');
-  return lines.join('\n');
-}
-
-export function formatSurahVerses(surah: Surah): string {
-  const lines: string[] = [];
-  lines.push('verses: [');
-  surah.verses.forEach(verse => {
-    lines.push('  {');
-    lines.push(`    arabic: ${jsString(verse.arabic)},`);
-    lines.push(`    transliteration: ${jsString(verse.transliteration)},`);
-    if (verse.verseNumber !== undefined) {
-      lines.push(`    verseNumber: ${verse.verseNumber},`);
-    }
-    lines.push('    wordTimings: [');
-    verse.wordTimings.forEach(wt => {
-      lines.push(
-        `      { word: ${jsString(wt.word)}, translit: ${jsString(wt.translit)}, start: ${fmt(wt.start)}, end: ${fmt(wt.end)} },`
-      );
-    });
-    lines.push('    ],');
-    lines.push('  },');
-  });
-  lines.push('],');
-  return lines.join('\n');
 }
