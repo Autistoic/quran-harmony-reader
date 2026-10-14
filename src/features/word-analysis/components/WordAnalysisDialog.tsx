@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff } from "lucide-react";
 import LetterDetailCard from "./LetterDetailCard";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { cn } from "@/lib/utils";
@@ -39,10 +39,47 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         onSelectedIndexChange?.(i);
     };
     const [rect, setRect] = useState<HighlightRect | null>(null);
+    const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLSpanElement>(null);
+    const letterCardRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const focusFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
     const toggleHideDetails = () => {
         setHideDetails(!hideDetails);
+    };
+    const canGoPrevious = selectedIndex !== null && selectedIndex > 0;
+    const canGoNext = letters.length > 0 && (selectedIndex === null || selectedIndex < letters.length - 1);
+    const focusLetterCard = (index: number) => {
+        const card = letterCardRefs.current[index];
+        if (!card) return;
+
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.focus({ preventScroll: true });
+        setFocusedCardIndex(index);
+        if (focusFlashTimeout.current) clearTimeout(focusFlashTimeout.current);
+        focusFlashTimeout.current = setTimeout(() => setFocusedCardIndex(null), 900);
+    };
+    const selectLetter = (index: number) => {
+        setSelectedIndex(index);
+        focusLetterCard(index);
+    };
+    const goPrevious = () => {
+        if (selectedIndex !== null && canGoPrevious) selectLetter(selectedIndex - 1);
+    };
+    const goNext = () => {
+        if (canGoNext) selectLetter(selectedIndex === null ? 0 : selectedIndex + 1);
+    };
+    const handleHeaderKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        if (event.key === "ArrowLeft") {
+            if (!canGoNext) return;
+            event.preventDefault();
+            goNext();
+        } else if (event.key === "ArrowRight") {
+            if (!canGoPrevious) return;
+            event.preventDefault();
+            goPrevious();
+        }
     };
 
     // Reset selection when dialog closes or word changes (uncontrolled mode only)
@@ -53,6 +90,10 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
     useEffect(() => {
         if (!isControlled) setInternalSelected(null);
     }, [word, isControlled]);
+
+    useEffect(() => () => {
+        if (focusFlashTimeout.current) clearTimeout(focusFlashTimeout.current);
+    }, []);
 
     useLayoutEffect(() => {
         const compute = () => {
@@ -184,8 +225,15 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                 <DialogTitle className="sr-only">{transliteration} — {word}</DialogTitle>
 
                 {/* Sticky header */}
-                <div className="sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border px-6 pt-6 pb-4">
-                    <div className="flex items-center gap-2">
+                <div
+                    className="sticky top-0 z-20 isolate relative bg-background/95 backdrop-blur border-b border-border shadow-sm px-0 pt-4 sm:pt-6 pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    role="group"
+                    aria-label={t("wordAnalysis.letterNavigation")}
+                    tabIndex={0}
+                    onKeyDown={handleHeaderKeyDown}
+                >
+                    {/*
+                    <div className="relative z-10 flex items-center justify-center gap-2 px-12 sm:px-20">
                         {onOpenReference && (
                             <button
                                 type="button"
@@ -210,9 +258,9 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                 <Eye className="h-4 w-4" />
                             )}
                         </button>
-                    </div>
+                    </div> */}
 
-                    <div className="flex flex-col items-center gap-2 pr-8">
+                    <div className="relative z-10 flex min-w-0 flex-col items-center gap-2 px-12 text-center sm:px-20">
                         {!hideDetails && (
                             <DialogDescription className="text-xs uppercase tracking-widest text-muted-foreground">
                                 {transliteration}
@@ -266,22 +314,51 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                             <p className="text-sm italic text-muted-foreground">"{meaning}"</p>
                         )}
                     </div>
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        disabled={!canGoNext}
+                        aria-disabled={!canGoNext}
+                        aria-label={t("wordAnalysis.nextLetter")}
+                        title={t("wordAnalysis.nextLetter")}
+                        className="absolute inset-y-0 left-0 z-20 flex w-12 flex-col items-center justify-center gap-2 border-r border-border/60 bg-background/30 text-foreground/75 transition-colors hover:bg-secondary/55 hover:text-foreground active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 sm:w-20"
+                    >
+                        <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+                        <span className="hidden px-1 text-center text-xs font-medium sm:inline">{t("wordAnalysis.nextLetter")}</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goPrevious}
+                        disabled={!canGoPrevious}
+                        aria-disabled={!canGoPrevious}
+                        aria-label={t("wordAnalysis.previousLetter")}
+                        title={t("wordAnalysis.previousLetter")}
+                        className="absolute inset-y-0 right-0 z-20 flex w-12 flex-col items-center justify-center gap-2 border-l border-border/60 bg-background/30 text-foreground/75 transition-colors hover:bg-secondary/55 hover:text-foreground active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 sm:w-20"
+                    >
+                        <ArrowRight aria-hidden="true" className="h-5 w-5" />
+                        <span className="hidden px-1 text-center text-xs font-medium sm:inline">{t("wordAnalysis.previousLetter")}</span>
+                    </button>
                 </div>
 
                 {/* Scrollable body */}
-                <div className="overflow-y-auto px-6 py-4">
+                <div className="overflow-y-auto px-6 py-4" onKeyDown={handleHeaderKeyDown}>
                     <div className="flex flex-col gap-2">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground px-1" dir="rtl">
                             {t("common.readingOrder")}
                         </span>
-                        <div dir="rtl" className="grid gap-3 sm:grid-cols-2">
+                        <div dir="rtl" className="grid grid-cols-1 gap-3">
                             {letters.map((letter, i) => (
                                 <LetterDetailCard
                                     key={i}
+                                    cardRef={(node) => { letterCardRefs.current[i] = node; }}
                                     letter={letter}
                                     index={i}
                                     selected={selectedIndex === i}
-                                    onSelect={() => setSelectedIndex(selectedIndex === i ? null : i)}
+                                    navigationFocused={focusedCardIndex === i}
+                                    onSelect={() => {
+                                        setSelectedIndex(selectedIndex === i ? null : i);
+                                        focusLetterCard(i);
+                                    }}
                                     hideDetails={hideDetails}
                                 />
                             ))}

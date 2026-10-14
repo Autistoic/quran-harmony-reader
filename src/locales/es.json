@@ -17,6 +17,9 @@
     "spanish": "Español"
   },
   "wordAnalysis": {
+    "letterNavigation": "Navegación por letras",
+    "nextLetter": "Siguiente letra",
+    "previousLetter": "Anterior letra",
     "referenceTitle": "Referencia del Alfabeto Árabe",
     "referenceDescription": "Todas las letras con sus formas aislada, inicial, medial y final.",
     "table": {

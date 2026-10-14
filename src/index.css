@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes letter-card-focus-flash {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+  25%, 65% { box-shadow: 0 0 0 4px hsl(var(--primary) / 0.24); }
+}
+
+.letter-card-focus-flash {
+  animation: letter-card-focus-flash 900ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-card-focus-flash { animation: none; }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

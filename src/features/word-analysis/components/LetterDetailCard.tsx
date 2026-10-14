@@ -1,3 +1,4 @@
+import type { Ref } from "react";
 import { ArrowLeft, ArrowRight, Link2, Unlink2 } from "lucide-react";
 import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
@@ -19,64 +20,79 @@ interface Props {
   selected?: boolean;
   onSelect?: () => void;
   hideDetails?: boolean;
+  cardRef?: Ref<HTMLButtonElement>;
+  navigationFocused?: boolean;
 }
 
-const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Props) => {
+const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails, cardRef, navigationFocused }: Props) => {
   const forms = getContextualForms(letter.base);
   const { t } = useTranslation();
 
   return (
     <button
+      ref={cardRef}
       type="button"
       dir="ltr"
       onClick={onSelect}
+      aria-pressed={selected}
       className={cn(
-        "flex flex-col gap-3 rounded-xl border bg-card/70 p-3.5 sm:p-4 text-left transition-colors overflow-visible",
+        "group flex flex-col gap-3 rounded-2xl border bg-card/75 p-4 text-left transition-all duration-200 overflow-visible",
+        "hover:shadow-md hover:border-primary/50 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        navigationFocused && "letter-card-focus-flash",
         selected
-          ? "border-primary ring-2 ring-primary/40 bg-primary/5"
-          : "border-border hover:border-primary/40",
+          ? "border-primary ring-2 ring-primary/40 bg-primary/5 shadow-sm"
+          : "border-border/80 shadow-xs",
       )}
     >
-      {/* Header: items-start prevents tall Arabic ink from dragging the header into the top border */}
-      <div className="flex items-start justify-between gap-3 w-full">
-        <div className="flex flex-col gap-1 pt-1">
-          <div className="flex items-baseline gap-2">
-            <span className="text-[10px] font-mono text-muted-foreground font-semibold">#{index + 1}</span>
-            <span className="text-sm font-semibold text-foreground tracking-tight">{letter.name}</span>
+      {/* 1. Header: Dominant Hero Glyph (~2x Scale) + Elevated Phonetics */}
+      <div className="flex items-center justify-between gap-4 w-full">
+        {/* Left Column: Subdued Sequence + Prominent Phonetic Pronunciation + Secondary Letter Name */}
+        <div className="flex flex-col gap-1.5 min-w-0">
+          {/* Demoted Index and Letter Name */}
+          <div className="flex items-center gap-1.5 text-muted-foreground/70">
+            <span className="text-[10px] font-mono tracking-wider">#{index + 1}</span>
+            <span className="text-muted-foreground/40">•</span>
+            <span className="text-xs font-medium text-muted-foreground truncate">{letter.name}</span>
           </div>
+
+          {/* Elevated Phonetic Sound (Highest value reading anchor for learners) */}
           {!hideDetails && (
-            <span className="text-xs text-muted-foreground font-mono">/{getFullSound(letter) || "∅"}/</span>
+            <div className="flex items-center">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-md font-mono text-base sm:text-lg font-bold text-foreground bg-secondary/60 border border-border/50 tracking-tight shadow-2xs">
+                /{getFullSound(letter) || "∅"}/
+              </span>
+            </div>
           )}
         </div>
 
-        {/* Hero Arabic Letter Display: min-h and leading-normal provide full vertical breathing room for stacked tashkeel */}
-        <div className="flex items-center justify-end min-h-[3.5rem] px-1 py-1 overflow-visible">
-          <span className="font-arabic text-3xl sm:text-4xl text-primary leading-normal select-none">
+        {/* Right Column: Hero Arabic Letter Glyph (~2x Scale, 48px-60px) */}
+        <div className="flex items-center justify-end min-h-[4.25rem] sm:min-h-[4.75rem] px-2 py-0.5 overflow-visible">
+          <span className="font-arabic text-5xl sm:text-6xl text-primary leading-normal select-none drop-shadow-2xs transition-transform duration-200 group-hover:scale-105">
             {letter.display}
           </span>
         </div>
       </div>
 
-      {/* Chips: Position + Shaddah + Vowel */}
+      {/* 2. Metadata Chips: Position + Shaddah + Vowel */}
       <div className="flex flex-wrap gap-1.5 items-center">
-        <span className="rounded bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
+        <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[10px] font-medium text-secondary-foreground border border-border/30">
           {t(`wordAnalysis.positions.${letter.position}`)}
         </span>
         {hasShadda(letter) && (
-          <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent">
+          <span className="rounded-md bg-accent/25 px-2 py-0.5 text-[10px] font-semibold text-accent-foreground border border-accent/30">
             {t("wordAnalysis.chips.shaddah")}
           </span>
         )}
         {letter.vowel && (
-          <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent">
+          <span className="rounded-md bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent border border-accent/20">
             {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
             {letter.vowel.sound ? ` → ${letter.vowel.sound}` : " → ∅"}
           </span>
         )}
       </div>
 
-      {/* Forms strip: min-h and leading-normal protect ascenders, tatweel, and descending tails */}
-      <div className="flex flex-col gap-1 w-full pt-1">
+      {/* 3. Forms strip: Isolated, Initial, Medial, Final representations */}
+      <div className="flex flex-col gap-1 w-full pt-0.5">
         <div className="flex justify-between gap-1" style={{ direction: "ltr" }}>
           {FORM_ORDER.map(({ key, pos, label }) => {
             const active = letter.position === pos;
@@ -84,8 +100,10 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
               <div
                 key={key}
                 className={cn(
-                  "flex flex-1 flex-col items-center justify-between rounded px-1 py-1.5 transition-colors min-h-[3.75rem]",
-                  active ? "bg-primary/15 text-primary ring-1 ring-primary/40 font-medium" : "bg-secondary/30 text-foreground/80",
+                  "flex flex-1 flex-col items-center justify-between rounded-lg px-1 py-1.5 transition-colors min-h-[3.75rem]",
+                  active
+                    ? "bg-primary/15 text-primary ring-1 ring-primary/40 font-medium"
+                    : "bg-secondary/30 text-foreground/75 hover:bg-secondary/50",
                 )}
               >
                 <div className="flex-1 flex items-center justify-center w-full overflow-visible py-0.5">
@@ -93,7 +111,7 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
                     {forms[key]}
                   </span>
                 </div>
-                <span className="text-[9px] uppercase tracking-wider opacity-70 mt-0.5">
+                <span className="text-[9px] uppercase tracking-wider opacity-65 mt-0.5">
                   {t(`wordAnalysis.forms.${label}`)}
                 </span>
               </div>
@@ -102,30 +120,36 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
         </div>
       </div>
 
-      {/* Joining Strip: actual contextual connection derived from position */}
-      {(() => {
+      {/* 4. Joining Strip: Progressive disclosure (ultra-subtle resting state, lights up on hover/focus) */}
+      {/* {(() => {
         const connectedLeft = letter.position === "Medial" || letter.position === "Initial";
         const connectedRight = letter.position === "Medial" || letter.position === "Final";
         return (
-          <div className="flex items-center justify-center gap-1.5 pt-1.5 w-full border-t border-border/40" style={{ direction: "ltr" }}>
-            <ArrowLeft size={12} className="text-muted-foreground/60" />
-            {connectedLeft ? (
-              <Link2 size={14} className="text-primary" />
-            ) : (
-              <Unlink2 size={14} className="text-muted-foreground/50" />
+          <div
+            className={cn(
+              "flex items-center justify-center gap-2 pt-2 w-full border-t border-border/30",
+              "opacity-60 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-200",
             )}
-            <span className="mx-1.5 text-lg leading-normal text-foreground font-arabic min-w-[1.25rem] text-center">
+            style={{ direction: "ltr" }}
+          >
+            <ArrowLeft size={11} className="text-muted-foreground/60 transition-colors group-hover:text-muted-foreground" />
+            {connectedLeft ? (
+              <Link2 size={13} className="text-primary transition-colors" />
+            ) : (
+              <Unlink2 size={13} className="text-muted-foreground/40 transition-colors" />
+            )}
+            <span className="mx-1 text-base leading-normal text-foreground font-arabic min-w-[1.25rem] text-center">
               {letter.base}
             </span>
             {connectedRight ? (
-              <Link2 size={14} className="text-primary" />
+              <Link2 size={13} className="text-primary transition-colors" />
             ) : (
-              <Unlink2 size={14} className="text-muted-foreground/50" />
+              <Unlink2 size={13} className="text-muted-foreground/40 transition-colors" />
             )}
-            <ArrowRight size={12} className="text-muted-foreground/60" />
+            <ArrowRight size={11} className="text-muted-foreground/60 transition-colors group-hover:text-muted-foreground" />
           </div>
         );
-      })()}
+      })()} */}
     </button>
   );
 };

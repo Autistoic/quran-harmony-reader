@@ -17,6 +17,9 @@
     "spanish": "Spanish"
   },
   "wordAnalysis": {
+    "letterNavigation": "Letter navigation",
+    "nextLetter": "Next letter",
+    "previousLetter": "Previous letter",
     "referenceTitle": "Arabic Letters Reference",
     "referenceDescription": "All letters with isolated, initial, medial, and final forms.",
     "table": {
