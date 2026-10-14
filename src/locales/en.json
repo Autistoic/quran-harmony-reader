@@ -20,6 +20,10 @@
     "letterNavigation": "Letter navigation",
     "nextLetter": "Next letter",
     "previousLetter": "Previous letter",
+    "viewForms": "View all forms",
+    "hideForms": "Hide forms",
+    "referenceGlyph": "Reference (Isolated)",
+    "contextGlyph": "In context ({position})",
     "referenceTitle": "Arabic Letters Reference",
     "referenceDescription": "All letters with isolated, initial, medial, and final forms.",
     "table": {

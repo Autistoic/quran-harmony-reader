@@ -20,6 +20,10 @@
     "letterNavigation": "Navegación por letras",
     "nextLetter": "Siguiente letra",
     "previousLetter": "Anterior letra",
+    "viewForms": "Ver todas las formas",
+    "hideForms": "Ocultar formas",
+    "referenceGlyph": "Aislada (Referencia)",
+    "contextGlyph": "En contexto ({position})",
     "referenceTitle": "Referencia del Alfabeto Árabe",
     "referenceDescription": "Todas las letras con sus formas aislada, inicial, medial y final.",
     "table": {
