@@ -24,6 +24,13 @@
     "hideForms": "Ocultar formas",
     "referenceGlyph": "Aislada (Referencia)",
     "contextGlyph": "En contexto ({position})",
+    "connection": {
+      "both": "Se une a ambos lados",
+      "previousOnly": "Se une solo a la anterior",
+      "nextOnly": "Se une solo a la siguiente",
+      "none": "No se une a ninguna",
+      "whyPrevious": "{{position}} porque {{previous}} no se une a ella."
+    },
     "referenceTitle": "Referencia del Alfabeto Árabe",
     "referenceDescription": "Todas las letras con sus formas aislada, inicial, medial y final.",
     "table": {

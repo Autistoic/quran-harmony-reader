@@ -1,7 +1,9 @@
 import type { Joining, Vowel } from "./types";
 
-/** Letters that never connect to the letter on their left. */
-export const NON_CONNECTING_LEFT = ["ا", "د", "ذ", "ر", "ز", "و"];
+/** Letters that cannot connect onward to the next letter in reading order. */
+export const NON_CONNECTING_LEFT: readonly string[] = [
+  "ا", "ٱ", "أ", "إ", "آ", "د", "ذ", "ر", "ز", "و", "ى", "ء", "ؤ", "ة",
+];
 
 interface LetterInfo {
   name: string;

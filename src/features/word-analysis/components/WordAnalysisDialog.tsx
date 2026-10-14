@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff } from "lucide-react";
 import LetterDetailCard from "./LetterDetailCard";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
+import { getLetterConnection } from "../lib/arabic/joining";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -352,6 +353,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                     key={i}
                                     cardRef={(node) => { letterCardRefs.current[i] = node; }}
                                     letter={letter}
+                                    connection={getLetterConnection(letters, i)}
                                     index={i}
                                     selected={selectedIndex === i}
                                     navigationFocused={focusedCardIndex === i}
