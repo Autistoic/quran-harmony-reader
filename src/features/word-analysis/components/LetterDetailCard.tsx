@@ -55,7 +55,7 @@ const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideD
           <div className="flex min-w-0 items-center gap-2 text-muted-foreground/70">
             <span className="shrink-0 text-xs font-mono tracking-wider">#{index + 1}</span>
             <span className="text-muted-foreground/40">•</span>
-            <span className="truncate text-sm font-medium text-muted-foreground sm:text-base">{letter.name}</span>
+            <span className="truncate text-sm font-medium text-muted-foreground sm:text-base">{t(letter.nameKey)}</span>
           </div>
           {!hideDetails && (
             <span className="inline-flex w-fit items-center rounded-md border border-border/50 bg-secondary/60 px-3 py-1 font-mono text-base font-bold tracking-tight text-foreground shadow-2xs sm:text-lg">

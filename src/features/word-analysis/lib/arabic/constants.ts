@@ -6,7 +6,7 @@ export const NON_CONNECTING_LEFT: readonly string[] = [
 ];
 
 interface LetterInfo {
-  name: string;
+  nameKey: string;
   consonantSound: string;
   joining: Joining;
 }
@@ -15,43 +15,43 @@ const j = (left: boolean, right: boolean): Joining => ({ left, right });
 
 /** Base Arabic letters with their phonetic + joining metadata. */
 export const LETTER_TABLE: Record<string, LetterInfo> = {
-  ا: { name: "Alif", consonantSound: "", joining: j(false, true) },
-  ٱ: { name: "Alif wasla", consonantSound: "", joining: j(false, true) },
-  أ: { name: "Alif with hamza above", consonantSound: "ʾ", joining: j(false, true) },
-  إ: { name: "Alif with hamza below", consonantSound: "ʾ", joining: j(false, true) },
-  آ: { name: "Alif with madda", consonantSound: "ʾ", joining: j(false, true) },
-  ب: { name: "Ba", consonantSound: "b", joining: j(true, true) },
-  ت: { name: "Ta", consonantSound: "t", joining: j(true, true) },
-  ث: { name: "Tha", consonantSound: "th", joining: j(true, true) },
-  ج: { name: "Jim", consonantSound: "j", joining: j(true, true) },
-  ح: { name: "Ha", consonantSound: "ḥ", joining: j(true, true) },
-  خ: { name: "Kha", consonantSound: "kh", joining: j(true, true) },
-  د: { name: "Dal", consonantSound: "d", joining: j(false, true) },
-  ذ: { name: "Dhal", consonantSound: "dh", joining: j(false, true) },
-  ر: { name: "Ra", consonantSound: "r", joining: j(false, true) },
-  ز: { name: "Zay", consonantSound: "z", joining: j(false, true) },
-  س: { name: "Sin", consonantSound: "s", joining: j(true, true) },
-  ش: { name: "Shin", consonantSound: "sh", joining: j(true, true) },
-  ص: { name: "Sad", consonantSound: "ṣ", joining: j(true, true) },
-  ض: { name: "Dad", consonantSound: "ḍ", joining: j(true, true) },
-  ط: { name: "Ta (emphatic)", consonantSound: "ṭ", joining: j(true, true) },
-  ظ: { name: "Za (emphatic)", consonantSound: "ẓ", joining: j(true, true) },
-  ع: { name: "Ayn", consonantSound: "ʿ", joining: j(true, true) },
-  غ: { name: "Ghayn", consonantSound: "gh", joining: j(true, true) },
-  ف: { name: "Fa", consonantSound: "f", joining: j(true, true) },
-  ق: { name: "Qaf", consonantSound: "q", joining: j(true, true) },
-  ك: { name: "Kaf", consonantSound: "k", joining: j(true, true) },
-  ل: { name: "Lam", consonantSound: "l", joining: j(true, true) },
-  م: { name: "Mim", consonantSound: "m", joining: j(true, true) },
-  ن: { name: "Nun", consonantSound: "n", joining: j(true, true) },
-  ه: { name: "Ha (soft)", consonantSound: "h", joining: j(true, true) },
-  و: { name: "Waw", consonantSound: "w", joining: j(false, true) },
-  ي: { name: "Ya", consonantSound: "y", joining: j(true, true) },
-  ء: { name: "Hamza", consonantSound: "ʾ", joining: j(false, false) },
-  ؤ: { name: "Waw with hamza", consonantSound: "ʾ", joining: j(false, true) },
-  ئ: { name: "Ya with hamza", consonantSound: "ʾ", joining: j(true, true) },
-  ة: { name: "Ta marbuta", consonantSound: "h", joining: j(false, true) },
-  ى: { name: "Alif maqsura", consonantSound: "", joining: j(false, true) },
+  ا: { nameKey: "wordAnalysis.letters.alif", consonantSound: "", joining: j(false, true) },
+  ٱ: { nameKey: "wordAnalysis.letters.alifWasla", consonantSound: "", joining: j(false, true) },
+  أ: { nameKey: "wordAnalysis.letters.alifHamzaAbove", consonantSound: "ʾ", joining: j(false, true) },
+  إ: { nameKey: "wordAnalysis.letters.alifHamzaBelow", consonantSound: "ʾ", joining: j(false, true) },
+  آ: { nameKey: "wordAnalysis.letters.alifMadda", consonantSound: "ʾ", joining: j(false, true) },
+  ب: { nameKey: "wordAnalysis.letters.ba", consonantSound: "b", joining: j(true, true) },
+  ت: { nameKey: "wordAnalysis.letters.ta", consonantSound: "t", joining: j(true, true) },
+  ث: { nameKey: "wordAnalysis.letters.tha", consonantSound: "th", joining: j(true, true) },
+  ج: { nameKey: "wordAnalysis.letters.jim", consonantSound: "j", joining: j(true, true) },
+  ح: { nameKey: "wordAnalysis.letters.ha", consonantSound: "ḥ", joining: j(true, true) },
+  خ: { nameKey: "wordAnalysis.letters.kha", consonantSound: "kh", joining: j(true, true) },
+  د: { nameKey: "wordAnalysis.letters.dal", consonantSound: "d", joining: j(false, true) },
+  ذ: { nameKey: "wordAnalysis.letters.dhal", consonantSound: "dh", joining: j(false, true) },
+  ر: { nameKey: "wordAnalysis.letters.ra", consonantSound: "r", joining: j(false, true) },
+  ز: { nameKey: "wordAnalysis.letters.zay", consonantSound: "z", joining: j(false, true) },
+  س: { nameKey: "wordAnalysis.letters.sin", consonantSound: "s", joining: j(true, true) },
+  ش: { nameKey: "wordAnalysis.letters.shin", consonantSound: "sh", joining: j(true, true) },
+  ص: { nameKey: "wordAnalysis.letters.sad", consonantSound: "ṣ", joining: j(true, true) },
+  ض: { nameKey: "wordAnalysis.letters.dad", consonantSound: "ḍ", joining: j(true, true) },
+  ط: { nameKey: "wordAnalysis.letters.taEmphatic", consonantSound: "ṭ", joining: j(true, true) },
+  ظ: { nameKey: "wordAnalysis.letters.zaEmphatic", consonantSound: "ẓ", joining: j(true, true) },
+  ع: { nameKey: "wordAnalysis.letters.ayn", consonantSound: "ʿ", joining: j(true, true) },
+  غ: { nameKey: "wordAnalysis.letters.ghayn", consonantSound: "gh", joining: j(true, true) },
+  ف: { nameKey: "wordAnalysis.letters.fa", consonantSound: "f", joining: j(true, true) },
+  ق: { nameKey: "wordAnalysis.letters.qaf", consonantSound: "q", joining: j(true, true) },
+  ك: { nameKey: "wordAnalysis.letters.kaf", consonantSound: "k", joining: j(true, true) },
+  ل: { nameKey: "wordAnalysis.letters.lam", consonantSound: "l", joining: j(true, true) },
+  م: { nameKey: "wordAnalysis.letters.mim", consonantSound: "m", joining: j(true, true) },
+  ن: { nameKey: "wordAnalysis.letters.nun", consonantSound: "n", joining: j(true, true) },
+  ه: { nameKey: "wordAnalysis.letters.haSoft", consonantSound: "h", joining: j(true, true) },
+  و: { nameKey: "wordAnalysis.letters.waw", consonantSound: "w", joining: j(false, true) },
+  ي: { nameKey: "wordAnalysis.letters.ya", consonantSound: "y", joining: j(true, true) },
+  ء: { nameKey: "wordAnalysis.letters.hamza", consonantSound: "ʾ", joining: j(false, false) },
+  ؤ: { nameKey: "wordAnalysis.letters.wawHamza", consonantSound: "ʾ", joining: j(false, true) },
+  ئ: { nameKey: "wordAnalysis.letters.yaHamza", consonantSound: "ʾ", joining: j(true, true) },
+  ة: { nameKey: "wordAnalysis.letters.taMarbuta", consonantSound: "h", joining: j(false, true) },
+  ى: { nameKey: "wordAnalysis.letters.alifMaqsura", consonantSound: "", joining: j(false, true) },
 };
 
 /** Harakat (vowel marks) by Unicode codepoint. */
@@ -70,5 +70,5 @@ export const SHADDA = "\u0651";
 export const TATWEEL = "\u0640";
 
 export const DIACRITIC_NAMES: Record<string, string> = {
-  [SHADDA]: "Shadda",
+  [SHADDA]: "wordAnalysis.diacritics.shaddah",
 };

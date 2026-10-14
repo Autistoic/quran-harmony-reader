@@ -22,7 +22,7 @@ export function parseArabicWord(input: string): LetterData[] {
       letters.push({
         base: ch,
         display: ch,
-        name: info.name,
+        nameKey: info.nameKey,
         consonantSound: info.consonantSound,
         marks: [],
         joining: { ...info.joining },

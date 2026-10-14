@@ -68,7 +68,7 @@ const AlphabetReferenceDialog = ({ open, onOpenChange, onBackToWord }: AlphabetR
                   )}
                   style={{ gridTemplateColumns: "minmax(64px,1fr) minmax(48px,0.8fr) repeat(4, minmax(48px,1fr))", direction: "ltr" }}
                 >
-                  <span className="text-sm font-medium text-foreground">{info.name}</span>
+                  <span className="text-sm font-medium text-foreground">{t(info.nameKey)}</span>
                   <span className="text-xs text-muted-foreground">/{info.consonantSound || "∅"}/</span>
                   {FORM_KEYS.map(({ key }) => (
                     <span

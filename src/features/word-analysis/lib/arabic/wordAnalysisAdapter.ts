@@ -4,7 +4,7 @@ import type { LetterData, Joining, Position, Vowel } from "./types";
 export interface WordAnalysisLetter {
   base: string;
   display: string;
-  name: string;
+  nameKey: string;
   consonantSound: string;
   marks: readonly string[];
   vowel?: Vowel;
@@ -19,7 +19,7 @@ export function toWordAnalysisLetters(letters: readonly LetterData[]): WordAnaly
   return letters.map((letter) => ({
     base: letter.base,
     display: letter.display,
-    name: letter.name,
+    nameKey: letter.nameKey,
     consonantSound: letter.consonantSound,
     marks: [...letter.marks],
     vowel: letter.vowel ? { ...letter.vowel } : undefined,

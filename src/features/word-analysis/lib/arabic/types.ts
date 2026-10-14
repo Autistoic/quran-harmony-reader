@@ -28,7 +28,7 @@ export type Position = "Initial" | "Medial" | "Final" | "Isolated";
 export interface LetterData {
   base: string;
   display: string;
-  name: string;
+  nameKey: string;
   consonantSound: string;
   marks: string[];
   vowel?: Vowel;

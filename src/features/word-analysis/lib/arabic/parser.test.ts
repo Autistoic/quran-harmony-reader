@@ -7,7 +7,7 @@ describe('parseArabicWord', () => {
   it('recognizes Alif wasla and retains shadda and vowel marks', () => {
     const letters = parseArabicWord('ٱلرَّحْمَـٰنِ');
 
-    expect(letters[0].name).toBe('Alif wasla');
+    expect(letters[0].nameKey).toBe('wordAnalysis.letters.alifWasla');
     expect(letters.find(letter => letter.base === 'ر')?.marks).toEqual(['َ', 'ّ']);
     expect(letters.find(letter => letter.base === 'م')?.marks).toEqual(['َ', 'ٰ']);
   });

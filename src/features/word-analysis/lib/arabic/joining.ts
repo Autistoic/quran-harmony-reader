@@ -1,7 +1,7 @@
 import { LETTER_TABLE, NON_CONNECTING_LEFT } from "./constants";
 import type { LetterData, Position } from "./types";
 
-type ConnectionLetter = Pick<LetterData, "base" | "joining" | "name">;
+type ConnectionLetter = Pick<LetterData, "base" | "joining" | "nameKey">;
 
 export interface LetterConnectionState {
   hasPrevious: boolean;

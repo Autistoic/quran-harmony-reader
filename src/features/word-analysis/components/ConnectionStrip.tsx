@@ -56,7 +56,7 @@ const ConnectionStrip = ({ connection, className }: Props) => {
         <span className="max-w-full text-[10px] leading-snug text-muted-foreground sm:text-[11px]">
           {t("wordAnalysis.connection.whyPrevious", {
             position: t(`wordAnalysis.positions.${connection.position}`),
-            previous: connection.previous.name,
+            previous: t(connection.previous.nameKey),
           })}
         </span>
       )}
