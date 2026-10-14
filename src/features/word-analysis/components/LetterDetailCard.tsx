@@ -26,6 +26,7 @@ const LetterDetailCard = ({ letter, index, selected, onSelect, hideDetails }: Pr
   return (
     <button
       type="button"
+      dir="ltr"
       onClick={onSelect}
       className={cn(
         "flex flex-col gap-2 rounded-xl border bg-card/70 p-3 sm:p-4 text-left transition-colors",

@@ -271,7 +271,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         {/* <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
               Letters (reading order, right → left) — tap a card to highlight
             </span> */}
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div dir="rtl" className="grid gap-3 sm:grid-cols-2">
                             {letters.map((letter, i) => (
                                 <LetterDetailCard
                                     key={i}
