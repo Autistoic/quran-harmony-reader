@@ -14,6 +14,12 @@ export default {
     },
     extend: {
       colors: {
+        cut: {
+          DEFAULT: "hsl(var(--cut))",
+          foreground: "hsl(var(--cut-foreground))",
+          soft: "hsl(var(--cut-soft))",
+        },
+        "rail-track": "hsl(var(--rail-track))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -11,8 +11,19 @@
   animation: letter-card-focus-flash 900ms ease-out;
 }
 
+@keyframes rail-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes rail-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes rail-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+.rail-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: rail-draw 450ms ease-out forwards; }
+.rail-pulse { animation: rail-pulse 500ms ease-in-out; }
+.rail-shake:hover, .rail-shake[data-state="open"] { animation: rail-shake 220ms ease-in-out; }
+.rail-node { transition: transform 180ms ease-out; transform-box: fill-box; transform-origin: center; }
+
 @media (prefers-reduced-motion: reduce) {
   .letter-card-focus-flash { animation: none; }
+  .rail-draw { animation: none; stroke-dashoffset: 0; }
+  .rail-pulse, .rail-shake:hover, .rail-shake[data-state="open"] { animation: none; }
+  .rail-node { transition: none; }
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
@@ -58,6 +69,15 @@ All colors MUST be HSL.
     --emerald-light: 158 35% 45%;
     --cream: 45 40% 98%;
     --cream-dark: 45 30% 92%;
+
+    /* Connection rail */
+    --rail-track: 40 18% 81%;
+    --cut: 36 64% 48%;
+    --cut-foreground: 30 75% 26%;
+    --cut-soft: 40 85% 94%;
+    --block-1: 158 45% 25%;
+    --block-2: 172 38% 30%;
+    --block-3: 78 28% 32%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
