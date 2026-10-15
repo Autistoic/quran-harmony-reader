@@ -110,6 +110,30 @@
       "TanweenKasra": "Tanween Kasra",
       "TanweenDamma": "Tanween Damma",
       "SuperscriptAlif": "Alif Daga"
+    },
+    "rail": {
+      "blockSummary_one": "Bloque {n} · 1 letra",
+      "blockSummary_other": "Bloque {n} · {count} letras · un trazo",
+      "cutNonJoining": "{letter} no se une a la siguiente",
+      "cutNonJoiningPrev": "{letter} no se une a la anterior",
+      "cutWordEdge": "Nueva palabra",
+      "popoverTitle": "Corte de conexión",
+      "popoverTitleWord": "Límite de palabra",
+      "popoverWhy": "{letter} nunca se une a la letra que le sigue, así que el trazo termina aquí y la siguiente letra empieza uno nuevo.",
+      "popoverWhyPrev": "{letter} no puede unirse a la letra anterior, así que el trazo se corta aquí.",
+      "popoverWhyWord": "Un espacio separa dos palabras, así que el trazo siempre vuelve a empezar.",
+      "popoverRule": "Las 6 letras que nunca se unen a la siguiente:",
+      "learnMore": "Ver más en Referencia",
+      "railLabel": "Riel de conexiones",
+      "nodeLabel": "Letra {index} de {total}: {name}, {status}, bloque {block}",
+      "ligatureLabel": "Ligadura Lam-Alif, letras {index} y {next} de {total}, bloque {block}",
+      "status_both": "unida a la anterior y a la siguiente",
+      "status_previous": "unida solo a la anterior",
+      "status_next": "unida solo a la siguiente",
+      "status_none": "sin unir",
+      "segmentLabel": "Conectada con la siguiente letra",
+      "cutLabel": "Corte de conexión después de {letter}",
+      "cutLabelWord": "Límite de palabra después de {letter}"
     }
   }
 }

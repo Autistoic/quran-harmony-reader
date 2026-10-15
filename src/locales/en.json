@@ -110,6 +110,30 @@
       "TanweenKasra": "Tanween Kasra",
       "TanweenDamma": "Tanween Damma",
       "SuperscriptAlif": "Dagger Alif"
+    },
+    "rail": {
+      "blockSummary_one": "Block {n} · 1 letter",
+      "blockSummary_other": "Block {n} · {count} letters · one stroke",
+      "cutNonJoining": "{letter} doesn't join the next letter",
+      "cutNonJoiningPrev": "{letter} doesn't join the previous letter",
+      "cutWordEdge": "New word",
+      "popoverTitle": "Connection break",
+      "popoverTitleWord": "Word boundary",
+      "popoverWhy": "{letter} never connects to the letter after it, so the stroke ends here and the next letter starts a new one.",
+      "popoverWhyPrev": "{letter} can't connect to the letter before it, so the stroke breaks here.",
+      "popoverWhyWord": "A space separates two words, so the stroke always restarts.",
+      "popoverRule": "The 6 letters that never join the next one:",
+      "learnMore": "Learn more in Reference",
+      "railLabel": "Connection rail",
+      "nodeLabel": "Letter {index} of {total}: {name}, {status}, block {block}",
+      "ligatureLabel": "Lam-Alif ligature, letters {index} and {next} of {total}, block {block}",
+      "status_both": "joined to previous and next",
+      "status_previous": "joined to previous only",
+      "status_next": "joined to next only",
+      "status_none": "not joined",
+      "segmentLabel": "Connected to next letter",
+      "cutLabel": "Connection break after {letter}",
+      "cutLabelWord": "Word boundary after {letter}"
     }
   }
 }
