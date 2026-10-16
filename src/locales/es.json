@@ -31,6 +31,39 @@
       "none": "No se une a ninguna",
       "whyPrevious": "{{position}} porque {{previous}} no se une a ella."
     },
+    "rail": {
+      "block": {
+        "one": "Bloque {block} · {count} letra · un trazo",
+        "many": "Bloque {block} · {count} letras · un trazo"
+      },
+      "cutLabel": "{letter} no se une a la siguiente letra",
+      "wordSeparator": "Nueva palabra",
+      "cutReason": {
+        "nonJoining": "{letter} no puede unirse hacia delante, así que la siguiente letra inicia un trazo nuevo.",
+        "wordEdge": "El espacio termina esta palabra. La siguiente empieza un trazo aparte."
+      },
+      "popover": {
+        "title": "Separación después de {letter}",
+        "ruleIntro": "Las 6 letras que nunca se unen a la siguiente:",
+        "ruleLetters": "Alif, Dal, Dhal, Ra, Zay, Waw",
+        "learnMore": "Más información"
+      },
+      "aria": {
+        "list": "Riel de unión entre letras",
+        "word": "Palabra {index}",
+        "wordEdge": "Riel de unión de palabra separado",
+        "node": "Letra {index} de {count}: {letter}, unida {joins}, bloque {block}",
+        "ligature": "Ligadura lam-alif para las letras {start} y {end} de {count}, bloque {block}",
+        "segment": "Unida a la siguiente letra",
+        "cut": "Separación después de {letter}",
+        "joining": {
+          "both": "a la anterior y a la siguiente",
+          "previous": "a la anterior",
+          "next": "a la siguiente",
+          "none": "a ninguna vecina"
+        }
+      }
+    },
     "letters": {
       "alif": "Alif",
       "alifWasla": "Alif wasla",

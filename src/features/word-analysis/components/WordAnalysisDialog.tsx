@@ -1,9 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import LetterDetailCard from "./LetterDetailCard";
+import ConnectionRail from "./ConnectionRail";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getLetterConnection } from "../lib/arabic/joining";
+import { buildCuts, buildStrokeBlocks, buildWordRanges } from "../lib/utils/strokeBlocks";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -30,24 +32,70 @@ interface HighlightRect {
     containerHeight: number;
 }
 
+interface PreviewBlock {
+    key: string;
+    id: number;
+    startIndex: number;
+    endIndex: number;
+    startOffset: number;
+    endOffset: number;
+}
+
 const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning, letters, onOpenReference, selectedIndex: controlledSelected, onSelectedIndexChange, hideDetails, setHideDetails }: Props) => {
     const { t } = useTranslation();
     const [internalSelected, setInternalSelected] = useState<number | null>(null);
     const isControlled = controlledSelected !== undefined;
     const selectedIndex = isControlled ? controlledSelected : internalSelected;
-    const setSelectedIndex = (i: number | null) => {
+    const setSelectedIndex = useCallback((i: number | null) => {
         if (!isControlled) setInternalSelected(i);
         onSelectedIndexChange?.(i);
-    };
+    }, [isControlled, onSelectedIndexChange]);
     const [rect, setRect] = useState<HighlightRect | null>(null);
+    const [previewBlockRects, setPreviewBlockRects] = useState<Record<string, HighlightRect>>({});
     const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
+    const [focusedLetterIndex, setFocusedLetterIndex] = useState<number | null>(null);
+    const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
+    const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLSpanElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const letterCardRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const letterCardContainerRefs = useRef<Array<HTMLDivElement | null>>([]);
     const focusFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const toggleHideDetails = () => {
-        setHideDetails(!hideDetails);
-    };
+    const wordGroups = useMemo(() => buildWordRanges(letters, word).map((range, groupIndex) => {
+        const groupLetters = letters.slice(range.startIndex, range.endIndex + 1);
+        const blocks = buildStrokeBlocks(groupLetters).map((block) => ({
+            ...block,
+            key: `word-${range.startIndex}-block-${block.id}`,
+        }));
+        return {
+            ...range,
+            index: groupIndex,
+            letters: groupLetters,
+            blocks,
+            cuts: buildCuts(groupLetters, word),
+        };
+    }), [letters, word]);
+    const blockKeyByLetter = useMemo(() => {
+        const keys: Array<string | undefined> = new Array(letters.length);
+        wordGroups.forEach((group) => group.blocks.forEach((block) => {
+            for (let index = block.startIndex; index <= block.endIndex; index += 1) {
+                keys[group.startIndex + index] = block.key;
+            }
+        }));
+        return keys;
+    }, [letters.length, wordGroups]);
+    const previewBlocks = useMemo<PreviewBlock[]>(() => wordGroups.flatMap((group) => group.blocks.map((block) => ({
+        key: block.key,
+        id: block.id,
+        startIndex: group.startIndex + block.startIndex,
+        endIndex: group.startIndex + block.endIndex,
+        startOffset: letters[group.startIndex + block.startIndex]?.startOffset ?? 0,
+        endOffset: letters[group.startIndex + block.endIndex]?.endOffset ?? 0,
+    }))), [letters, wordGroups]);
+    const selectedBlockKey = selectedIndex === null ? null : blockKeyByLetter[selectedIndex] ?? null;
+    const highlightedBlockKey = hoveredBlockKey ?? selectedBlockKey;
+    const previewLetterIndex = hoveredCardIndex ?? focusedLetterIndex ?? selectedIndex;
     const canGoPrevious = selectedIndex !== null && selectedIndex > 0;
     const canGoNext = letters.length > 0 && (selectedIndex === null || selectedIndex < letters.length - 1);
     const focusLetterCard = (index: number) => {
@@ -63,6 +111,9 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
     const selectLetter = (index: number) => {
         setSelectedIndex(index);
         focusLetterCard(index);
+    };
+    const onBlockHover = (index: number, active: boolean) => {
+        setHoveredBlockKey(active ? blockKeyByLetter[index] ?? null : null);
     };
     const goPrevious = () => {
         if (selectedIndex !== null && canGoPrevious) selectLetter(selectedIndex - 1);
@@ -98,7 +149,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
 
     useLayoutEffect(() => {
         const compute = () => {
-            if (selectedIndex === null) {
+            if (previewLetterIndex === null) {
                 setRect(null);
                 return;
             }
@@ -107,7 +158,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             if (!container || !span) return;
             const textNode = span.firstChild;
             if (!(textNode instanceof Text)) return;
-            const letter = letters[selectedIndex];
+            const letter = letters[previewLetterIndex];
             if (!letter) return;
 
             const len = textNode.data.length;
@@ -218,7 +269,94 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             cancelAnimationFrame(raf);
             window.removeEventListener("resize", onResize);
         };
-    }, [selectedIndex, word, letters, open]);
+    }, [previewLetterIndex, word, letters, open]);
+
+    // Measure a range for each joined block without splitting the Arabic text node,
+    // preserving contextual ligatures and the existing word-level shaping.
+    useLayoutEffect(() => {
+        const computeBlockRects = () => {
+            const container = containerRef.current;
+            const span = textRef.current;
+            const textNode = span?.firstChild;
+            if (!container || !(textNode instanceof Text)) return;
+
+            const containerBox = container.getBoundingClientRect();
+            const nextRects: Record<string, HighlightRect> = {};
+            previewBlocks.forEach((block) => {
+                const start = Math.min(block.startOffset, textNode.data.length);
+                const end = Math.min(block.endOffset, textNode.data.length);
+                if (start >= end) return;
+                const range = document.createRange();
+                try {
+                    range.setStart(textNode, start);
+                    range.setEnd(textNode, end);
+                } catch {
+                    return;
+                }
+                const bounds = range.getBoundingClientRect();
+                if (bounds.width <= 0 || bounds.height <= 0) return;
+                const padX = 3.5;
+                const padY = 5;
+                nextRects[block.key] = {
+                    left: bounds.left - containerBox.left - padX,
+                    top: bounds.top - containerBox.top - padY,
+                    width: bounds.width + padX * 2,
+                    height: bounds.height + padY * 2,
+                    containerWidth: containerBox.width,
+                    containerHeight: containerBox.height,
+                };
+            });
+            setPreviewBlockRects((current) => {
+                const keys = Object.keys(nextRects);
+                if (keys.length === Object.keys(current).length && keys.every((key) => {
+                    const a = current[key];
+                    const b = nextRects[key];
+                    return !!a && Math.abs(a.left - b.left) < 0.5 && Math.abs(a.top - b.top) < 0.5
+                        && Math.abs(a.width - b.width) < 0.5 && Math.abs(a.height - b.height) < 0.5;
+                })) return current;
+                return nextRects;
+            });
+        };
+
+        const frame = requestAnimationFrame(computeBlockRects);
+        const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(computeBlockRects);
+        if (containerRef.current) observer?.observe(containerRef.current);
+        window.addEventListener("resize", computeBlockRects);
+        document.fonts?.ready.then(computeBlockRects).catch(() => undefined);
+        return () => {
+            cancelAnimationFrame(frame);
+            observer?.disconnect();
+            window.removeEventListener("resize", computeBlockRects);
+        };
+    }, [previewBlocks, word, open]);
+
+    // Keep the active card synchronized with the dialog's scroll viewport.
+    useEffect(() => {
+        const root = scrollContainerRef.current;
+        if (!root || !open || typeof IntersectionObserver === "undefined") return;
+        const observer = new IntersectionObserver(() => {
+            const bounds = root.getBoundingClientRect();
+            const center = bounds.top + bounds.height / 2;
+            let nearestIndex = -1;
+            let nearestDistance = Infinity;
+            letterCardRefs.current.forEach((card, index) => {
+                if (!card) return;
+                const cardBounds = card.getBoundingClientRect();
+                if (cardBounds.bottom <= bounds.top || cardBounds.top >= bounds.bottom) return;
+                const distance = Math.abs(cardBounds.top + cardBounds.height / 2 - center);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestIndex = index;
+                }
+            });
+            if (nearestIndex >= 0) {
+                setFocusedLetterIndex((current) => current !== nearestIndex ? null : current);
+                setSelectedIndex(nearestIndex);
+            }
+        }, { root, threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] });
+        letterCardRefs.current.forEach((card) => { if (card) observer.observe(card); });
+        return () => observer.disconnect();
+    }, [letters.length, open, setSelectedIndex]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -233,33 +371,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                     tabIndex={0}
                     onKeyDown={handleHeaderKeyDown}
                 >
-                    {/*
-                    <div className="relative z-10 flex items-center justify-center gap-2 px-12 sm:px-20">
-                        {onOpenReference && (
-                            <button
-                                type="button"
-                                onClick={onOpenReference}
-                                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-                                aria-label={t("common.reference")}
-                            >
-                                <BookOpen className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">{t("common.reference")}</span>
-                            </button>
-                        )}
-
-                        <button
-                            type="button"
-                            onClick={toggleHideDetails}
-                            aria-label={t("common.toggleDetails")}
-                            className="inline-flex items-center justify-center rounded-md border border-border px-2 py-1"
-                        >
-                            {hideDetails ? (
-                                <EyeOff className="h-4 w-4" />
-                            ) : (
-                                <Eye className="h-4 w-4" />
-                            )}
-                        </button>
-                    </div> */}
 
                     <div className="relative z-10 flex min-w-0 flex-col items-center gap-5 px-12 text-center sm:gap-6 sm:px-20">
                         {!hideDetails && (
@@ -272,7 +383,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                             className="relative mt-8 font-arabic text-7xl sm:text-8xl md:text-9xl leading-[1.6] select-none"
                             style={{ direction: "rtl" }}
                         >
-                            {/* Precision highlight background pill */}
+                            {/* Precision highlight remains tied to the active logical letter. */}
                             {rect && (
                                 <span
                                     aria-hidden
@@ -287,18 +398,38 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                 />
                             )}
 
-                            {/* Base text layer: full word preserved for unbroken shaping, dimmed when letter active */}
+                            {/* Preserve the full word's contextual Arabic shaping. */}
                             <span
                                 ref={textRef}
                                 className={cn(
                                     "relative z-[1] transition-colors duration-200",
-                                    selectedIndex !== null ? "text-muted-foreground/35" : "text-primary"
+                                    previewLetterIndex !== null ? "text-muted-foreground/35" : "text-primary"
                                 )}
                             >
                                 {word}
                             </span>
 
-                            {/* Active text layer: intact word clipped to active letter bounds */}
+                            {previewBlocks.map((block) => {
+                                const blockRect = previewBlockRects[block.key];
+                                if (!blockRect) return null;
+                                const tone = ["--stroke-block-1", "--stroke-block-2", "--stroke-block-3"][(block.id - 1) % 3];
+                                return (
+                                    <span
+                                        key={`underline-${block.key}`}
+                                        aria-hidden
+                                        className="pointer-events-none absolute z-[1] h-[3px] rounded-full transition-opacity duration-200"
+                                        style={{
+                                            left: blockRect.left,
+                                            top: blockRect.top + blockRect.height + 2,
+                                            width: blockRect.width,
+                                            backgroundColor: `hsl(var(${tone}))`,
+                                            opacity: 1,
+                                        }}
+                                    />
+                                );
+                            })}
+
+                            {/* Reveal only the active letter while preserving the shaped word layer. */}
                             {rect && (
                                 <span
                                     aria-hidden
@@ -342,27 +473,83 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                 </div>
 
                 {/* Scrollable body */}
-                <div className="overflow-y-auto px-6 py-4" onKeyDown={handleHeaderKeyDown}>
-                    <div className="flex flex-col gap-2">
+                <div ref={scrollContainerRef} className="overflow-y-auto px-6 py-4" onKeyDown={handleHeaderKeyDown}>
+                    <div className="flex flex-col gap-3">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground px-1" dir="rtl">
                             {t("common.readingOrder")}
                         </span>
-                        <div dir="rtl" className="grid grid-cols-1 gap-3">
-                            {letters.map((letter, i) => (
-                                <LetterDetailCard
-                                    key={i}
-                                    cardRef={(node) => { letterCardRefs.current[i] = node; }}
-                                    letter={letter}
-                                    connection={getLetterConnection(letters, i)}
-                                    index={i}
-                                    selected={selectedIndex === i}
-                                    navigationFocused={focusedCardIndex === i}
-                                    onSelect={() => {
-                                        setSelectedIndex(selectedIndex === i ? null : i);
-                                        focusLetterCard(i);
-                                    }}
-                                    hideDetails={hideDetails}
-                                />
+                        <div dir="rtl" className="flex flex-col gap-4">
+                            {wordGroups.map((group, groupIndex) => (
+                                <section key={`word-${group.startIndex}`} aria-label={t("wordAnalysis.rail.aria.word", { index: groupIndex + 1 })}>
+                                    {groupIndex > 0 && (
+                                        <div role="separator" aria-label={t("wordAnalysis.rail.aria.wordEdge")} className="mb-4 flex items-center gap-3 px-1">
+                                            <span className="h-px flex-1 bg-[hsl(var(--connection-cut))]/50" />
+                                            <span className="rounded-full border border-[hsl(var(--connection-cut))]/30 bg-[hsl(var(--connection-cut-tint))] px-2.5 py-1 text-[10px] font-semibold text-[hsl(var(--connection-cut-foreground))]">
+                                                {t("wordAnalysis.rail.wordSeparator")}
+                                            </span>
+                                            <span className="h-px flex-1 bg-[hsl(var(--connection-cut))]/50" />
+                                        </div>
+                                    )}
+                                    <div dir="ltr" className="grid grid-cols-[24px_minmax(0,1fr)] items-stretch gap-x-3 min-[481px]:grid-cols-[28px_minmax(0,1fr)]">
+                                        <ConnectionRail
+                                            letters={group.letters}
+                                            word={word}
+                                            ranges={[{ startIndex: 0, endIndex: group.letters.length - 1 }]}
+                                            blocks={group.blocks}
+                                            cuts={group.cuts.filter((cut) => cut.reason !== "word-edge")}
+                                            cardRefs={letterCardRefs}
+                                            cardContainerRefs={letterCardContainerRefs}
+                                            indexOffset={group.startIndex}
+                                            totalLetters={letters.length}
+                                            selectedIndex={selectedIndex !== null && selectedIndex >= group.startIndex && selectedIndex <= group.endIndex ? selectedIndex - group.startIndex : null}
+                                            highlightedBlockKey={highlightedBlockKey}
+                                            onBlockHover={setHoveredBlockKey}
+                                            onSelectIndex={(index) => selectLetter(group.startIndex + index)}
+                                            onOpenReference={onOpenReference}
+                                        />
+                                        <div className="flex min-w-0 flex-col gap-3">
+                                            {group.letters.map((letter, localIndex) => {
+                                                const index = group.startIndex + localIndex;
+                                                const block = group.blocks.find((item) => item.startIndex <= localIndex && item.endIndex >= localIndex);
+                                                const isBlockStart = block?.startIndex === localIndex;
+                                                const hasCutAfter = group.cuts.some((cut) => cut.afterIndex === localIndex && cut.reason === "non-joining-letter");
+                                                return (
+                                                    <div key={index} className={hasCutAfter && localIndex < group.letters.length - 1 ? "mb-[22px]" : undefined}>
+                                                        {isBlockStart && block.size >= 2 && (
+                                                            <div className="mb-1 flex min-h-5 items-center justify-end pr-2">
+                                                                <span
+                                                                    data-active={highlightedBlockKey === block.key}
+                                                                    className="connection-block-label max-w-full truncate rounded-md border bg-background/95 px-2 py-0.5 text-[11px] font-semibold shadow-sm"
+                                                                    style={{
+                                                                        color: `hsl(var(${["--stroke-block-1", "--stroke-block-2", "--stroke-block-3"][(block.id - 1) % 3]}))`,
+                                                                        borderColor: `hsl(var(${["--stroke-block-1", "--stroke-block-2", "--stroke-block-3"][(block.id - 1) % 3]}) / 0.35)`,
+                                                                    }}
+                                                                >
+                                                                    {t("wordAnalysis.rail.block.many", { block: block.id, count: block.size })}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <LetterDetailCard
+                                                            cardRef={(node) => { letterCardRefs.current[index] = node; }}
+                                                            cardContainerRef={(node) => { letterCardContainerRefs.current[index] = node; }}
+                                                            letter={letter}
+                                                            connection={getLetterConnection(group.letters, localIndex)}
+                                                            index={index}
+                                                            selected={selectedIndex === index}
+                                                            navigationFocused={focusedCardIndex === index}
+                                                            isException={getLetterConnection(group.letters, localIndex).previousBreaksConnection}
+                                                            onBlockHover={(active) => onBlockHover(index, active)}
+                                                            onLetterHover={(active) => setHoveredCardIndex(active ? index : null)}
+                                                            onLetterFocus={(active) => setFocusedLetterIndex(active ? index : null)}
+                                                            onSelect={() => setSelectedIndex(selectedIndex === index ? null : index)}
+                                                            hideDetails={hideDetails}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </section>
                             ))}
                         </div>
                     </div>

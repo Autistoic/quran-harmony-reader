@@ -1,11 +1,12 @@
 import { useId, useState, type Ref } from "react";
 import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
 import { getContextualForms } from "../lib/arabic/forms";
 import type { LetterConnectionState } from "../lib/arabic/joining";
-import ConnectionStrip from "./ConnectionStrip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -24,32 +25,73 @@ interface Props {
   onSelect?: () => void;
   hideDetails?: boolean;
   cardRef?: Ref<HTMLButtonElement>;
+  cardContainerRef?: Ref<HTMLDivElement>;
   navigationFocused?: boolean;
+  isException?: boolean;
+  onBlockHover?: (active: boolean) => void;
+  onLetterHover?: (active: boolean) => void;
+  onLetterFocus?: (active: boolean) => void;
 }
 
-const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideDetails, cardRef, navigationFocused }: Props) => {
+const LetterDetailCard = ({
+  letter,
+  connection,
+  index,
+  selected,
+  onSelect,
+  cardRef,
+  cardContainerRef,
+  navigationFocused,
+  isException,
+  onBlockHover,
+  onLetterHover,
+  onLetterFocus,
+}: Props) => {
   const forms = getContextualForms(letter.base);
   const activeForm = forms[connection.position.toLowerCase() as keyof typeof forms];
   const { t } = useTranslation();
   const [showForms, setShowForms] = useState(false);
   const formsId = useId();
 
+  const toggleForms = () => {
+    setShowForms((visible) => !visible);
+  };
+
   return (
-    <div
+    <Card
+      ref={cardContainerRef}
       dir="ltr"
+      onMouseEnter={() => {
+        onBlockHover?.(true);
+        onLetterHover?.(true);
+      }}
+      onMouseLeave={() => {
+        onBlockHover?.(false);
+        onLetterHover?.(false);
+      }}
       className={cn(
         "group overflow-visible rounded-2xl border bg-card/75 text-left transition-all duration-200",
         "hover:border-primary/50 hover:bg-card hover:shadow-md",
         navigationFocused && "letter-card-focus-flash",
+        isException && "border-l-[3px] border-l-[hsl(var(--connection-cut))]",
         selected ? "border-primary ring-2 ring-primary/40 bg-primary/5 shadow-sm" : "border-border/80 shadow-xs",
       )}
     >
-      <button
+      <Button
         ref={cardRef}
         type="button"
+        variant="ghost"
         onClick={onSelect}
+        onFocus={() => {
+          onBlockHover?.(true);
+          onLetterFocus?.(true);
+        }}
+        onBlur={() => {
+          onBlockHover?.(false);
+          onLetterFocus?.(false);
+        }}
         aria-pressed={selected}
-        className="grid w-full grid-cols-1 gap-4 rounded-t-2xl p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[minmax(0,1fr)_minmax(8rem,0.65fr)_minmax(14rem,0.9fr)] sm:items-center sm:gap-5 sm:p-5"
+        className="grid h-auto w-full grid-cols-1 gap-4 rounded-t-2xl p-4 text-left hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[minmax(0,1fr)_minmax(14rem,0.9fr)] sm:items-center sm:gap-5 sm:p-5"
       >
         <div className="flex min-w-0 flex-col items-start gap-2.5">
           <div className="flex min-w-0 items-center gap-2 text-muted-foreground/70">
@@ -57,11 +99,9 @@ const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideD
             <span className="text-muted-foreground/40">•</span>
             <span className="truncate text-sm font-medium text-muted-foreground sm:text-base">{t(letter.nameKey)}</span>
           </div>
-          {!hideDetails && (
-            <span className="inline-flex w-fit items-center rounded-md border border-border/50 bg-secondary/60 px-3 py-1 font-mono text-base font-bold tracking-tight text-foreground shadow-2xs sm:text-lg">
-              /{getFullSound(letter) || "∅"}/
-            </span>
-          )}
+          <span className="inline-flex w-fit items-center rounded-md border border-border/50 bg-secondary/60 px-3 py-1 font-mono text-base font-bold tracking-tight text-foreground shadow-2xs sm:text-lg">
+            /{getFullSound(letter) || "∅"}/
+          </span>
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="rounded-md border border-border/30 bg-secondary/80 px-2.5 py-1 text-xs font-medium text-secondary-foreground">
               {t(`wordAnalysis.positions.${connection.position}`)}
@@ -72,14 +112,13 @@ const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideD
               </span>
             )}
             {letter.vowel && (
-              <span className="rounded-md border border-accent/20 bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent">
+              <span className="rounded-md border border-accent/20 bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent-foreground">
                 {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
                 {letter.vowel.sound ? ` → ${letter.vowel.sound}` : " → ∅"}
               </span>
             )}
           </div>
         </div>
-        <ConnectionStrip className="w-full sm:justify-self-center" connection={connection} />
         <span
           role="img"
           aria-label={`${t("wordAnalysis.positions.Isolated")}: ${forms.isolated}; ${t(`wordAnalysis.positions.${connection.position}`)}: ${activeForm}`}
@@ -103,22 +142,24 @@ const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideD
             </span>
           </span>
         </span>
-      </button>
+      </Button>
 
       <div className="flex justify-end px-2 pb-1">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           aria-label={t(showForms ? "wordAnalysis.hideForms" : "wordAnalysis.viewForms")}
           aria-expanded={showForms}
           aria-controls={formsId}
-          onClick={() => setShowForms((visible) => !visible)}
+          onClick={toggleForms}
           className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronDown
             aria-hidden="true"
             className={cn("h-4 w-4 transition-transform duration-200 motion-reduce:transition-none", showForms && "rotate-180")}
           />
-        </button>
+        </Button>
       </div>
 
       <div
@@ -157,7 +198,7 @@ const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideD
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

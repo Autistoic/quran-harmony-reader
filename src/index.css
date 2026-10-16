@@ -11,11 +11,67 @@
   animation: letter-card-focus-flash 900ms ease-out;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .letter-card-focus-flash { animation: none; }
+@keyframes connection-rail-draw {
+  to { stroke-dashoffset: 0; }
 }
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+@keyframes connection-rail-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes connection-cut-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(-2px, 0) rotate(-3deg); }
+  75% { transform: translate(2px, 0) rotate(3deg); }
+}
+
+.connection-rail { overflow: visible; }
+
+.connection-stroke-draw {
+  stroke-dashoffset: 1;
+  animation: connection-rail-draw 450ms ease-out var(--draw-delay, 0ms) both;
+}
+
+.connection-stroke-pulse {
+  stroke-dashoffset: 0;
+  animation: connection-rail-pulse 500ms ease-out 1;
+}
+
+.connection-rail-node-circle { transition: r 180ms ease, fill 180ms ease, stroke 180ms ease; }
+
+.connection-rail-node-highlight {
+  transform: scale(1.12);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.connection-cut-trigger:hover > span,
+.connection-cut-trigger:focus-visible > span,
+.connection-cut-trigger[aria-expanded="true"] > span { animation: connection-cut-shake 220ms ease-in-out; }
+
+.connection-block-label { background-color: hsl(var(--background) / 0.96); }
+
+@media (max-width: 480px) {
+  .connection-block-label:not([data-active="true"]) { display: none; }
+  .connection-cut-label { display: none; }
+  .connection-rail-node-circle:not([data-active="true"]) { r: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-card-focus-flash,
+  .connection-stroke-draw,
+  .connection-stroke-pulse,
+  .connection-cut-trigger:hover > span,
+  .connection-cut-trigger:focus-visible > span,
+  .connection-cut-trigger[aria-expanded="true"] > span { animation: none; }
+  .connection-stroke-draw { stroke-dashoffset: 0; }
+  .connection-rail-node-circle { transition: none; }
+  .connection-rail-node-highlight { transform: none; }
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
 
@@ -50,6 +106,16 @@ All colors MUST be HSL.
     --ring: 158 45% 25%;
 
     --radius: 0.75rem;
+
+    /* Low-saturation rail tones and high-contrast connection-break surfaces. */
+    --rail-track: 40 18% 81%;
+    --stroke-block-soft: 154 22% 87%;
+    --stroke-block-1: 158 38% 36%;
+    --stroke-block-2: 169 32% 38%;
+    --stroke-block-3: 76 31% 37%;
+    --connection-cut: 31 68% 35%;
+    --connection-cut-tint: 39 90% 92%;
+    --connection-cut-foreground: 29 77% 28%;
 
     /* Custom Quran theme */
     --gold: 43 80% 55%;
@@ -98,6 +164,15 @@ All colors MUST be HSL.
     --input: 150 20% 20%;
     --ring: 43 80% 55%;
 
+    --rail-track: 150 13% 31%;
+    --stroke-block-soft: 156 25% 24%;
+    --stroke-block-1: 155 40% 58%;
+    --stroke-block-2: 172 36% 58%;
+    --stroke-block-3: 78 38% 57%;
+    --connection-cut: 38 78% 62%;
+    --connection-cut-tint: 35 38% 22%;
+    --connection-cut-foreground: 39 88% 72%;
+
     --gold: 43 80% 55%;
     --gold-light: 43 70% 45%;
     --emerald: 158 45% 35%;
@@ -117,11 +192,6 @@ All colors MUST be HSL.
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
 }
