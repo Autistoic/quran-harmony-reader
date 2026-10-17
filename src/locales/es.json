@@ -18,12 +18,17 @@
   },
   "wordAnalysis": {
     "letterNavigation": "Navegación por letras",
+    "lesson": "Lección",
+    "cardAriaLabel": "Lección {index}, {letter}, fonética {sound}. Forma actual: {form}.",
+    "contextualFormNames": {
+      "Isolated": "Aislada",
+      "Initial": "Inicial",
+      "Medial": "Media",
+      "Final": "Final"
+    },
+    "currentForm": "*Esta es la forma actual",
     "nextLetter": "Siguiente letra",
     "previousLetter": "Anterior letra",
-    "viewForms": "Ver todas las formas",
-    "hideForms": "Ocultar formas",
-    "referenceGlyph": "Aislada (Referencia)",
-    "contextGlyph": "En contexto ({position})",
     "connection": {
       "both": "Se une a ambos lados",
       "previousOnly": "Se une solo a la anterior",

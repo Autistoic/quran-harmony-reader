@@ -115,8 +115,7 @@ interface Props {
   indexOffset: number;
   totalLetters: number;
   selectedIndex: number | null;
-  highlightedBlockKey: string | null;
-  onBlockHover: (key: string | null) => void;
+  selectedBlockKey: string | null;
   onSelectIndex: (index: number) => void;
   onOpenReference?: () => void;
 }
@@ -142,15 +141,11 @@ function RailCut({
   cut,
   letter,
   onOpenReference,
-  blockKey,
-  onBlockHover,
   t,
 }: {
   cut: StrokeCut;
   letter: WordAnalysisLetter;
   onOpenReference?: () => void;
-  blockKey: string;
-  onBlockHover: (key: string | null) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
 }) {
   const [open, setOpen] = useState(false);
@@ -168,10 +163,6 @@ function RailCut({
           aria-label={t("wordAnalysis.rail.aria.cut", { letter: letterName })}
           aria-expanded={open}
           title={t("wordAnalysis.rail.cutLabel", { letter: letterName })}
-          onMouseEnter={() => onBlockHover(blockKey)}
-          onMouseLeave={() => onBlockHover(null)}
-          onFocus={() => onBlockHover(blockKey)}
-          onBlur={() => onBlockHover(null)}
           className="connection-cut-trigger inline-flex h-full w-full items-center justify-center rounded-full bg-background/90 text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-foreground/70"
         >
           <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[hsl(var(--connection-cut))] text-background shadow-sm ring-2 ring-background">
@@ -222,7 +213,7 @@ function RailCut({
   );
 }
 
-const ConnectionRail = ({ letters, word, ranges, blocks, cuts, cardRefs, cardContainerRefs, indexOffset, totalLetters, selectedIndex, highlightedBlockKey, onBlockHover, onSelectIndex, onOpenReference }: Props) => {
+const ConnectionRail = ({ letters, word, ranges, blocks, cuts, cardRefs, cardContainerRefs, indexOffset, totalLetters, selectedIndex, selectedBlockKey, onSelectIndex, onOpenReference }: Props) => {
   const { t } = useTranslation();
   const { railRef, centers, cutCenters, height, width } = useCardPositions(cardRefs, cardContainerRefs, letters.length, indexOffset);
   const rangeForLetter = new Array<LetterWordRange | undefined>(letters.length);
@@ -315,7 +306,7 @@ const ConnectionRail = ({ letters, word, ranges, blocks, cuts, cardRefs, cardCon
           />
         ))}
         {trackSegments.filter(({ joined }) => joined).map(({ node, next }, index) => {
-          const active = highlightedBlockKey === node.blockKey;
+          const active = selectedBlockKey === node.blockKey;
           const length = Math.abs(next.y - node.y);
           return (
             <g key={`stroke-${node.index}`} className={active ? "connection-stroke-pulse" : undefined}>
@@ -348,7 +339,7 @@ const ConnectionRail = ({ letters, word, ranges, blocks, cuts, cardRefs, cardCon
 
         {visibleNodes.filter((node) => Number.isFinite(node.y)).map((node) => {
           const isActive = node.letterIndexes.includes(selectedIndex ?? -1);
-          const isHighlighted = highlightedBlockKey === node.blockKey;
+          const isHighlighted = selectedBlockKey === node.blockKey;
           const radius = isActive ? 10 : 7;
           const blockTone = BLOCK_TONES[(node.blockId - 1) % BLOCK_TONES.length];
           return (
@@ -402,33 +393,12 @@ const ConnectionRail = ({ letters, word, ranges, blocks, cuts, cardRefs, cardCon
               aria-label={nodeLabel}
               aria-current={node.letterIndexes.includes(selectedIndex ?? -1) ? "true" : undefined}
               onClick={() => onSelectIndex(node.index)}
-              onMouseEnter={() => onBlockHover(node.blockKey)}
-              onMouseLeave={() => onBlockHover(null)}
-              onFocus={() => onBlockHover(node.blockKey)}
-              onBlur={() => onBlockHover(null)}
               className="h-full w-full rounded-full bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
             />
           </div>
         );
       })}
 
-      {trackSegments.map(({ node, next, joined }) => {
-        if (!joined) return null;
-        const midpoint = (node.y + next.y) / 2;
-        return (
-          <div key={`segment-hit-${node.index}`} role="presentation" className="absolute left-1/2 z-10 h-11 w-11 -translate-x-1/2 -translate-y-1/2" style={{ top: midpoint }}>
-            <button
-              type="button"
-              aria-label={t("wordAnalysis.rail.aria.segment")}
-              onMouseEnter={() => onBlockHover(node.blockKey)}
-              onMouseLeave={() => onBlockHover(null)}
-              onFocus={() => onBlockHover(node.blockKey)}
-              onBlur={() => onBlockHover(null)}
-              className="h-full w-full rounded-full bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-            />
-          </div>
-        );
-      })}
 
       {trackSegments.filter(({ joined }) => !joined).map(({ node, next, cut, cutY }) => {
         if (!cut) return null;
@@ -440,8 +410,6 @@ const ConnectionRail = ({ letters, word, ranges, blocks, cuts, cardRefs, cardCon
               cut={cut}
               letter={markerLetter}
               onOpenReference={onOpenReference}
-              blockKey={node.blockKey}
-              onBlockHover={onBlockHover}
               t={t}
             />
             <span title={label} className="connection-cut-label pointer-events-none absolute left-[calc(100%+5px)] top-1/2 max-w-[min(15rem,calc(100vw-7rem))] -translate-y-1/2 truncate rounded-md border border-[hsl(var(--connection-cut))]/30 bg-[hsl(var(--connection-cut-tint))] px-2 py-1 text-[11px] font-semibold leading-none text-[hsl(var(--connection-cut-foreground))] shadow-sm">

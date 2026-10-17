@@ -53,12 +53,9 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
     const [rect, setRect] = useState<HighlightRect | null>(null);
     const [previewBlockRects, setPreviewBlockRects] = useState<Record<string, HighlightRect>>({});
     const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
-    const [focusedLetterIndex, setFocusedLetterIndex] = useState<number | null>(null);
-    const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
-    const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLSpanElement>(null);
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const letterListRef = useRef<HTMLDivElement>(null);
     const letterCardRefs = useRef<Array<HTMLButtonElement | null>>([]);
     const letterCardContainerRefs = useRef<Array<HTMLDivElement | null>>([]);
     const focusFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,15 +91,21 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         endOffset: letters[group.startIndex + block.endIndex]?.endOffset ?? 0,
     }))), [letters, wordGroups]);
     const selectedBlockKey = selectedIndex === null ? null : blockKeyByLetter[selectedIndex] ?? null;
-    const highlightedBlockKey = hoveredBlockKey ?? selectedBlockKey;
-    const previewLetterIndex = hoveredCardIndex ?? focusedLetterIndex ?? selectedIndex;
     const canGoPrevious = selectedIndex !== null && selectedIndex > 0;
     const canGoNext = letters.length > 0 && (selectedIndex === null || selectedIndex < letters.length - 1);
     const focusLetterCard = (index: number) => {
         const card = letterCardRefs.current[index];
+        const list = letterListRef.current;
         if (!card) return;
 
-        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (list) {
+            const listRect = list.getBoundingClientRect();
+            const cardRect = card.getBoundingClientRect();
+            const cardTop = list.scrollTop + cardRect.top - listRect.top;
+            const centeredTop = cardTop - (list.clientHeight - cardRect.height) / 2;
+
+            list.scrollTo({ top: centeredTop, behavior: "smooth" });
+        }
         card.focus({ preventScroll: true });
         setFocusedCardIndex(index);
         if (focusFlashTimeout.current) clearTimeout(focusFlashTimeout.current);
@@ -111,9 +114,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
     const selectLetter = (index: number) => {
         setSelectedIndex(index);
         focusLetterCard(index);
-    };
-    const onBlockHover = (index: number, active: boolean) => {
-        setHoveredBlockKey(active ? blockKeyByLetter[index] ?? null : null);
     };
     const goPrevious = () => {
         if (selectedIndex !== null && canGoPrevious) selectLetter(selectedIndex - 1);
@@ -149,7 +149,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
 
     useLayoutEffect(() => {
         const compute = () => {
-            if (previewLetterIndex === null) {
+            if (selectedIndex === null) {
                 setRect(null);
                 return;
             }
@@ -158,7 +158,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             if (!container || !span) return;
             const textNode = span.firstChild;
             if (!(textNode instanceof Text)) return;
-            const letter = letters[previewLetterIndex];
+            const letter = letters[selectedIndex];
             if (!letter) return;
 
             const len = textNode.data.length;
@@ -269,7 +269,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             cancelAnimationFrame(raf);
             window.removeEventListener("resize", onResize);
         };
-    }, [previewLetterIndex, word, letters, open]);
+    }, [selectedIndex, word, letters, open]);
 
     // Measure a range for each joined block without splitting the Arabic text node,
     // preserving contextual ligatures and the existing word-level shaping.
@@ -330,34 +330,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         };
     }, [previewBlocks, word, open]);
 
-    // Keep the active card synchronized with the dialog's scroll viewport.
-    useEffect(() => {
-        const root = scrollContainerRef.current;
-        if (!root || !open || typeof IntersectionObserver === "undefined") return;
-        const observer = new IntersectionObserver(() => {
-            const bounds = root.getBoundingClientRect();
-            const center = bounds.top + bounds.height / 2;
-            let nearestIndex = -1;
-            let nearestDistance = Infinity;
-            letterCardRefs.current.forEach((card, index) => {
-                if (!card) return;
-                const cardBounds = card.getBoundingClientRect();
-                if (cardBounds.bottom <= bounds.top || cardBounds.top >= bounds.bottom) return;
-                const distance = Math.abs(cardBounds.top + cardBounds.height / 2 - center);
-                if (distance < nearestDistance) {
-                    nearestDistance = distance;
-                    nearestIndex = index;
-                }
-            });
-            if (nearestIndex >= 0) {
-                setFocusedLetterIndex((current) => current !== nearestIndex ? null : current);
-                setSelectedIndex(nearestIndex);
-            }
-        }, { root, threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] });
-        letterCardRefs.current.forEach((card) => { if (card) observer.observe(card); });
-        return () => observer.disconnect();
-    }, [letters.length, open, setSelectedIndex]);
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] p-0 bg-background border-border flex flex-col overflow-hidden">
@@ -403,7 +375,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                 ref={textRef}
                                 className={cn(
                                     "relative z-[1] transition-colors duration-200",
-                                    previewLetterIndex !== null ? "text-muted-foreground/35" : "text-primary"
+                                    selectedIndex !== null ? "text-muted-foreground/35" : "text-primary"
                                 )}
                             >
                                 {word}
@@ -473,7 +445,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                 </div>
 
                 {/* Scrollable body */}
-                <div ref={scrollContainerRef} className="overflow-y-auto px-6 py-4" onKeyDown={handleHeaderKeyDown}>
+                <div ref={letterListRef} className="min-h-0 flex-1 overflow-y-auto px-6 py-4" onKeyDown={handleHeaderKeyDown}>
                     <div className="flex flex-col gap-3">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground px-1" dir="rtl">
                             {t("common.readingOrder")}
@@ -502,8 +474,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                             indexOffset={group.startIndex}
                                             totalLetters={letters.length}
                                             selectedIndex={selectedIndex !== null && selectedIndex >= group.startIndex && selectedIndex <= group.endIndex ? selectedIndex - group.startIndex : null}
-                                            highlightedBlockKey={highlightedBlockKey}
-                                            onBlockHover={setHoveredBlockKey}
+                                            selectedBlockKey={selectedBlockKey}
                                             onSelectIndex={(index) => selectLetter(group.startIndex + index)}
                                             onOpenReference={onOpenReference}
                                         />
@@ -518,7 +489,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                                         {isBlockStart && block.size >= 2 && (
                                                             <div className="mb-1 flex min-h-5 items-center justify-end pr-2">
                                                                 <span
-                                                                    data-active={highlightedBlockKey === block.key}
+                                                                    data-active={selectedBlockKey === block.key}
                                                                     className="connection-block-label max-w-full truncate rounded-md border bg-background/95 px-2 py-0.5 text-[11px] font-semibold shadow-sm"
                                                                     style={{
                                                                         color: `hsl(var(${["--stroke-block-1", "--stroke-block-2", "--stroke-block-3"][(block.id - 1) % 3]}))`,
@@ -538,11 +509,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                                             selected={selectedIndex === index}
                                                             navigationFocused={focusedCardIndex === index}
                                                             isException={getLetterConnection(group.letters, localIndex).previousBreaksConnection}
-                                                            onBlockHover={(active) => onBlockHover(index, active)}
-                                                            onLetterHover={(active) => setHoveredCardIndex(active ? index : null)}
-                                                            onLetterFocus={(active) => setFocusedLetterIndex(active ? index : null)}
                                                             onSelect={() => setSelectedIndex(selectedIndex === index ? null : index)}
-                                                            hideDetails={hideDetails}
                                                         />
                                                     </div>
                                                 );
