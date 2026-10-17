@@ -18,18 +18,56 @@
   },
   "wordAnalysis": {
     "letterNavigation": "Letter navigation",
+    "lesson": "Lesson",
+    "cardAriaLabel": "Lesson {index}, {letter}, phonetic {sound}. Current form: {form}.",
+    "contextualFormNames": {
+      "Isolated": "Isolated",
+      "Initial": "Initial",
+      "Medial": "Medial",
+      "Final": "Final"
+    },
+    "currentForm": "*This is the current form",
     "nextLetter": "Next letter",
     "previousLetter": "Previous letter",
-    "viewForms": "View all forms",
-    "hideForms": "Hide forms",
-    "referenceGlyph": "Reference (Isolated)",
-    "contextGlyph": "In context ({position})",
     "connection": {
       "both": "Connects on both sides",
       "previousOnly": "Connects to previous only",
       "nextOnly": "Connects to next only",
       "none": "Does not connect",
       "whyPrevious": "{{position}} because {{previous}} does not connect to it."
+    },
+    "rail": {
+      "block": {
+        "one": "Block {block} · {count} letter · one stroke",
+        "many": "Block {block} · {count} letters · one stroke"
+      },
+      "cutLabel": "{letter} doesn't join the next letter",
+      "wordSeparator": "New word",
+      "cutReason": {
+        "nonJoining": "{letter} cannot connect forward, so the next letter begins a new stroke.",
+        "wordEdge": "A space ends this word. The next word starts a separate stroke."
+      },
+      "popover": {
+        "title": "Connection break after {letter}",
+        "ruleIntro": "The 6 letters that never join the next one:",
+        "ruleLetters": "Alif, Dal, Dhal, Ra, Zay, Waw",
+        "learnMore": "Learn more"
+      },
+      "aria": {
+        "list": "Letter connection rail",
+        "word": "Word {index}",
+        "wordEdge": "Separate word connection rail",
+        "node": "Letter {index} of {count}: {letter}, joined {joins}, block {block}",
+        "ligature": "Lam-Alif ligature for letters {start} and {end} of {count}, block {block}",
+        "segment": "Connected to next letter",
+        "cut": "Connection break after {letter}",
+        "joining": {
+          "both": "to previous and next",
+          "previous": "to previous",
+          "next": "to next",
+          "none": "to neither neighbor"
+        }
+      }
     },
     "letters": {
       "alif": "Alif",

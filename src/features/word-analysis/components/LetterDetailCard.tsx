@@ -1,19 +1,20 @@
-import { useId, useState, type Ref } from "react";
-import { ChevronDown } from "lucide-react";
+import { useId, type Ref } from "react";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
 import { getContextualForms } from "../lib/arabic/forms";
 import type { LetterConnectionState } from "../lib/arabic/joining";
-import ConnectionStrip from "./ConnectionStrip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
-const FORM_ORDER: { key: keyof ReturnType<typeof getContextualForms>; pos: Position; label: string }[] = [
-  { key: "final", pos: "Final", label: "fin" },
-  { key: "medial", pos: "Medial", label: "med" },
-  { key: "initial", pos: "Initial", label: "ini" },
-  { key: "isolated", pos: "Isolated", label: "iso" },
+const FORM_ORDER: { key: keyof ReturnType<typeof getContextualForms>; pos: Position }[] = [
+  { key: "isolated", pos: "Isolated" },
+  { key: "initial", pos: "Initial" },
+  { key: "medial", pos: "Medial" },
+  { key: "final", pos: "Final" },
 ];
 
 interface Props {
@@ -22,142 +23,139 @@ interface Props {
   index: number;
   selected?: boolean;
   onSelect?: () => void;
-  hideDetails?: boolean;
   cardRef?: Ref<HTMLButtonElement>;
+  cardContainerRef?: Ref<HTMLDivElement>;
   navigationFocused?: boolean;
+  isException?: boolean;
 }
 
-const LetterDetailCard = ({ letter, connection, index, selected, onSelect, hideDetails, cardRef, navigationFocused }: Props) => {
+const LetterDetailCard = ({
+  letter,
+  connection,
+  index,
+  selected,
+  onSelect,
+  cardRef,
+  cardContainerRef,
+  navigationFocused,
+  isException,
+}: Props) => {
   const forms = getContextualForms(letter.base);
-  const activeForm = forms[connection.position.toLowerCase() as keyof typeof forms];
   const { t } = useTranslation();
-  const [showForms, setShowForms] = useState(false);
-  const formsId = useId();
+  const sound = getFullSound(letter) || "∅";
+  const formsDescriptionId = useId();
 
   return (
-    <div
+    <Card
+      ref={cardContainerRef}
       dir="ltr"
       className={cn(
-        "group overflow-visible rounded-2xl border bg-card/75 text-left transition-all duration-200",
-        "hover:border-primary/50 hover:bg-card hover:shadow-md",
+        "overflow-hidden rounded-2xl border bg-card/75 text-left transition-all duration-200",
+        "hover:bg-card hover:shadow-md",
         navigationFocused && "letter-card-focus-flash",
+        isException && "border-l-[3px] border-l-[hsl(var(--connection-cut))]",
         selected ? "border-primary ring-2 ring-primary/40 bg-primary/5 shadow-sm" : "border-border/80 shadow-xs",
       )}
     >
-      <button
+      <Button
         ref={cardRef}
         type="button"
+        variant="ghost"
         onClick={onSelect}
+        aria-label={t("wordAnalysis.cardAriaLabel", {
+          index: index + 1,
+          letter: t(letter.nameKey),
+          sound: `/${sound}/`,
+          form: t(`wordAnalysis.positions.${connection.position}`),
+        })}
+        aria-describedby={formsDescriptionId}
         aria-pressed={selected}
-        className="grid w-full grid-cols-1 gap-4 rounded-t-2xl p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[minmax(0,1fr)_minmax(8rem,0.65fr)_minmax(14rem,0.9fr)] sm:items-center sm:gap-5 sm:p-5"
+        className="flex h-auto w-full flex-col gap-3 rounded-none p-3 text-left hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:gap-4 sm:p-4"
       >
-        <div className="flex min-w-0 flex-col items-start gap-2.5">
-          <div className="flex min-w-0 items-center gap-2 text-muted-foreground/70">
-            <span className="shrink-0 text-xs font-mono tracking-wider">#{index + 1}</span>
-            <span className="text-muted-foreground/40">•</span>
-            <span className="truncate text-sm font-medium text-muted-foreground sm:text-base">{t(letter.nameKey)}</span>
-          </div>
-          {!hideDetails && (
-            <span className="inline-flex w-fit items-center rounded-md border border-border/50 bg-secondary/60 px-3 py-1 font-mono text-base font-bold tracking-tight text-foreground shadow-2xs sm:text-lg">
-              /{getFullSound(letter) || "∅"}/
-            </span>
-          )}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="rounded-md border border-border/30 bg-secondary/80 px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-              {t(`wordAnalysis.positions.${connection.position}`)}
-            </span>
-            {hasShadda(letter) && (
-              <span className="rounded-md border border-accent/30 bg-accent/25 px-2.5 py-1 text-xs font-semibold text-accent-foreground">
-                {t("wordAnalysis.chips.shaddah")}
-              </span>
-            )}
-            {letter.vowel && (
-              <span className="rounded-md border border-accent/20 bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent">
-                {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
-                {letter.vowel.sound ? ` → ${letter.vowel.sound}` : " → ∅"}
-              </span>
-            )}
-          </div>
-        </div>
-        <ConnectionStrip className="w-full sm:justify-self-center" connection={connection} />
-        <span
-          role="img"
-          aria-label={`${t("wordAnalysis.positions.Isolated")}: ${forms.isolated}; ${t(`wordAnalysis.positions.${connection.position}`)}: ${activeForm}`}
-          className="grid w-full grid-cols-2 gap-3 sm:max-w-[18rem] sm:justify-self-end sm:gap-4"
-          style={{ direction: "rtl" }}
-        >
-          <span className="flex min-h-[7.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-lg px-2 py-2 text-center sm:min-h-[8rem] sm:px-3">
-            <span aria-hidden="true" className="font-arabic text-5xl leading-normal text-muted-foreground/65 sm:text-6xl">
-              {forms.isolated}
-            </span>
-            <span className="w-full text-[10px] leading-snug text-muted-foreground sm:text-xs">
-              {t("wordAnalysis.referenceGlyph")}
-            </span>
+        <div className="flex min-h-9 w-full min-w-0 items-center gap-2 sm:gap-3">
+          <h3 className="min-w-0 flex-1 truncate font-serif text-sm font-semibold uppercase tracking-wide text-foreground sm:text-base">
+            <span className="text-muted-foreground">#{index + 1}</span>
+            <span className="px-1.5 text-muted-foreground/60">•</span>
+            <span>{t(letter.nameKey)}</span>
+          </h3>
+          <span className="inline-flex shrink-0 items-center rounded-full border border-border/70 bg-secondary/75 px-3 py-1 font-mono text-sm font-bold tracking-tight text-foreground sm:text-base">
+            /{sound}/
           </span>
-          <span className="flex min-h-[7.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-lg border border-primary/30 border-r-2 bg-primary/10 px-2 py-2 text-center shadow-xs sm:min-h-[8rem] sm:px-3">
-            <span aria-hidden="true" className="font-arabic text-6xl leading-normal text-primary drop-shadow-2xs transition-transform duration-200 group-hover:scale-105 sm:text-7xl">
-              {activeForm}
-            </span>
-            <span className="w-full text-[10px] leading-snug text-primary sm:text-xs">
-              {t("wordAnalysis.contextGlyph", { position: t(`wordAnalysis.positions.${connection.position}`) })}
-            </span>
-          </span>
-        </span>
-      </button>
-
-      <div className="flex justify-end px-2 pb-1">
-        <button
-          type="button"
-          aria-label={t(showForms ? "wordAnalysis.hideForms" : "wordAnalysis.viewForms")}
-          aria-expanded={showForms}
-          aria-controls={formsId}
-          onClick={() => setShowForms((visible) => !visible)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ChevronDown
-            aria-hidden="true"
-            className={cn("h-4 w-4 transition-transform duration-200 motion-reduce:transition-none", showForms && "rotate-180")}
-          />
-        </button>
-      </div>
-
-      <div
-        id={formsId}
-        aria-hidden={!showForms}
-        className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none",
-          showForms ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
-        )}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <div className={cn("px-3", showForms && "border-t border-border/50 pb-3 pt-2 sm:px-3.5")}>
-            <div className="flex w-full justify-between gap-1" style={{ direction: "ltr" }}>
-              {FORM_ORDER.map(({ key, pos, label }) => {
-                const active = connection.position === pos;
-                return (
-                  <div
-                    key={key}
-                    className={cn(
-                      "flex min-h-[3.1rem] flex-1 flex-col items-center justify-between rounded-lg px-1 py-1 transition-colors",
-                      active
-                        ? "bg-primary/15 font-medium text-primary ring-1 ring-primary/40"
-                        : "bg-secondary/30 text-foreground/75 hover:bg-secondary/50",
-                    )}
-                  >
-                    <div className="flex flex-1 items-center justify-center overflow-visible py-0.5">
-                      <span className="font-arabic text-xl leading-normal">{forms[key]}</span>
-                    </div>
-                    <span className="mt-0.5 text-[9px] uppercase tracking-wider opacity-65">
-                      {t(`wordAnalysis.forms.${label}`)}
-                    </span>
-                  </div>
-                );
-              })}
+          {(hasShadda(letter) || letter.vowel) && (
+            <div className="ml-auto hidden shrink-0 items-center gap-1.5 sm:flex">
+              {hasShadda(letter) && (
+                <span className="rounded-full border border-accent/30 bg-accent/20 px-2 py-1 text-[10px] font-medium text-accent-foreground">
+                  {t("wordAnalysis.chips.shaddah")}
+                </span>
+              )}
+              {letter.vowel && (
+                <span className="rounded-full border border-accent/20 bg-accent/15 px-2 py-1 text-[10px] font-medium text-accent-foreground">
+                  {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
+                </span>
+              )}
             </div>
-          </div>
+          )}
         </div>
+
+        <div
+          aria-hidden="true"
+          className="grid h-44 w-full grid-cols-4 overflow-hidden rounded-xl border border-foreground/55 bg-background/45 sm:h-52 md:h-56"
+        >
+          {FORM_ORDER.map(({ key, pos }, formIndex) => {
+            const active = connection.position === pos;
+            const formLabel = t(`wordAnalysis.contextualFormNames.${pos}`);
+            const glyph = forms[key];
+
+            return (
+              <div
+                key={key}
+                role="group"
+                aria-label={`${formLabel}: ${glyph}${active ? `, ${t("wordAnalysis.currentForm")}` : ""}`}
+                aria-current={active ? "true" : undefined}
+                className={cn(
+                  "relative grid min-w-0 grid-rows-[1fr_auto_auto] items-center justify-items-center gap-1 px-1 py-3 text-center transition-colors sm:gap-1.5 sm:px-2 sm:py-4",
+                  formIndex < FORM_ORDER.length - 1 && "border-r border-border/80",
+                  active
+                    ? "z-[1] bg-primary/10 text-foreground ring-2 ring-inset ring-primary/75"
+                    : "bg-secondary/10 text-foreground/75",
+                )}
+              >
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-1.5 top-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground sm:right-2 sm:top-2"
+                  >
+                    <Check aria-hidden="true" className="h-3.5 w-3.5" />
+                  </span>
+                )}
+                <span
+                  dir="rtl"
+                  aria-hidden="true"
+                  className={cn(
+                    "grid h-full min-h-0 place-items-center font-arabic text-5xl leading-none sm:text-6xl md:text-7xl",
+                    active ? "text-primary" : "text-foreground/85",
+                  )}
+                >
+                  {glyph}
+                </span>
+                <span className="w-full truncate text-[10px] font-medium uppercase tracking-wide sm:text-xs">
+                  {formLabel}
+                </span>
+                <span className="flex h-7 w-full items-start justify-center text-[8px] leading-tight text-primary sm:text-[10px]">
+                  {active ? t("wordAnalysis.currentForm") : "\u00a0"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </Button>
+      <div id={formsDescriptionId} className="sr-only">
+        {FORM_ORDER.map(({ key, pos }) => {
+          const active = connection.position === pos;
+          return `${t(`wordAnalysis.contextualFormNames.${pos}`)}: ${forms[key]}${active ? `, ${t("wordAnalysis.currentForm")}` : ""}. `;
+        })}
       </div>
-    </div>
+    </Card>
   );
 };
 
