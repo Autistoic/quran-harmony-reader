@@ -125,6 +125,15 @@ All colors MUST be HSL.
     --cream: 45 40% 98%;
     --cream-dark: 45 30% 92%;
 
+    /* Connection rail */
+    --rail-track: 40 18% 81%;
+    --cut: 36 64% 48%;
+    --cut-foreground: 30 75% 26%;
+    --cut-soft: 40 85% 94%;
+    --block-1: 158 45% 25%;
+    --block-2: 172 38% 30%;
+    --block-3: 78 28% 32%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
