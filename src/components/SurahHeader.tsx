@@ -19,7 +19,7 @@ export const SurahHeader = ({ surah }: SurahHeaderProps) => {
         <p className="text-sm text-muted-foreground uppercase tracking-widest">
           Surah {surah.id}
         </p>
-        <h1 className="font-arabic text-5xl md:text-6xl text-foreground mb-2">
+        <h1 className="font-quran-arabic text-5xl md:text-6xl text-foreground mb-2">
           {surah.arabicName}
         </h1>
         <h2 className="text-2xl font-transliteration text-primary font-medium">

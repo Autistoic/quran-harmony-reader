@@ -107,7 +107,9 @@ export const QuranVerse = ({
                 <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
                 <PopoverContent className="w-72" align="center">
                     <TimingEditor
-                        word={`${wt.word}  (${wt.translit})`}
+                        word={wt.word}
+                        arabicWord={wt.word}
+                        transliteration={wt.translit || undefined}
                         initialStart={wt.start}
                         initialEnd={wt.end}
                         getCurrentTime={getCurrentTime}
@@ -170,7 +172,7 @@ export const QuranVerse = ({
                             className="flex flex-col items-center max-w-[10rem] text-center"
                         >
                             {/* Top: Arabic text */}
-                            <span className="font-arabic text-3xl md:text-4xl leading-loose text-foreground">
+                            <span className="font-quran-arabic text-3xl md:text-4xl leading-loose text-foreground">
                                 {renderArabicWord(wordTiming.word, wordIndex, isHighlighted)}
                             </span>
 

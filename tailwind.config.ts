@@ -76,14 +76,11 @@ export default {
           dark: "hsl(var(--cream-dark))",
         },
       },
-    //   fontFamily: {
-    //     arabic: ['Amiri', 'Scheherazade New', 'serif'],
-    //     transliteration: ['Lora', 'Georgia', 'serif'],
-    //   },
-       fontFamily: {
-    arabic: ['Noto Sans Arabic', 'IBM Plex Sans Arabic', 'sans-serif'],
-    transliteration: ['Lora', 'Georgia', 'serif'],
-    },
+      fontFamily: {
+        "quran-arabic": ["Amiri", "serif"],
+        "analysis-arabic": ["Scheherazade New", "serif"],
+        transliteration: ['Lora', 'Georgia', 'serif'],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 
 interface TimingEditorProps {
   word: string;
+  arabicWord?: string;
+  transliteration?: string;
   initialStart: number;
   initialEnd: number;
   getCurrentTime?: () => number;
@@ -20,6 +22,8 @@ interface TimingEditorProps {
 
 export const TimingEditor = ({
   word,
+  arabicWord,
+  transliteration,
   initialStart,
   initialEnd,
   getCurrentTime,
@@ -115,7 +119,14 @@ export const TimingEditor = ({
 
   return (
     <div className="space-y-3">
-      <div className="text-sm font-semibold text-center break-all">{word}</div>
+      <div className="text-sm font-semibold text-center break-all" dir={arabicWord ? "ltr" : undefined}>
+        {arabicWord ? (
+          <>
+            <span dir="rtl" className="font-quran-arabic">{arabicWord}</span>
+            {transliteration && <span dir="ltr" className="ml-1 font-transliteration">({transliteration})</span>}
+          </>
+        ) : word}
+      </div>
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
