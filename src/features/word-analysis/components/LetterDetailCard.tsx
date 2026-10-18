@@ -132,7 +132,7 @@ const LetterDetailCard = ({
                   dir="rtl"
                   aria-hidden="true"
                   className={cn(
-                    "grid h-full min-h-0 place-items-center font-arabic text-5xl leading-none sm:text-6xl md:text-7xl",
+                    "grid h-full min-h-0 place-items-center font-analysis-arabic text-5xl leading-none sm:text-6xl md:text-7xl",
                     active ? "text-primary" : "text-foreground/85",
                   )}
                 >
