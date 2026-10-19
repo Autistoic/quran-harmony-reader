@@ -1,5 +1,5 @@
 import type { LetterData, Joining, Position, Vowel } from "./types";
-import { WORD_SEGMENT_OVERRIDES } from "./wordOverrides";
+import { NORMALIZED_OVERRIDES, overrideKey, WORD_SEGMENT_OVERRIDES, type WordSegmentOverride } from "./wordOverrides";
 
 /** Presentation model consumed by the word-analysis UI. */
 export interface WordAnalysisLetter {
@@ -21,10 +21,15 @@ export interface WordAnalysisLetter {
 
 /** Keep parser/domain data separate from the props shape used by the dialog UI. */
 export function toWordAnalysisLetters(letters: readonly LetterData[], wordText: string, transliteration = ""): WordAnalysisLetter[] {
-  const overrideSegments = WORD_SEGMENT_OVERRIDES[wordText];
-  const overrideRanges = overrideSegments?.length === letters.length
-    ? alignOverrideSegments(overrideSegments, transliteration)
-    : null;
+  const override = NORMALIZED_OVERRIDES.get(overrideKey(wordText, transliteration));
+const overrideRanges = resolveOverrideRanges(override, letters.length, transliteration.length);
+if (override && !overrideRanges) {
+  console.warn("Override descartado", wordText, transliteration, {
+    expected: letters.length,
+    got: override.length,
+    translitLength: transliteration.length,
+  });
+}
   const transliterationRanges = overrideRanges ?? alignTransliterationRanges(letters, transliteration);
   return letters.map((letter, index) => ({
     base: letter.base,
@@ -42,24 +47,31 @@ export function toWordAnalysisLetters(letters: readonly LetterData[], wordText: 
   }));
 }
 
-/** Resolve registry segments to UTF-16 ranges in the rendered transliteration. */
-function alignOverrideSegments(segments: readonly string[], transliteration: string): Array<{ start: number; end: number }> | null {
-  const ranges: Array<{ start: number; end: number }> = [];
-  let cursor = 0;
+/** Accept explicit ranges only when they safely address the current text. */
+function resolveOverrideRanges(
+  ranges: WordSegmentOverride | undefined,
+  letterCount: number,
+  transliterationLength: number,
+): Array<{ start: number; end: number }> | null {
+  if (!ranges || ranges.length !== letterCount) return null;
 
-  for (const segment of segments) {
-    if (segment.length === 0) {
-      ranges.push({ start: cursor, end: cursor });
-      continue;
+  const resolved: Array<{ start: number; end: number }> = [];
+  for (const range of ranges) {
+    if (
+      !Array.isArray(range)
+      || range.length !== 2
+      || !Number.isInteger(range[0])
+      || !Number.isInteger(range[1])
+      || range[0] < 0
+      || range[0] > range[1]
+      || range[1] > transliterationLength
+    ) {
+      return null;
     }
-    const start = transliteration.indexOf(segment, cursor);
-    if (start === -1) return null;
-    const end = start + segment.length;
-    ranges.push({ start, end });
-    cursor = end;
+    resolved.push({ start: range[0], end: range[1] });
   }
 
-  return ranges;
+  return resolved;
 }
 
 /**
