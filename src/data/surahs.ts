@@ -32,79 +32,86 @@ export const surahAlFatiha: Surah = {
         {
             arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
             transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
+            translation: "En el nombre de Dios, el Compasivo con toda la creación, el Misericordioso con los creyentes.",
             verseNumber: 1,
             wordTimings: [
-                { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0.8 },
-                { word: "ٱللَّهِ", translit: "llāhi", start: 0.8, end: 1.5 },
-                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 3.5 },
-                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 3.5, end: 4.5 } // Fin del verso y pausa
+                { word: "بِسْمِ", translit: "bismi", translation: "en (el) nombre", start: 0.0, end: 0.8 },
+                { word: "ٱللَّهِ", translit: "llāhi", translation: "(de) Allah", start: 0.8, end: 1.5 },
+                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Clementísimo", start: 1.5, end: 3.5 },
+                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordiosísimo", start: 3.5, end: 4.5 }
             ]
         },
         {
             arabic: "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
             transliteration: "al-ḥamdu lillāhi rabbi l-ʿālamīn",
+            translation: "Todas las alabanzas son para Dios, Señor de todo cuanto existe.",
             verseNumber: 2,
             wordTimings: [
-                { word: "ٱلْحَمْدُ", translit: "al-ḥamdu", start: 7.0, end: 7.9 },
-                { word: "لِلَّهِ", translit: "lillāhi", start: 7.9, end: 9.0 },
-                { word: "رَبِّ", translit: "rabbi", start: 9.0, end: 9.8 },
-                { word: "ٱلْعَـٰلَمِينَ", translit: "l-ʿālamīn", start: 9.8, end: 11.0 }
+                { word: "ٱلْحَمْدُ", translit: "al-ḥamdu", translation: "todas las alabanzas y agradecimientos", start: 7.0, end: 7.9 },
+                { word: "لِلَّهِ", translit: "lillāhi", translation: "(sean) para Allah", start: 7.9, end: 9.0 },
+                { word: "رَبِّ", translit: "rabbi", translation: "el Señor", start: 9.0, end: 9.8 },
+                { word: "ٱلْعَـٰلَمِينَ", translit: "l-ʿālamīn", translation: "del universo", start: 9.8, end: 11.0 }
             ]
         },
         {
             arabic: "ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
             transliteration: "ar-raḥmāni r-raḥīm",
+            translation: "El Compasivo, el Misericordioso.",
             verseNumber: 3,
             wordTimings: [
-                { word: "ٱلرَّحْمَـٰنِ", translit: "ar-raḥmāni", start: 13.5, end: 14.8 },
-                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 14.8, end: 16.5 }
+                { word: "ٱلرَّحْمَـٰنِ", translit: "ar-raḥmāni", translation: "el Clementísimo", start: 13.5, end: 14.8 },
+                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordiosísimo", start: 14.8, end: 16.5 }
             ]
         },
         {
             arabic: "مَـٰلِكِ يَوْمِ ٱلدِّينِ",
             transliteration: "māliki yawmi d-dīn",
+            translation: "Soberano absoluto del Día del Juicio Final.",
             verseNumber: 4,
             wordTimings: [
-                { word: "مَـٰلِكِ", translit: "māliki", start: 16.5, end: 17.0 },
-                { word: "يَوْمِ", translit: "yawmi", start: 17.0, end: 17.6 },
-                { word: "ٱلدِّينِ", translit: "d-dīn", start: 17.6, end: 21.0 }
+                { word: "مَـٰلِكِ", translit: "māliki", translation: "(el) Soberano", start: 16.5, end: 17.0 },
+                { word: "يَوْمِ", translit: "yawmi", translation: "(del) Día", start: 17.0, end: 17.6 },
+                { word: "ٱلدِّينِ", translit: "d-dīn", translation: "(del) Juicio", start: 17.6, end: 21.0 }
             ]
         },
         {
             arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
             transliteration: "iyyāka naʿbudu wa-iyyāka nastaʿīn",
-            "verseNumber": 5,
-            "wordTimings": [
-                { "word": "إِيَّاكَ", "translit": "iyyāka", "start": 21.0, "end": 22.0 },
-                { "word": "نَعْبُدُ", "translit": "naʿbudu", "start": 22.0, "end": 23.0 },
-                { "word": "وَإِيَّاكَ", "translit": "wa-iyyāka", "start": 23.0, "end": 24.3 },
-                { "word": "نَسْتَعِينُ", "translit": "nastaʿīn", "start": 24.3, "end": 27.0 }
+            translation: "Solo a Ti te adoramos y solo de Ti imploramos ayuda.",
+            verseNumber: 5,
+            wordTimings: [
+                { word: "إِيَّاكَ", translit: "iyyāka", translation: "solo a Ti", start: 21.0, end: 22.0 },
+                { word: "نَعْبُدُ", translit: "naʿbudu", translation: "adoramos", start: 22.0, end: 23.0 },
+                { word: "وَإِيَّاكَ", translit: "wa-iyyāka", translation: "y solo a Ti", start: 23.0, end: 24.3 },
+                { word: "نَسْتَعِينُ", translit: "nastaʿīn", translation: "pedimos ayuda", start: 24.3, end: 27.0 }
             ]
         },
         {
             arabic: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
             transliteration: "ihdinā ṣ-ṣirāṭa l-mustaqīm",
-            "verseNumber": 6,
-            "wordTimings": [
-                { "word": "ٱهْدِنَا", "translit": "ihdinā", "start": 30.5, "end": 31.3 },
-                { "word": "ٱلصِّرَٰطَ", "translit": "ṣ-ṣirāṭa", "start": 31.3, "end": 32.7 },
-                { "word": "ٱلْمُسْتَقِيمَ", "translit": "l-mustaqīm", "start": 32.7, "end": 35.5 }
+            translation: "¡Guíanos por el camino recto!",
+            verseNumber: 6,
+            wordTimings: [
+                { word: "ٱهْدِنَا", translit: "ihdinā", translation: "guíanos", start: 30.5, end: 31.3 },
+                { word: "ٱلصِّرَٰطَ", translit: "ṣ-ṣirāṭa", translation: "(hacia) el camino", start: 31.3, end: 32.7 },
+                { word: "ٱلْمُسْتَقِيمَ", translit: "l-mustaqīm", translation: "recto", start: 32.7, end: 35.5 }
             ]
         },
         {
             arabic: "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ",
             transliteration: "ṣirāṭa lladhīna anʿamta ʿalayhim ghayri l-maghḍūbi ʿalayhim wa-lā ḍ-ḍāllīn",
+            translation: "El camino de los que has colmado con Tus favores, no el de los que han caído en Tu ira, ni el de los que se extraviaron.",
             verseNumber: 7,
             wordTimings: [
-                { "word": "صِرَٰطَ", "translit": "ṣirāṭa", "start": 38.1, "end": 39.0 },
-                { "word": "ٱلَّذِينَ", "translit": "lladhīna", "start": 39.0, "end": 40.5 },
-                { "word": "أَنْعَمْتَ", "translit": "anʿamta", "start": 40.5, "end": 41.8 },
-                { "word": "عَلَيْهِمْ", "translit": "ʿalayhim", "start": 41.8, "end": 42.9 },
-                { "word": "غَيْرِ", "translit": "ghayri", "start": 42.6, "end": 44.3 },
-                { "word": "ٱلْمَغْضُوبِ", "translit": "l-maghḍūbi", "start": 44.3, "end": 45.9 },
-                { "word": "عَلَيْهِمْ", "translit": "ʿalayhim", "start": 45.9, "end": 46.8 },
-                { "word": "وَلَا", "translit": "wa-lā", "start": 46.8, "end": 48.4 },
-                { "word": "ٱلضَّآلِّينَ", "translit": "ḍ-ḍāllīn", "start": 48.4, "end": 54.0 }
+                { word: "صِرَٰطَ", translit: "ṣirāṭa", translation: "(el) camino", start: 38.1, end: 39.0 },
+                { word: "ٱلَّذِينَ", translit: "lladhīna", translation: "(de) aquellos", start: 39.0, end: 40.5 },
+                { word: "أَنْعَمْتَ", translit: "anʿamta", translation: "Tú has concedido (Tus) favores", start: 40.5, end: 41.8 },
+                { word: "عَلَيْهِمْ", translit: "ʿalayhim", translation: "sobre ellos", start: 41.8, end: 42.9 },
+                { word: "غَيْرِ", translit: "ghayri", translation: "no (de)", start: 42.6, end: 44.3 },
+                { word: "ٱلْمَغْضُوبِ", translit: "l-maghḍūbi", translation: "aquellos que incurrieron en (Tu) ira", start: 44.3, end: 45.9 },
+                { word: "عَلَيْهِمْ", translit: "ʿalayhim", translation: "sobre ellos mismos", start: 45.9, end: 46.8 },
+                { word: "وَلَا", translit: "wa-lā", translation: "y no", start: 46.8, end: 48.4 },
+                { word: "ٱلضَّآلِّينَ", translit: "ḍ-ḍāllīn", translation: "(de) aquellos que se extravían", start: 48.4, end: 54.0 }
             ]
         }
     ]

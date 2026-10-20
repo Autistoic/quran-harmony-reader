@@ -74,7 +74,7 @@ const AlphabetReferenceDialog = ({ open, onOpenChange, onBackToWord }: AlphabetR
                     <span
                       key={key}
                       className={cn(
-                        "text-center leading-none font-arabic",
+                        "text-center leading-none font-analysis-arabic",
                         key === "isolated" ? "text-primary" : "text-foreground/85",
                       )}
                       style={{

@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WirdSharif from "./pages/WirdSharif";
-
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { I18nProvider } from "@/i18n";
 
 const queryClient = new QueryClient();
@@ -26,13 +26,15 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <I18nProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AppContent />
-      </TooltipProvider>
-    </I18nProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
+      <I18nProvider>
+        <TooltipProvider delayDuration={200}>
+          <Toaster />
+          <Sonner position="top-center" richColors />
+          <AppContent />
+        </TooltipProvider>
+      </I18nProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

@@ -185,7 +185,7 @@ function RailCut({
             <p className="text-[11px] font-medium leading-snug text-foreground">
               {t("wordAnalysis.rail.popover.ruleIntro")}
             </p>
-            <div className="mt-1.5 flex items-center gap-2 font-arabic text-lg text-muted-foreground" dir="rtl" aria-label={t("wordAnalysis.rail.popover.ruleLetters")}>
+            <div className="mt-1.5 flex items-center gap-2 font-analysis-arabic text-lg text-muted-foreground" dir="rtl" aria-label={t("wordAnalysis.rail.popover.ruleLetters")}>
               {NON_JOINING_RULE_LETTERS.map((glyph) => (
                 <span key={glyph} className={isKnownCause && glyph === causeGlyph ? "rounded bg-[hsl(var(--connection-cut-tint))] px-1 font-bold text-[hsl(var(--connection-cut-foreground))] ring-1 ring-[hsl(var(--connection-cut))]/30" : "px-0.5"}>
                   {glyph}

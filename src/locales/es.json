@@ -14,7 +14,31 @@
     "quranReader": "Lector del Corán",
     "language": "Idioma",
     "english": "Inglés",
-    "spanish": "Español"
+    "spanish": "Español",
+    "selectSurah": "Seleccionar Sura",
+    "searchSurah": "Buscar por nombre o número...",
+    "verses": "versículos",
+    "noSurahFound": "No se encontraron suras",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "readerSubtitle": "Lectura y Recitación"
+  },
+  "reader": {
+    "fontSize": "Tamaño",
+    "transliteration": "Transliteración",
+    "wordTranslation": "Por palabra",
+    "verseTranslation": "Verso completo",
+    "analyzeWord": "Analizar",
+    "copied": "Aleya copiada al portapapeles"
+  },
+  "theme": {
+    "toggle": "Cambiar tema",
+    "light": "Claro (Pergamino)",
+    "dark": "Oscuro (Noche)",
+    "system": "Sistema"
+  },
+  "prayer": {
+    "next": "Próxima oración"
   },
   "wordAnalysis": {
     "letterNavigation": "Navegación por letras",

@@ -23,6 +23,8 @@ interface Props {
     setHideDetails: (hideDetails: boolean) => void;
 }
 
+const ARABIC_HIGHLIGHT_VERTICAL_BLEED = 48;
+
 interface HighlightRect {
     left: number;
     top: number;
@@ -32,14 +34,6 @@ interface HighlightRect {
     containerHeight: number;
 }
 
-interface PreviewBlock {
-    key: string;
-    id: number;
-    startIndex: number;
-    endIndex: number;
-    startOffset: number;
-    endOffset: number;
-}
 
 const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning, letters, onOpenReference, selectedIndex: controlledSelected, onSelectedIndexChange, hideDetails, setHideDetails }: Props) => {
     const { t } = useTranslation();
@@ -51,10 +45,12 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         onSelectedIndexChange?.(i);
     }, [isControlled, onSelectedIndexChange]);
     const [rect, setRect] = useState<HighlightRect | null>(null);
-    const [previewBlockRects, setPreviewBlockRects] = useState<Record<string, HighlightRect>>({});
+    const [transliterationRect, setTransliterationRect] = useState<HighlightRect | null>(null);
     const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLSpanElement>(null);
+    const transliterationContainerRef = useRef<HTMLSpanElement>(null);
+    const transliterationRef = useRef<HTMLSpanElement>(null);
     const letterListRef = useRef<HTMLDivElement>(null);
     const letterCardRefs = useRef<Array<HTMLButtonElement | null>>([]);
     const letterCardContainerRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -82,14 +78,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         }));
         return keys;
     }, [letters.length, wordGroups]);
-    const previewBlocks = useMemo<PreviewBlock[]>(() => wordGroups.flatMap((group) => group.blocks.map((block) => ({
-        key: block.key,
-        id: block.id,
-        startIndex: group.startIndex + block.startIndex,
-        endIndex: group.startIndex + block.endIndex,
-        startOffset: letters[group.startIndex + block.startIndex]?.startOffset ?? 0,
-        endOffset: letters[group.startIndex + block.endIndex]?.endOffset ?? 0,
-    }))), [letters, wordGroups]);
     const selectedBlockKey = selectedIndex === null ? null : blockKeyByLetter[selectedIndex] ?? null;
     const canGoPrevious = selectedIndex !== null && selectedIndex > 0;
     const canGoNext = letters.length > 0 && (selectedIndex === null || selectedIndex < letters.length - 1);
@@ -250,11 +238,18 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             const padX = 3.5;
             const padY = 5;
 
+            const localTop = Math.max(0, top - containerBox.top - padY);
+            const localBottom = Math.min(containerBox.height, bottom - containerBox.top + padY);
+            if (localBottom <= localTop) {
+                setRect(null);
+                return;
+            }
+
             setRect({
                 left: left - containerBox.left - padX,
-                top: top - containerBox.top - padY,
+                top: localTop,
                 width: right - left + padX * 2,
-                height: bottom - top + padY * 2,
+                height: localBottom - localTop,
                 containerWidth: containerBox.width,
                 containerHeight: containerBox.height,
             });
@@ -271,64 +266,68 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         };
     }, [selectedIndex, word, letters, open]);
 
-    // Measure a range for each joined block without splitting the Arabic text node,
-    // preserving contextual ligatures and the existing word-level shaping.
     useLayoutEffect(() => {
-        const computeBlockRects = () => {
-            const container = containerRef.current;
-            const span = textRef.current;
+        const compute = () => {
+            if (selectedIndex === null || hideDetails) {
+                setTransliterationRect(null);
+                return;
+            }
+            const container = transliterationContainerRef.current;
+            const span = transliterationRef.current;
+            const letter = letters[selectedIndex];
             const textNode = span?.firstChild;
-            if (!container || !(textNode instanceof Text)) return;
+            if (!container || !span || !letter || !(textNode instanceof Text)) {
+                setTransliterationRect(null);
+                return;
+            }
 
-            const containerBox = container.getBoundingClientRect();
-            const nextRects: Record<string, HighlightRect> = {};
-            previewBlocks.forEach((block) => {
-                const start = Math.min(block.startOffset, textNode.data.length);
-                const end = Math.min(block.endOffset, textNode.data.length);
-                if (start >= end) return;
-                const range = document.createRange();
-                try {
-                    range.setStart(textNode, start);
-                    range.setEnd(textNode, end);
-                } catch {
-                    return;
-                }
-                const bounds = range.getBoundingClientRect();
-                if (bounds.width <= 0 || bounds.height <= 0) return;
-                const padX = 3.5;
-                const padY = 5;
-                nextRects[block.key] = {
-                    left: bounds.left - containerBox.left - padX,
-                    top: bounds.top - containerBox.top - padY,
-                    width: bounds.width + padX * 2,
-                    height: bounds.height + padY * 2,
-                    containerWidth: containerBox.width,
-                    containerHeight: containerBox.height,
-                };
-            });
-            setPreviewBlockRects((current) => {
-                const keys = Object.keys(nextRects);
-                if (keys.length === Object.keys(current).length && keys.every((key) => {
-                    const a = current[key];
-                    const b = nextRects[key];
-                    return !!a && Math.abs(a.left - b.left) < 0.5 && Math.abs(a.top - b.top) < 0.5
-                        && Math.abs(a.width - b.width) < 0.5 && Math.abs(a.height - b.height) < 0.5;
-                })) return current;
-                return nextRects;
+            if (letter.transliterationStartOffset === undefined || letter.transliterationEndOffset === undefined) {
+                setTransliterationRect(null);
+                return;
+            }
+            const start = Math.max(0, Math.min(letter.transliterationStartOffset, textNode.data.length));
+            const end = Math.max(start, Math.min(letter.transliterationEndOffset, textNode.data.length));
+            if (start >= end) {
+                setTransliterationRect(null);
+                return;
+            }
+
+            const range = document.createRange();
+            try {
+                range.setStart(textNode, start);
+                range.setEnd(textNode, end);
+            } catch {
+                setTransliterationRect(null);
+                return;
+            }
+
+            const rangeRect = range.getBoundingClientRect();
+            if (rangeRect.width <= 0 || rangeRect.height <= 0) {
+                setTransliterationRect(null);
+                return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            const padX = 2;
+            const padY = 2;
+            setTransliterationRect({
+                left: rangeRect.left - containerRect.left - padX,
+                top: rangeRect.top - containerRect.top - padY,
+                width: rangeRect.width + padX * 2,
+                height: rangeRect.height + padY * 2,
+                containerWidth: containerRect.width,
+                containerHeight: containerRect.height,
             });
         };
 
-        const frame = requestAnimationFrame(computeBlockRects);
-        const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(computeBlockRects);
-        if (containerRef.current) observer?.observe(containerRef.current);
-        window.addEventListener("resize", computeBlockRects);
-        document.fonts?.ready.then(computeBlockRects).catch(() => undefined);
+        const raf = requestAnimationFrame(compute);
+        window.addEventListener("resize", compute);
+        document.fonts?.ready.then(compute).catch(() => undefined);
         return () => {
-            cancelAnimationFrame(frame);
-            observer?.disconnect();
-            window.removeEventListener("resize", computeBlockRects);
+            cancelAnimationFrame(raf);
+            window.removeEventListener("resize", compute);
         };
-    }, [previewBlocks, word, open]);
+    }, [selectedIndex, transliteration, letters, open, hideDetails]);
+
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -346,13 +345,30 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
 
                     <div className="relative z-10 flex min-w-0 flex-col items-center gap-5 px-12 text-center sm:gap-6 sm:px-20">
                         {!hideDetails && (
-                            <DialogDescription className="text-xs uppercase tracking-widest text-muted-foreground">
-                                {transliteration}
+                            <DialogDescription className="text-base uppercase tracking-widest text-muted-foreground">
+                                <span ref={transliterationContainerRef} className="relative inline-block">
+                                    <span ref={transliterationRef} className={cn("relative z-[1] transition-colors duration-200", selectedIndex !== null && transliterationRect ? "text-muted-foreground/50" : undefined)}>
+                                        {transliteration}
+                                    </span>
+                                    {transliterationRect && selectedIndex !== null && (
+                                        <span
+                                            aria-hidden
+                                            className="pointer-events-none absolute rounded-sm bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
+                                            style={{
+                                                left: transliterationRect.left,
+                                                top: transliterationRect.top,
+                                                width: transliterationRect.width,
+                                                height: transliterationRect.height,
+                                                zIndex: 0,
+                                            }}
+                                        />
+                                    )}
+                                </span>
                             </DialogDescription>
                         )}
                         <div
                             ref={containerRef}
-                            className="relative mt-8 font-arabic text-7xl sm:text-8xl md:text-9xl leading-[1.6] select-none"
+                            className="relative mt-8 font-analysis-arabic text-7xl sm:text-8xl md:text-9xl leading-[4.6] select-none"
                             style={{ direction: "rtl" }}
                         >
                             {/* Precision highlight remains tied to the active logical letter. */}
@@ -362,9 +378,9 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                     className="pointer-events-none absolute rounded-md bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
                                     style={{
                                         left: rect.left,
-                                        top: rect.top,
+                                        top: -ARABIC_HIGHLIGHT_VERTICAL_BLEED,
                                         width: rect.width,
-                                        height: rect.height,
+                                        height: rect.containerHeight + ARABIC_HIGHLIGHT_VERTICAL_BLEED * 2,
                                         zIndex: 0,
                                     }}
                                 />
@@ -381,31 +397,12 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                 {word}
                             </span>
 
-                            {previewBlocks.map((block) => {
-                                const blockRect = previewBlockRects[block.key];
-                                if (!blockRect) return null;
-                                const tone = ["--stroke-block-1", "--stroke-block-2", "--stroke-block-3"][(block.id - 1) % 3];
-                                return (
-                                    <span
-                                        key={`underline-${block.key}`}
-                                        aria-hidden
-                                        className="pointer-events-none absolute z-[1] h-[3px] rounded-full transition-opacity duration-200"
-                                        style={{
-                                            left: blockRect.left,
-                                            top: blockRect.top + blockRect.height + 2,
-                                            width: blockRect.width,
-                                            backgroundColor: `hsl(var(${tone}))`,
-                                            opacity: 1,
-                                        }}
-                                    />
-                                );
-                            })}
 
                             {/* Reveal only the active letter while preserving the shaped word layer. */}
                             {rect && (
                                 <span
                                     aria-hidden
-                                    className="pointer-events-none absolute inset-0 z-[2] font-arabic text-primary transition-all duration-200"
+                                    className="pointer-events-none absolute inset-0 z-[2] font-analysis-arabic text-primary transition-all duration-200"
                                     style={{
                                         clipPath: `inset(${Math.max(0, rect.top)}px ${Math.max(0, rect.containerWidth - (rect.left + rect.width))}px ${Math.max(0, rect.containerHeight - (rect.top + rect.height))}px ${Math.max(0, rect.left)}px round 6px)`,
                                     }}
@@ -415,7 +412,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                             )}
                         </div>
                         {!hideDetails && (
-                            <p className="text-sm italic text-muted-foreground">"{meaning}"</p>
+                            <p className="mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
                         )}
                     </div>
                     <button
