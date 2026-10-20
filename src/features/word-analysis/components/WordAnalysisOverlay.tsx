@@ -19,7 +19,7 @@ export function WordAnalysisOverlay() {
   const transliteration = searchParams.get("t")?.trim() ?? "";
   const meaning = searchParams.get("m")?.trim() ?? "";
   const parsedLetters = useMemo(() => parseArabicWord(word), [word]);
-  const letters = useMemo(() => toWordAnalysisLetters(parsedLetters), [parsedLetters]);
+  const letters = useMemo(() => toWordAnalysisLetters(parsedLetters, word, transliteration), [parsedLetters, word, transliteration]);
 
   useEffect(() => {
     setReferenceOpen(false);

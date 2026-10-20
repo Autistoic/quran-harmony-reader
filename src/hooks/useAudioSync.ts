@@ -19,11 +19,13 @@ export const useAudioSync = (data: AudioSyncData) => {
     const [currentWord, setCurrentWord] = useState<CurrentWord | null>(null);
     const animationFrameRef = useRef<number>();
     const stopTimeRef = useRef<number | null>(null);
+    const [playbackRate, setPlaybackRateState] = useState(1);
 
     // Initialize audio
     useEffect(() => {
         const audio = new Audio(data.audioUrl);
         audioRef.current = audio;
+        audio.playbackRate = playbackRate;
 
         audio.addEventListener('loadedmetadata', () => {
             setDuration(audio.duration);
@@ -158,11 +160,28 @@ export const useAudioSync = (data: AudioSyncData) => {
         play();
     }, [seek, play]);
 
+    const setPlaybackRate = useCallback((rate: number) => {
+        setPlaybackRateState(rate);
+        if (audioRef.current) {
+            audioRef.current.playbackRate = rate;
+        }
+    }, []);
+
+    const skip = useCallback((seconds: number) => {
+        if (audioRef.current) {
+            const next = Math.max(0, Math.min(audioRef.current.duration || 1000, audioRef.current.currentTime + seconds));
+            seek(next);
+        }
+    }, [seek]);
+
     return {
         isPlaying,
         currentTime,
         duration,
         currentWord,
+        playbackRate,
+        setPlaybackRate,
+        skip,
         play,
         pause,
         toggle,

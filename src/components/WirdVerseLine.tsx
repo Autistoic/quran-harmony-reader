@@ -95,8 +95,8 @@ export const WirdVerseLine = ({
             <span
               onClick={() => handleWordClick(wordIndex)}
               className={cn(
-                'inline-block mx-1 px-1 rounded transition-all duration-200 cursor-pointer hover:bg-accent/30',
-                isHighlighted && 'bg-accent text-accent-foreground font-bold scale-110 shadow-lg',
+                'inline-block mx-1 px-1.5 py-0.5 rounded-md transition-all duration-200 cursor-pointer hover:bg-accent/20',
+                isHighlighted && 'bg-accent/25 text-foreground ring-1 ring-accent/60 font-bold scale-[1.04] shadow-xs',
                 editMode && 'ring-1 ring-border/60'
               )}
             >
