@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Play, Pause, RotateCcw, RotateCw, Gauge } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -8,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/i18n';
+import { toast } from 'sonner';
 
 interface AudioPlayerProps {
   isPlaying: boolean;
@@ -20,6 +22,7 @@ interface AudioPlayerProps {
   onSkip?: (seconds: number) => void;
   onPlaybackRateChange?: (rate: number) => void;
   title?: string;
+  playbackError?: boolean;
 }
 
 const formatTime = (seconds: number): string => {
@@ -40,9 +43,16 @@ export const AudioPlayer = ({
   onSkip,
   onPlaybackRateChange,
   title,
+  playbackError = false,
 }: AudioPlayerProps) => {
   const { t } = useTranslation();
   const speeds = [0.75, 1, 1.25];
+
+  useEffect(() => {
+    if (playbackError) {
+      toast.error(t('reader.audioPlaybackError') || 'No se pudo reproducir el audio.');
+    }
+  }, [playbackError, t]);
 
   return (
     <div className="relative rounded-2xl sm:rounded-3xl border border-border/80 bg-card/90 backdrop-blur-xl p-3 sm:p-4 shadow-xl transition-all">

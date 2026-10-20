@@ -29,7 +29,8 @@
     "wordTranslation": "Por palabra",
     "verseTranslation": "Verso completo",
     "analyzeWord": "Analizar",
-    "copied": "Aleya copiada al portapapeles"
+    "copied": "Aleya copiada al portapapeles",
+    "audioPlaybackError": "No se pudo reproducir el audio. Comprueba tu conexión e inténtalo de nuevo."
   },
   "theme": {
     "toggle": "Cambiar tema",

@@ -27,6 +27,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
 
     const {
         isPlaying,
+        playbackError,
         currentTime,
         duration,
         currentWord,
@@ -167,7 +168,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                                 key={index}
                                 verse={verse}
                                 verseIndex={index}
-                                currentWord={currentWord}
+                                currentWord={currentWord?.verseIndex === index ? currentWord : null}
                                 onPlayVerse={playFromVerse}
                                 onPause={pause}
                                 onPlayWord={playFromWord}
@@ -200,6 +201,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                         onSkip={skip}
                         onPlaybackRateChange={setPlaybackRate}
                         title={effectiveWird.name}
+                        playbackError={playbackError}
                     />
                 </div>
 

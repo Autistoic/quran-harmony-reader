@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { WirdVerse } from '@/data/wirdSharif';
 import { cn } from '@/lib/utils';
 import { Play, Pause } from 'lucide-react';
@@ -27,7 +28,7 @@ interface WirdVerseLineProps {
   showTranslation?: boolean;
 }
 
-export const WirdVerseLine = ({
+export const WirdVerseLine = memo(({
   isPlaying,
   verse,
   verseIndex,
@@ -161,6 +162,6 @@ export const WirdVerseLine = ({
       )}
     </div>
   );
-};
+});
 
 

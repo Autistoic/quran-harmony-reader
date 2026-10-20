@@ -29,7 +29,8 @@
     "wordTranslation": "Word by word",
     "verseTranslation": "Full verse",
     "analyzeWord": "Analyze",
-    "copied": "Verse copied to clipboard"
+    "copied": "Verse copied to clipboard",
+    "audioPlaybackError": "Audio could not be played. Check your connection and try again."
   },
   "theme": {
     "toggle": "Toggle theme",

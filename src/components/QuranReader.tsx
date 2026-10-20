@@ -30,6 +30,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
 
     const {
         isPlaying,
+        playbackError,
         currentTime,
         duration,
         currentWord,
@@ -102,7 +103,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                             key={index}
                             verse={verse}
                             verseIndex={index}
-                            currentWord={currentWord}
+                            currentWord={currentWord?.verseIndex === index ? currentWord : null}
                             onPlayVerse={playFromVerse}
                             onPauseVerse={pause}
                             onPlayWord={playFromWord}
@@ -138,6 +139,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                         onSkip={skip}
                         onPlaybackRateChange={setPlaybackRate}
                         title={effectiveSurah.name}
+                        playbackError={playbackError}
                     />
                 </div>
 

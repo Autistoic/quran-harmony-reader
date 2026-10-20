@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
 import { Play, Pause, BookOpen, Copy, Check } from 'lucide-react';
@@ -35,7 +35,7 @@ interface QuranVerseProps {
     fontSize?: 'normal' | 'large' | 'xlarge';
 }
 
-export const QuranVerse = ({
+export const QuranVerse = memo(({
     verse,
     verseIndex,
     currentWord,
@@ -294,4 +294,4 @@ export const QuranVerse = ({
             )}
         </article>
     );
-};
+});
