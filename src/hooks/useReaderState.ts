@@ -24,7 +24,42 @@ export function useReaderState(
     const getCurrentTime = useCallback(() => currentTimeRef.current, []);
     const [editMode, setEditMode] = useState(false);
     const [openCursor, setOpenCursor] = useState<WordCursor | null>(null);
-    const [showTranslation, setShowTranslation] = useState(false);
+
+    const [showTranslation, setShowTranslation] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem('quran_show_verse_trans');
+            return saved !== null ? saved === 'true' : true;
+        } catch {
+            return true;
+        }
+    });
+
+    const [fontSize, setFontSizeState] = useState<'normal' | 'large' | 'xlarge'>(() => {
+        try {
+            const saved = localStorage.getItem('quran_font_size') as 'normal' | 'large' | 'xlarge' | null;
+            return saved || 'large';
+        } catch {
+            return 'large';
+        }
+    });
+
+    const [showTransliteration, setShowTransliterationState] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem('quran_show_translit');
+            return saved !== null ? saved === 'true' : true;
+        } catch {
+            return true;
+        }
+    });
+
+    const [showWordTranslation, setShowWordTranslationState] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem('quran_show_word_trans');
+            return saved !== null ? saved === 'true' : true;
+        } catch {
+            return true;
+        }
+    });
 
     const wordCursors = useMemo(
         () => verses.flatMap((verse, verseIndex) =>
@@ -57,8 +92,33 @@ export function useReaderState(
         }
     }, [cursorIndex, wordCursors]);
 
+    const setFontSize = useCallback((size: 'normal' | 'large' | 'xlarge') => {
+        setFontSizeState(size);
+        try { localStorage.setItem('quran_font_size', size); } catch {}
+    }, []);
+
+    const setShowTransliteration = useCallback((val: boolean | ((prev: boolean) => boolean)) => {
+        setShowTransliterationState(prev => {
+            const next = typeof val === 'function' ? val(prev) : val;
+            try { localStorage.setItem('quran_show_translit', String(next)); } catch {}
+            return next;
+        });
+    }, []);
+
+    const setShowWordTranslation = useCallback((val: boolean | ((prev: boolean) => boolean)) => {
+        setShowWordTranslationState(prev => {
+            const next = typeof val === 'function' ? val(prev) : val;
+            try { localStorage.setItem('quran_show_word_trans', String(next)); } catch {}
+            return next;
+        });
+    }, []);
+
     const toggleTranslation = useCallback(() => {
-        setShowTranslation(isVisible => !isVisible);
+        setShowTranslation(isVisible => {
+            const next = !isVisible;
+            try { localStorage.setItem('quran_show_verse_trans', String(next)); } catch {}
+            return next;
+        });
     }, []);
 
     return {
@@ -73,5 +133,11 @@ export function useReaderState(
         hasNext,
         showTranslation,
         toggleTranslation,
+        fontSize,
+        setFontSize,
+        showTransliteration,
+        setShowTransliteration,
+        showWordTranslation,
+        setShowWordTranslation,
     };
 }

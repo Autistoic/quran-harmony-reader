@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { Verse } from '@/data/surahs';
 import { cn } from '@/lib/utils';
-import { Play, Pause, BookOpen } from 'lucide-react';
+import { Play, Pause, BookOpen, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Link } from 'react-router-dom';
 import { TimingEditor } from './TimingEditor';
+import { toast } from 'sonner';
+import { useTranslation } from '@/i18n';
 
 interface QuranVerseProps {
     verse: Verse;
@@ -25,7 +28,11 @@ interface QuranVerseProps {
     onNavCursor?: (dir: 'prev' | 'next') => void;
     hasPrev?: boolean;
     hasNext?: boolean;
+    // Readability options
     showTranslation: boolean;
+    showTransliteration?: boolean;
+    showWordTranslation?: boolean;
+    fontSize?: 'normal' | 'large' | 'xlarge';
 }
 
 export const QuranVerse = ({
@@ -47,17 +54,48 @@ export const QuranVerse = ({
     hasPrev,
     hasNext,
     showTranslation,
+    showTransliteration = true,
+    showWordTranslation = true,
+    fontSize = 'large',
 }: QuranVerseProps) => {
+    const [copied, setCopied] = useState(false);
+    const { t } = useTranslation();
+
+    const handleCopyVerse = async () => {
+        const textToCopy = `${verse.arabic}\n${verse.transliteration}${verse.translation ? `\n"${verse.translation}"` : ''}`;
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            setCopied(true);
+            toast.success(t("reader.copied") || "Aleya copiada al portapapeles");
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            toast.error("No se pudo copiar");
+        }
+    };
+
+    const arabicFontSizeClass = {
+        normal: 'text-2xl md:text-3xl leading-[2.2]',
+        large: 'text-3xl md:text-4xl leading-[2.5]',
+        xlarge: 'text-4xl md:text-5xl leading-[2.7]',
+    }[fontSize];
+
+    const transliterationSizeClass = {
+        normal: 'text-xs md:text-sm',
+        large: 'text-sm md:text-base',
+        xlarge: 'text-base md:text-lg',
+    }[fontSize];
+
     const renderArabicWord = (text: string, wordIndex: number, isHighlighted: boolean) => {
         const wt = verse.wordTimings[wordIndex];
         const wordSpan = (
             <span
                 onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
                 className={cn(
-                    'inline-block mx-1 px-1 rounded transition-all duration-200',
+                    'inline-block px-1.5 py-0.5 rounded-lg transition-all duration-200 select-none',
                     editMode && 'cursor-pointer hover:bg-accent/30 ring-1 ring-border/60',
-                    !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
-                    isHighlighted && 'bg-accent text-accent-foreground font-bold scale-110 shadow-lg'
+                    !editMode && onPlayWord && 'cursor-pointer hover:bg-primary/10',
+                    isHighlighted &&
+                        'bg-accent/25 text-foreground ring-1.5 ring-accent/70 shadow-sm scale-[1.04]'
                 )}
             >
                 {text}
@@ -73,22 +111,35 @@ export const QuranVerse = ({
 
             return (
                 <Popover>
-                    <PopoverTrigger asChild>
-                        {wordSpan}
-                    </PopoverTrigger>
-
-                    <PopoverContent className="w-auto p-2" align="center">
-                        <Button
-                            asChild
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8"
-                            onClick={() => onPauseAudio?.()}
-                        >
-                            <Link to={`/?${wordAnalysisQuery.toString()}`} aria-label="Analizar palabra">
-                                <BookOpen className="h-4 w-4" />
-                            </Link>
-                        </Button>
+                    <PopoverTrigger asChild>{wordSpan}</PopoverTrigger>
+                    <PopoverContent className="w-auto min-w-[12rem] p-3 text-center bg-popover/95 backdrop-blur-md border-border/80 shadow-lg" align="center">
+                        <div className="space-y-2">
+                            <div className="font-quran-arabic text-2xl text-primary">{wt.word}</div>
+                            {wt.translit && (
+                                <div className="text-xs font-transliteration italic text-muted-foreground">
+                                    {wt.translit}
+                                </div>
+                            )}
+                            {wt.translation && (
+                                <div className="text-xs text-foreground/80 font-medium">
+                                    "{wt.translation}"
+                                </div>
+                            )}
+                            <div className="pt-1.5 border-t border-border/60 flex items-center justify-center gap-2">
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-xs gap-1 px-2.5 rounded-lg"
+                                    onClick={() => onPauseAudio?.()}
+                                >
+                                    <Link to={`/?${wordAnalysisQuery.toString()}`} aria-label="Analizar palabra">
+                                        <BookOpen className="h-3.5 w-3.5 text-primary" />
+                                        <span>{t("reader.analyzeWord") || "Analizar"}</span>
+                                    </Link>
+                                </Button>
+                            </div>
+                        </div>
                     </PopoverContent>
                 </Popover>
             );
@@ -128,38 +179,58 @@ export const QuranVerse = ({
     };
 
     const hasAnyTranslation = verse.wordTimings.some((w) => w.translation);
+    const isThisVersePlaying = !!isPlaying && currentWord?.verseIndex === verseIndex;
 
     return (
-        <div className="py-8 border-b border-border/40 last:border-b-0 group">
-            {/* Verse header with number and play button */}
-            <div className="flex justify-center items-center gap-3 mb-4">
-                {onPlayVerse && !editMode && (() => {
-                    const isThisVersePlaying = !!isPlaying && currentWord?.verseIndex === verseIndex;
-                    return (
+        <article className="py-7 md:py-9 border-b border-border/50 last:border-b-0 group transition-colors">
+            {/* Verse header with number, audio control, and copy action */}
+            <div className="flex items-center justify-between mb-5 px-1">
+                {/* Ayah number medallion */}
+                <div className="flex items-center gap-2.5">
+                    {verse.verseNumber && (
+                        <div
+                            className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/50 border border-border/80 shadow-2xs group-hover:border-primary/40 transition-colors"
+                            title={`Aleya ${verse.verseNumber}`}
+                        >
+                            <span className="text-xs font-bold text-primary">
+                                {verse.verseNumber}
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Actions: Play verse & Copy */}
+                <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                    {onPlayVerse && !editMode && (
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => (isThisVersePlaying ? onPauseVerse?.() : onPlayVerse(verseIndex))}
-                            className="h-8 w-8 rounded-full opacity-50 group-hover:opacity-100 transition-opacity text-primary hover:bg-primary/10"
+                            className="h-8 w-8 rounded-full hover:bg-primary/10 text-primary transition-all"
+                            title={isThisVersePlaying ? "Pausar aleya" : "Escuchar aleya"}
+                            aria-label={isThisVersePlaying ? "Pausar aleya" : "Escuchar aleya"}
                         >
-                            {isThisVersePlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                            {isThisVersePlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
                         </Button>
-                    );
-                })()}
-                {verse.verseNumber && (
-                    <span className="inline-flex items-center justify-center w-8 h-8 rotate-45 rounded-md border border-gold/60 text-primary text-sm font-medium"><span className="-rotate-45">
-                        {verse.verseNumber}
-                    </span></span>
-                )}
+                    )}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleCopyVerse}
+                        className="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
+                        title="Copiar aleya"
+                        aria-label="Copiar texto de la aleya"
+                    >
+                        {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                    </Button>
+                </div>
             </div>
 
-            {/* Word-by-word columns (quran.com style): RTL flow, each word is a
-                self-contained column with Arabic on top, transliteration in the
-                middle and translation at the bottom. */}
+            {/* Word-by-word columns: RTL flow with Arabic on top, transliteration middle, word translation bottom */}
             <div
                 dir="rtl"
                 style={{ direction: 'rtl' }}
-                className="flex flex-wrap justify-start items-start gap-x-2 gap-y-5"
+                className="flex flex-wrap justify-start items-start gap-x-2.5 gap-y-6 sm:gap-x-4 sm:gap-y-7"
             >
                 {verse.wordTimings.map((wordTiming, wordIndex) => {
                     const isHighlighted =
@@ -169,36 +240,39 @@ export const QuranVerse = ({
                     return (
                         <span
                             key={wordIndex}
-                            className="flex flex-col items-center max-w-[10rem] text-center"
+                            className="flex flex-col items-center max-w-[11rem] text-center"
                         >
-                            {/* Top: Arabic text */}
-                            <span className="font-quran-arabic text-3xl md:text-4xl leading-loose text-foreground">
+                            {/* Arabic word */}
+                            <span className={cn('font-quran-arabic text-foreground drop-shadow-2xs', arabicFontSizeClass)}>
                                 {renderArabicWord(wordTiming.word, wordIndex, isHighlighted)}
                             </span>
 
-                            {/* Middle: transliteration (highlights sync with Arabic) */}
-                            <span
-                                onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
-                                className={cn(
-                                    'mt-2 font-transliteration text-sm md:text-base text-muted-foreground italic leading-snug break-words rounded transition-all duration-200',
-                                    !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
-                                    editMode && 'ring-1 ring-border/60 px-1',
-                                    isHighlighted && 'bg-accent/50 text-accent-foreground font-semibold not-italic'
-                                )}
-                            >
-                                {wordTiming.translit}
-                            </span>
-
-                            {/* Bottom: per-word translation */}
-                            {hasAnyTranslation && (
-                                <span className="text-xs text-muted-foreground/70 leading-snug break-words mt-0.5">
-                                    {wordTiming.translation || <span className="opacity-30">—</span>}
+                            {/* Transliteration */}
+                            {showTransliteration && (
+                                <span
+                                    onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
+                                    className={cn(
+                                        'mt-1 font-transliteration text-muted-foreground italic leading-snug break-words rounded-md px-1 transition-all duration-200',
+                                        transliterationSizeClass,
+                                        !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
+                                        editMode && 'ring-1 ring-border/60',
+                                        isHighlighted && 'bg-accent/30 text-accent-foreground font-semibold not-italic shadow-xs'
+                                    )}
+                                >
+                                    {wordTiming.translit}
                                 </span>
                             )}
 
-                            {/* Edit-mode timing labels */}
+                            {/* Word Translation */}
+                            {showWordTranslation && hasAnyTranslation && (
+                                <span dir="ltr" className="text-[11px] sm:text-xs text-muted-foreground/75 leading-tight break-words mt-1">
+                                    {wordTiming.translation || <span className="opacity-25">—</span>}
+                                </span>
+                            )}
+
+                            {/* Edit-mode timing markers */}
                             {editMode && (
-                                <span className="font-mono text-[10px] leading-none text-muted-foreground mt-1">
+                                <span className="font-mono text-[9px] leading-none text-muted-foreground mt-1.5 px-1 py-0.5 rounded bg-muted">
                                     {wordTiming.start.toFixed(2)}→{wordTiming.end.toFixed(2)}
                                 </span>
                             )}
@@ -207,12 +281,17 @@ export const QuranVerse = ({
                 })}
             </div>
 
-            {/* Full verse translation in Spanish (LTR) */}
+            {/* Full verse translation in Spanish */}
             {showTranslation && verse.translation && (
-                <p className="text-center text-base text-foreground/80 mt-4 italic max-w-2xl mx-auto" dir="ltr">
-                    {verse.translation}
-                </p>
+                <div
+                    className="mt-6 p-3 sm:p-4 rounded-2xl bg-muted/25 border border-border/40 text-left md:text-center text-sm sm:text-base text-foreground/85 leading-relaxed font-transliteration italic transition-all"
+                    dir="ltr"
+                >
+                    <p className="max-w-2xl mx-auto">
+                        "{verse.translation}"
+                    </p>
+                </div>
             )}
-        </div>
+        </article>
     );
 };
