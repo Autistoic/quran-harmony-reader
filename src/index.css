@@ -77,33 +77,33 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 40 30% 97%;
-    --foreground: 150 25% 14%;
+    --background: 42 33% 97%;
+    --foreground: 154 36% 12%;
 
-    --card: 40 40% 99%;
-    --card-foreground: 150 25% 14%;
+    --card: 42 35% 99.5%;
+    --card-foreground: 154 36% 12%;
 
-    --popover: 45 40% 98%;
-    --popover-foreground: 150 30% 15%;
+    --popover: 42 35% 99%;
+    --popover-foreground: 154 36% 12%;
 
-    --primary: 158 45% 25%;
+    --primary: 158 52% 23%;
     --primary-foreground: 45 40% 98%;
 
-    --secondary: 45 50% 90%;
-    --secondary-foreground: 150 30% 15%;
+    --secondary: 42 30% 92%;
+    --secondary-foreground: 154 36% 14%;
 
-    --muted: 45 30% 92%;
-    --muted-foreground: 150 15% 40%;
+    --muted: 42 22% 93%;
+    --muted-foreground: 152 16% 40%;
 
-    --accent: 43 80% 55%;
-    --accent-foreground: 150 30% 15%;
+    --accent: 42 85% 48%;
+    --accent-foreground: 154 36% 12%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 40 20% 89%;
-    --input: 40 20% 89%;
-    --ring: 158 45% 25%;
+    --border: 42 20% 88%;
+    --input: 42 20% 88%;
+    --ring: 158 52% 23%;
 
     --radius: 0.75rem;
 
@@ -118,12 +118,12 @@ All colors MUST be HSL.
     --connection-cut-foreground: 29 77% 28%;
 
     /* Custom Quran theme */
-    --gold: 43 80% 55%;
+    --gold: 42 85% 48%;
     --gold-light: 43 70% 75%;
-    --emerald: 158 45% 25%;
+    --emerald: 158 52% 23%;
     --emerald-light: 158 35% 45%;
-    --cream: 45 40% 98%;
-    --cream-dark: 45 30% 92%;
+    --cream: 42 33% 97%;
+    --cream-dark: 42 25% 90%;
 
     /* Connection rail */
     --rail-track: 40 18% 81%;
@@ -145,33 +145,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 150 25% 8%;
-    --foreground: 45 30% 92%;
+    --background: 152 30% 7.5%;
+    --foreground: 45 28% 92%;
 
-    --card: 150 25% 12%;
-    --card-foreground: 45 30% 92%;
+    --card: 152 24% 11%;
+    --card-foreground: 45 28% 92%;
 
-    --popover: 150 25% 12%;
-    --popover-foreground: 45 30% 92%;
+    --popover: 152 24% 11%;
+    --popover-foreground: 45 28% 92%;
 
-    --primary: 43 80% 55%;
-    --primary-foreground: 150 30% 10%;
+    --primary: 43 85% 58%;
+    --primary-foreground: 152 32% 7.5%;
 
-    --secondary: 150 20% 18%;
-    --secondary-foreground: 45 30% 92%;
+    --secondary: 152 20% 16%;
+    --secondary-foreground: 45 28% 92%;
 
-    --muted: 150 20% 15%;
-    --muted-foreground: 45 20% 60%;
+    --muted: 152 18% 14%;
+    --muted-foreground: 45 15% 65%;
 
-    --accent: 158 45% 35%;
-    --accent-foreground: 45 30% 92%;
+    --accent: 158 40% 28%;
+    --accent-foreground: 45 30% 94%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 45%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 150 20% 20%;
-    --input: 150 20% 20%;
-    --ring: 43 80% 55%;
+    --border: 152 18% 18%;
+    --input: 152 18% 18%;
+    --ring: 43 85% 58%;
 
     --rail-track: 150 13% 31%;
     --stroke-block-soft: 156 25% 24%;
@@ -182,11 +182,11 @@ All colors MUST be HSL.
     --connection-cut-tint: 35 38% 22%;
     --connection-cut-foreground: 39 88% 72%;
 
-    --gold: 43 80% 55%;
+    --gold: 43 85% 58%;
     --gold-light: 43 70% 45%;
     --emerald: 158 45% 35%;
     --emerald-light: 158 35% 50%;
-    --cream: 45 30% 92%;
+    --cream: 45 28% 92%;
     --cream-dark: 150 20% 18%;
 
     --sidebar-background: 240 5.9% 10%;
@@ -202,5 +202,30 @@ All colors MUST be HSL.
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
+  html {
+    color-scheme: light dark;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  .font-quran-arabic, .font-analysis-arabic {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
 }

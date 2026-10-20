@@ -8,8 +8,8 @@ import { AudioPlayer } from './AudioPlayer';
 import { SurahHeader } from './SurahHeader';
 import { SurahNavigation } from './SurahNavigation';
 import { TimingEditorPanel } from './TimingEditorPanel';
-import { Button } from './ui/button';
-import { Languages } from 'lucide-react';
+import { ReadingControls } from './ReadingControls';
+import { useTranslation } from '@/i18n';
 
 interface QuranReaderProps {
     surah: Surah;
@@ -17,6 +17,7 @@ interface QuranReaderProps {
 }
 
 export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
+    const { t } = useTranslation();
     const {
         effectiveData: effectiveSurah,
         setWordTiming,
@@ -32,6 +33,9 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
         currentTime,
         duration,
         currentWord,
+        playbackRate,
+        setPlaybackRate,
+        skip,
         toggle,
         seek,
         restart,
@@ -40,6 +44,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
         playFromWord,
         playFromTime,
     } = useAudioSync(effectiveSurah);
+
     const {
         getCurrentTime,
         editMode,
@@ -51,25 +56,47 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
         hasNext,
         showTranslation,
         toggleTranslation,
+        fontSize,
+        setFontSize,
+        showTransliteration,
+        setShowTransliteration,
+        showWordTranslation,
+        setShowWordTranslation,
     } = useReaderState(effectiveSurah.verses, currentTime, effectiveSurah.id);
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Background pattern */}
+        <div className="min-h-screen bg-background pb-28 sm:pb-32 transition-colors">
+            {/* Background subtle radial pattern */}
             <div className="fixed inset-0 opacity-5 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-radial from-primary via-transparent to-transparent" />
             </div>
 
-            <div className="relative max-w-3xl mx-auto px-4 py-8 md:py-12">
-                {/* Navigation */}
+            <main className="relative max-w-3xl mx-auto px-4 py-6 md:py-10">
+                {/* Surah Navigation selector & prev/next */}
                 {onNavigate && (
                     <SurahNavigation currentSurah={effectiveSurah} onNavigate={onNavigate} />
                 )}
-                {/* Header */}
+
+                {/* Surah Header with Bismillah banner */}
                 <SurahHeader surah={effectiveSurah} />
 
-                {/* Verses */}
-                <div className="bg-card rounded-3xl border border-border/60 px-5 py-4 md:px-12 md:py-8 shadow-sm mb-8">
+                {/* Reading Preferences Toolbar */}
+                <ReadingControls
+                    fontSize={fontSize}
+                    onFontSizeChange={setFontSize}
+                    showTransliteration={showTransliteration}
+                    onToggleTransliteration={() => setShowTransliteration((prev) => !prev)}
+                    showWordTranslation={showWordTranslation}
+                    onToggleWordTranslation={() => setShowWordTranslation((prev) => !prev)}
+                    showVerseTranslation={showTranslation}
+                    onToggleVerseTranslation={toggleTranslation}
+                />
+
+                {/* Verses Container */}
+                <section
+                    aria-label={`Versículos de ${effectiveSurah.name}`}
+                    className="bg-card rounded-3xl border border-border/70 px-5 py-6 sm:px-8 sm:py-8 md:px-12 md:py-10 shadow-sm mb-8 transition-colors"
+                >
                     {effectiveSurah.verses.map((verse, index) => (
                         <QuranVerse
                             key={index}
@@ -91,32 +118,29 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                             hasPrev={hasPrev}
                             hasNext={hasNext}
                             showTranslation={showTranslation}
+                            showTransliteration={showTransliteration}
+                            showWordTranslation={showWordTranslation}
+                            fontSize={fontSize}
                         />
                     ))}
-                </div>
+                </section>
 
-                {/* Audio Player - Fixed at bottom on mobile */}
-                <div className="sticky bottom-4 z-10 space-y-2">
-                    <div className="flex justify-end">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={toggleTranslation}
-                            className="shadow-md rounded-full"
-                        >
-                            <Languages className="h-4 w-4 mr-1" />
-                            {showTranslation ? 'Ocultar' : 'Mostrar'} traducción
-                        </Button>
-                    </div>
+                {/* Sticky Audio Player Floating Bar */}
+                <div className="fixed bottom-4 left-4 right-4 max-w-xl mx-auto z-30">
                     <AudioPlayer
                         isPlaying={isPlaying}
                         currentTime={currentTime}
                         duration={duration}
+                        playbackRate={playbackRate}
                         onToggle={toggle}
                         onSeek={seek}
                         onRestart={restart}
+                        onSkip={skip}
+                        onPlaybackRateChange={setPlaybackRate}
+                        title={effectiveSurah.name}
                     />
                 </div>
+
                 {/* Timing editor panel */}
                 <TimingEditorPanel
                     kind="surah"
@@ -129,13 +153,14 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                     onExportBackup={exportBackup}
                     onImportBackup={importBackup}
                 />
-                {/* Instructions */}
-                <p className="text-center text-sm text-muted-foreground mt-8">
+
+                {/* Instructions / Guidance */}
+                <p className="text-center text-xs text-muted-foreground mt-8 max-w-md mx-auto leading-relaxed">
                     {editMode
                         ? 'Modo edición activo: tocá una palabra árabe para ajustar sus tiempos.'
-                        : 'Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio.'}
+                        : 'Tocá cualquier palabra para escucharla o analizar sus letras. Las palabras se iluminan armónicamente con el audio.'}
                 </p>
-            </div>
+            </main>
         </div>
     );
 };

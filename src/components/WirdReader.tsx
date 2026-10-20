@@ -6,8 +6,8 @@ import { useReaderState } from '@/hooks/useReaderState';
 import { WirdVerseLine } from './WirdVerseLine';
 import { AudioPlayer } from './AudioPlayer';
 import { TimingEditorPanel } from './TimingEditorPanel';
-import { Link } from 'react-router-dom';
-import { ChevronLeft, Languages } from 'lucide-react';
+import { Navbar } from './Navbar';
+import { Languages, BookOpen } from 'lucide-react';
 import { Button } from './ui/button';
 import {
     Pagination,
@@ -30,6 +30,9 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
         currentTime,
         duration,
         currentWord,
+        playbackRate,
+        setPlaybackRate,
+        skip,
         toggle,
         seek,
         restart,
@@ -67,59 +70,53 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
     }, [currentWord?.verseIndex]);
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background text-foreground pb-28 sm:pb-32 transition-colors">
+            <Navbar />
+
             {/* Background pattern */}
             <div className="fixed inset-0 opacity-5 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-radial from-primary via-transparent to-transparent" />
             </div>
 
-            <div className="relative max-w-3xl mx-auto px-4 py-8 md:py-12">
-                {/* Back navigation + Practice button */}
-                <div className="mb-6 flex items-center justify-between">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link to="/" className="flex items-center gap-2">
-                            <ChevronLeft className="h-4 w-4" />
-                            <span>Volver a Surahs</span>
-                        </Link>
-                    </Button>
-                    <div className="flex items-center gap-2">
+            <main className="relative max-w-3xl mx-auto px-4 py-6 md:py-10">
+                {/* Header card */}
+                <div className="text-center mb-8 rounded-3xl border border-border/70 bg-card/60 backdrop-blur-md p-6 sm:p-10 shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
+                        <span>Litania Espiritual</span>
+                        <span>•</span>
+                        <span>{effectiveWird.verses.length} versos</span>
+                    </div>
+
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-transliteration text-primary font-medium tracking-tight mb-3">
+                        {wird.name}
+                    </h1>
+
+                    <div className="flex items-center justify-center gap-3 my-4 max-w-xs mx-auto">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-accent/60" />
+                        <div className="w-2.5 h-2.5 rotate-45 bg-accent/80 border border-background shadow-xs" />
+                        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-accent/60" />
+                    </div>
+
+                    {/* Translation toggle button in header */}
+                    <div className="flex justify-center mt-4">
                         <Button
-                            variant="outline"
+                            variant={showTranslations ? "secondary" : "outline"}
                             size="sm"
                             onClick={toggleTranslation}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 rounded-xl text-xs h-8"
                             aria-pressed={showTranslations}
                         >
-                            <Languages className="h-4 w-4" />
-                            <span>{showTranslations ? 'Ocultar' : 'Traducción'}</span>
+                            <Languages className="h-3.5 w-3.5" />
+                            <span>{showTranslations ? 'Ocultar traducción' : 'Mostrar traducción'}</span>
                         </Button>
-                    </div>
-                </div>
-
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="flex items-center justify-center gap-4 mb-6">
-                        <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent" />
-                        <div className="w-3 h-3 rotate-45 bg-accent" />
-                        <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent" />
-                    </div>
-                    <div className="space-y-2">
-                        <h1 className="text-3xl md:text-4xl font-transliteration text-primary font-medium">
-                            {wird.name}
-                        </h1>
-                    </div>
-                    <div className="flex items-center justify-center gap-4 mt-6">
-                        <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent" />
-                        <div className="w-3 h-3 rotate-45 bg-accent" />
-                        <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent" />
                     </div>
                 </div>
 
                 {/* Pagination (top) */}
                 {pages.length > 1 && (
-                    <div className="mb-4">
+                    <div className="mb-6 flex justify-center">
                         <Pagination>
-                            <PaginationContent>
+                            <PaginationContent className="bg-card/70 backdrop-blur-md border border-border/70 p-1 rounded-2xl shadow-2xs">
                                 <PaginationItem>
                                     <PaginationPrevious
                                         onClick={(e) => {
@@ -127,7 +124,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                                             const idx = pages.indexOf(currentPage);
                                             if (idx > 0) setCurrentPage(pages[idx - 1]);
                                         }}
-                                        className={pages.indexOf(currentPage) === 0 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                        className={pages.indexOf(currentPage) === 0 ? 'pointer-events-none opacity-40' : 'cursor-pointer'}
                                     />
                                 </PaginationItem>
                                 {pages.map((p) => (
@@ -138,7 +135,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                                                 e.preventDefault();
                                                 setCurrentPage(p);
                                             }}
-                                            className="cursor-pointer"
+                                            className={`cursor-pointer rounded-xl ${p === currentPage ? 'bg-primary text-primary-foreground font-bold shadow-xs' : ''}`}
                                         >
                                             {p}
                                         </PaginationLink>
@@ -151,7 +148,7 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                                             const idx = pages.indexOf(currentPage);
                                             if (idx < pages.length - 1) setCurrentPage(pages[idx + 1]);
                                         }}
-                                        className={pages.indexOf(currentPage) === pages.length - 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                        className={pages.indexOf(currentPage) === pages.length - 1 ? 'pointer-events-none opacity-40' : 'cursor-pointer'}
                                     />
                                 </PaginationItem>
                             </PaginationContent>
@@ -159,8 +156,8 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                     </div>
                 )}
 
-                {/* Verses */}
-                <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 p-6 md:p-10 shadow-xl mb-8">
+                {/* Verses Container */}
+                <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/70 p-6 md:p-10 shadow-sm mb-8 transition-colors">
                     {effectiveWird.verses.map((verse, index) => {
                         const versePage = verse.page ?? 1;
                         if (versePage !== currentPage) return null;
@@ -190,15 +187,19 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                     })}
                 </div>
 
-                {/* Audio Player */}
-                <div className="sticky bottom-4 z-10">
+                {/* Floating Bottom Audio Player */}
+                <div className="fixed bottom-4 left-4 right-4 max-w-xl mx-auto z-30">
                     <AudioPlayer
                         isPlaying={isPlaying}
                         currentTime={currentTime}
                         duration={duration}
+                        playbackRate={playbackRate}
                         onToggle={toggle}
                         onSeek={seek}
                         onRestart={restart}
+                        onSkip={skip}
+                        onPlaybackRateChange={setPlaybackRate}
+                        title={effectiveWird.name}
                     />
                 </div>
 
@@ -216,12 +217,12 @@ export const WirdReader = ({ wird }: WirdReaderProps) => {
                 />
 
                 {/* Instructions */}
-                <p className="text-center text-sm text-muted-foreground mt-8">
+                <p className="text-center text-xs text-muted-foreground mt-8 max-w-md mx-auto leading-relaxed">
                     {editMode
                         ? 'Modo edición activo: tocá una palabra para ajustar sus tiempos.'
-                        : 'Presiona play para escuchar la recitación. Las palabras se resaltarán conforme avanza el audio.'}
+                        : 'Presiona play para escuchar la recitación. Las palabras se iluminarán conforme avanza el audio.'}
                 </p>
-            </div>
+            </main>
         </div>
     );
 };

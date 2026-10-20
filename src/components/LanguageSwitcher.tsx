@@ -56,7 +56,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className={cn("h-8 gap-1.5 px-2.5 text-xs font-medium border-border/80 bg-background/80 hover:bg-accent", className)}
+          className={cn("h-9 gap-1.5 px-2.5 rounded-xl text-xs font-medium border-border/70 bg-card/70 hover:bg-accent/20 focus-visible:ring-primary", className)}
           aria-label={t("nav.language")}
         >
           <Globe className="h-3.5 w-3.5 text-muted-foreground" />
