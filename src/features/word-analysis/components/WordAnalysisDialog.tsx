@@ -266,8 +266,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         };
     }, [selectedIndex, word, letters, open]);
 
-<<<<<<< HEAD
-=======
     useLayoutEffect(() => {
         const compute = () => {
             if (selectedIndex === null || hideDetails) {
@@ -330,7 +328,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
         };
     }, [selectedIndex, transliteration, letters, open, hideDetails]);
 
->>>>>>> 969fc24367f2eb11637ddf9979998cb380f1c680
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -371,11 +368,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         )}
                         <div
                             ref={containerRef}
-<<<<<<< HEAD
-                            className="relative mt-8 font-analysis-arabic text-7xl sm:text-8xl md:text-9xl leading-[1.6] select-none"
-=======
                             className="relative mt-8 font-analysis-arabic text-7xl sm:text-8xl md:text-9xl leading-[4.6] select-none"
->>>>>>> 969fc24367f2eb11637ddf9979998cb380f1c680
                             style={{ direction: "rtl" }}
                         >
                             {/* Precision highlight remains tied to the active logical letter. */}
