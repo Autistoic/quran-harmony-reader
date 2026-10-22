@@ -336,14 +336,14 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
 
                 {/* Sticky header */}
                 <div
-                    className="sticky top-0 z-20 isolate relative bg-background/95 backdrop-blur border-b border-border shadow-sm px-0 pt-4 sm:pt-6 pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    className="sticky top-0 z-20 isolate relative bg-background/95 backdrop-blur border-b border-border shadow-sm px-0 pt-3 sm:pt-6 pb-3 sm:pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                     role="group"
                     aria-label={t("wordAnalysis.letterNavigation")}
                     tabIndex={0}
                     onKeyDown={handleHeaderKeyDown}
                 >
 
-                    <div className="relative z-10 flex min-w-0 flex-col items-center gap-5 px-12 text-center sm:gap-6 sm:px-20">
+                    <div className="relative z-10 flex min-w-0 flex-col items-center gap-1.5 px-12 text-center sm:gap-6 sm:px-20">
                         {!hideDetails && (
                             <DialogDescription className="text-base uppercase tracking-widest text-muted-foreground">
                                 <span ref={transliterationContainerRef} className="relative inline-block">
@@ -353,13 +353,12 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                     {transliterationRect && selectedIndex !== null && (
                                         <span
                                             aria-hidden
-                                            className="pointer-events-none absolute rounded-sm bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
+                                            className="pointer-events-none absolute z-0 rounded-sm bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
                                             style={{
                                                 left: transliterationRect.left,
                                                 top: transliterationRect.top,
                                                 width: transliterationRect.width,
                                                 height: transliterationRect.height,
-                                                zIndex: 0,
                                             }}
                                         />
                                     )}
@@ -368,20 +367,17 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         )}
                         <div
                             ref={containerRef}
-                            className="relative mt-8 font-analysis-arabic text-7xl sm:text-8xl md:text-9xl leading-[4.6] select-none"
+                            className="relative mt-1 sm:mt-8 font-analysis-arabic text-6xl sm:text-8xl md:text-9xl leading-[1.3] sm:leading-[4.6] select-none"
                             style={{ direction: "rtl" }}
                         >
                             {/* Precision highlight remains tied to the active logical letter. */}
                             {rect && (
                                 <span
                                     aria-hidden
-                                    className="pointer-events-none absolute rounded-md bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
+                                    className="pointer-events-none absolute -top-1.5 -bottom-1.5 sm:-top-12 sm:-bottom-12 z-0 rounded-md bg-primary/15 ring-1 ring-primary/40 transition-all duration-200"
                                     style={{
                                         left: rect.left,
-                                        top: -ARABIC_HIGHLIGHT_VERTICAL_BLEED,
                                         width: rect.width,
-                                        height: rect.containerHeight + ARABIC_HIGHLIGHT_VERTICAL_BLEED * 2,
-                                        zIndex: 0,
                                     }}
                                 />
                             )}
@@ -412,7 +408,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                             )}
                         </div>
                         {!hideDetails && (
-                            <p className="mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
+                            <p className="mt-1 sm:mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
                         )}
                     </div>
                     <button
