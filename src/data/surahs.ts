@@ -29,18 +29,18 @@ export const surahAlFatiha: Surah = {
     arabicName: "الفاتحة",
     audioUrl: "https://archive.org/download/00.-fatiha-suresi/00.Fatiha%20suresi.mp3",
     verses: [
-        {
-            arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-            transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
-            translation: "En el nombre de Dios, el Compasivo con toda la creación, el Misericordioso con los creyentes.",
-            verseNumber: 1,
-            wordTimings: [
-                { word: "بِسْمِ", translit: "bismi", translation: "en (el) nombre", start: 0.0, end: 0.8 },
-                { word: "ٱللَّهِ", translit: "llāhi", translation: "(de) Allah", start: 0.8, end: 1.5 },
-                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Clementísimo", start: 1.5, end: 3.5 },
-                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordiosísimo", start: 3.5, end: 4.5 }
-            ]
-        },
+        // {
+        //     arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+        //     transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
+        //     translation: "En el nombre de Dios, el Compasivo con toda la creación, el Misericordioso con los creyentes.",
+        //     verseNumber: 1,
+        //     wordTimings: [
+        //         { word: "بِسْمِ", translit: "bismi", translation: "en (el) nombre", start: 0.0, end: 0.8 },
+        //         { word: "ٱللَّهِ", translit: "llāhi", translation: "(de) Allah", start: 0.8, end: 1.5 },
+        //         { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Clementísimo", start: 1.5, end: 3.5 },
+        //         { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordiosísimo", start: 3.5, end: 4.5 }
+        //     ]
+        // },
         {
             arabic: "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
             transliteration: "al-ḥamdu lillāhi rabbi l-ʿālamīn",
@@ -124,16 +124,16 @@ export const surahAlIkhlas: Surah = {
     arabicName: "الإخلاص",
     audioUrl: "https://archive.org/download/112.-ihlas-suresi/112.Ihlas%20suresi.mp3",
     verses: [
-        {
-            arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-            transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
-            wordTimings: [
-                { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0.8 },
-                { word: "ٱللَّهِ", translit: "llāhi", start: 0.8, end: 1.5 },
-                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 2.5 },
-                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 2.5, end: 3.8 }
-            ]
-        },
+        // {
+        //     arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+        //     transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
+        //     wordTimings: [
+        //         { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0.8 },
+        //         { word: "ٱللَّهِ", translit: "llāhi", start: 0.8, end: 1.5 },
+        //         { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 2.5 },
+        //         { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 2.5, end: 3.8 }
+        //     ]
+        // },
         {
             arabic: "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
             transliteration: "qul huwa llāhu aḥad",
@@ -187,16 +187,16 @@ export const surahAlFalaq: Surah = {
     arabicName: "الفلق",
     audioUrl: "https://archive.org/download/113-al-falaq_202605/113%20Al-Falaq%20%D8%A7%D9%84%D9%81%D9%84%D9%82.mp3",
     verses: [
-        {
-            arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-            transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
-            wordTimings: [
-                { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0.8 },
-                { word: "ٱللَّهِ", translit: "llāhi", start: 0.8, end: 1.5 },
-                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 2.0 },
-                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 2.0, end: 2.5 },
-            ],
-        },
+        // {
+        //     arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+        //     transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
+        //     wordTimings: [
+        //         { word: "بِسْمِ", translit: "bismi", start: 0.0, end: 0.8 },
+        //         { word: "ٱللَّهِ", translit: "llāhi", start: 0.8, end: 1.5 },
+        //         { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", start: 1.5, end: 2.0 },
+        //         { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", start: 2.0, end: 2.5 },
+        //     ],
+        // },
         {
             arabic: "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
             transliteration: "qul ’a‘ūdhu birabbi l-falaq",
@@ -270,18 +270,18 @@ export const surahAnNas: Surah = {
     arabicName: "الناس",
     audioUrl: "https://archive.org/download/114-an-nas_202605/114%20An-Nas%20%D8%A7%D9%84%D9%86%D8%A7%D8%B3.mp3",
     verses: [
-        {
-            arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-            transliteration: "bismi l-lāhi r-raḥmāni r-raḥīm",
-            translation: "En el nombre de Allah, el Compasivo, el Misericordioso.",
-            verseNumber: 0,
-            wordTimings: [
-                { word: "بِسْمِ", translit: "bismi", translation: "en el nombre", start: 0.0, end: 0 },
-                { word: "ٱللَّهِ", translit: "l-lāhi", translation: "de Allah", start: 0, end: 0 },
-                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Compasivo", start: 0, end: 0 },
-                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordioso", start: 0, end: 0 },
-            ],
-        },
+        // {
+        //     arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+        //     transliteration: "bismi l-lāhi r-raḥmāni r-raḥīm",
+        //     translation: "En el nombre de Allah, el Compasivo, el Misericordioso.",
+        //     verseNumber: 0,
+        //     wordTimings: [
+        //         { word: "بِسْمِ", translit: "bismi", translation: "en el nombre", start: 0.0, end: 0 },
+        //         { word: "ٱللَّهِ", translit: "l-lāhi", translation: "de Allah", start: 0, end: 0 },
+        //         { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Compasivo", start: 0, end: 0 },
+        //         { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordioso", start: 0, end: 0 },
+        //     ],
+        // },
         {
             arabic: "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ",
             transliteration: "qul ʾaʿūdhu birabbi n-nās",

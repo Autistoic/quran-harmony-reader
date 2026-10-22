@@ -252,7 +252,7 @@ export const QuranVerse = memo(({
                                 <span
                                     onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
                                     className={cn(
-                                        'mt-1 font-transliteration text-muted-foreground italic leading-snug break-words rounded-md px-1 transition-all duration-200',
+                                        'mt-6 font-transliteration text-muted-foreground italic leading-snug break-words rounded-md px-1 transition-all duration-200',
                                         transliterationSizeClass,
                                         !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
                                         editMode && 'ring-1 ring-border/60',
