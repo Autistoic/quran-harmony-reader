@@ -404,7 +404,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                     aria-hidden
                                     className="pointer-events-none absolute inset-0 z-[2] font-analysis-arabic text-primary transition-all duration-200"
                                     style={{
-                                        clipPath: `inset(${Math.max(0, rect.top)}px ${Math.max(0, rect.containerWidth - (rect.left + rect.width))}px ${Math.max(0, rect.containerHeight - (rect.top + rect.height))}px ${Math.max(0, rect.left)}px round 6px)`,
+                                        clipPath: `inset(-1.5em ${Math.max(0, rect.containerWidth - (rect.left + rect.width))}px -1.5em ${Math.max(0, rect.left)}px)`,
                                     }}
                                 >
                                     {word}
