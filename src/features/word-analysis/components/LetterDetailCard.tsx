@@ -110,10 +110,10 @@ const LetterDetailCard = ({
               <div
                 key={key}
                 role="group"
-                aria-label={`${formLabel}: ${glyph}${active ? `, ${t("wordAnalysis.currentForm")}` : ""}`}
+                aria-label={`${formLabel}: ${glyph}`}
                 aria-current={active ? "true" : undefined}
                 className={cn(
-                  "relative grid min-w-0 grid-rows-[1fr_auto_auto] items-center justify-items-center gap-1 px-1 py-3 text-center transition-colors sm:gap-1.5 sm:px-2 sm:py-4",
+                  "relative grid min-w-0 grid-rows-[1fr_auto] items-center justify-items-center gap-1 px-1 py-3 text-center transition-colors sm:gap-1.5 sm:px-2 sm:py-4",
                   formIndex < FORM_ORDER.length - 1 && "border-r border-border/80",
                   active
                     ? "z-[1] bg-primary/10 text-foreground ring-2 ring-inset ring-primary/75"
@@ -132,7 +132,7 @@ const LetterDetailCard = ({
                   dir="rtl"
                   aria-hidden="true"
                   className={cn(
-                    "grid h-full min-h-0 place-items-center font-analysis-arabic text-5xl leading-none sm:text-6xl md:text-7xl",
+                    "grid h-full w-full min-w-0 justify-self-stretch place-items-center text-center font-analysis-arabic text-5xl leading-none sm:text-6xl md:text-7xl",
                     active ? "text-primary" : "text-foreground/85",
                   )}
                 >
@@ -141,9 +141,6 @@ const LetterDetailCard = ({
                 <span className="w-full truncate text-[10px] font-medium uppercase tracking-wide sm:text-xs">
                   {formLabel}
                 </span>
-                <span className="flex h-7 w-full items-start justify-center text-[8px] leading-tight text-primary sm:text-[10px]">
-                  {active ? t("wordAnalysis.currentForm") : "\u00a0"}
-                </span>
               </div>
             );
           })}
@@ -151,8 +148,7 @@ const LetterDetailCard = ({
       </Button>
       <div id={formsDescriptionId} className="sr-only">
         {FORM_ORDER.map(({ key, pos }) => {
-          const active = connection.position === pos;
-          return `${t(`wordAnalysis.contextualFormNames.${pos}`)}: ${forms[key]}${active ? `, ${t("wordAnalysis.currentForm")}` : ""}. `;
+          return `${t(`wordAnalysis.contextualFormNames.${pos}`)}: ${forms[key]}. `;
         })}
       </div>
     </Card>
