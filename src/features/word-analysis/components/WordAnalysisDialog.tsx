@@ -334,7 +334,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
             <DialogContent
                 closeButtonLabel={t("common.close")}
                 closeButtonClassName="right-3 top-[calc(env(safe-area-inset-top)+0.5rem)] z-50 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground opacity-100 shadow-md transition-colors hover:bg-secondary hover:text-secondary-foreground active:scale-95 active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:right-4 sm:top-4 sm:h-9 sm:w-9"
-                className="left-0 right-0 top-0 h-[100dvh] max-h-none w-screen max-w-none translate-x-0 translate-y-0 rounded-none p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-background border-border flex flex-col overflow-hidden sm:left-[50%] sm:right-auto sm:top-[50%] sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:pt-0 sm:pb-0"
+                className="left-0 right-0 top-0 h-[100dvh] max-h-none w-auto max-w-none translate-x-0 translate-y-0 rounded-none p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-background border-border flex flex-col overflow-hidden sm:left-[50%] sm:right-auto sm:top-[50%] sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:pt-0 sm:pb-0"
             >
                 <DialogTitle className="sr-only">{transliteration} — {word}</DialogTitle>
 

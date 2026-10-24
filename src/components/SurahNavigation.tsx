@@ -19,14 +19,14 @@ export const SurahNavigation = ({ currentSurah, onNavigate }: SurahNavigationPro
 
   return (
     <>
-      <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6 p-2 rounded-2xl bg-card/60 backdrop-blur-md border border-border/60 shadow-xs">
+      <div className="mb-6 flex min-w-0 items-center justify-between gap-1 rounded-2xl border border-border/60 bg-card/60 p-2 shadow-xs backdrop-blur-md sm:gap-4">
         {/* Previous Button */}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => prevSurah && onNavigate(prevSurah)}
           disabled={!prevSurah}
-          className="flex items-center gap-1.5 h-9 px-3 rounded-xl hover:bg-muted/70 disabled:opacity-30 transition-all"
+          className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-2 transition-all hover:bg-muted/70 disabled:opacity-30 sm:px-3"
           title={prevSurah ? `${t("nav.previous") || "Anterior"}: ${prevSurah.name}` : undefined}
           aria-label={prevSurah ? `Ir a ${prevSurah.name}` : "Sura anterior"}
         >
@@ -40,16 +40,16 @@ export const SurahNavigation = ({ currentSurah, onNavigate }: SurahNavigationPro
         <button
           type="button"
           onClick={() => setSelectorOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border/80 bg-background/80 hover:bg-muted/80 hover:border-primary/40 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-2xs"
+          className="group flex min-w-0 max-w-full flex-1 items-center justify-center gap-1 overflow-hidden rounded-xl border border-border/80 bg-background/80 px-1.5 py-1.5 shadow-2xs transition-all hover:border-primary/40 hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:flex-none sm:gap-2 sm:px-3"
           title={t("nav.selectSurah") || "Seleccionar Sura"}
         >
-          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
             {currentSurah.id}
           </span>
-          <span className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+          <span className="min-w-0 truncate text-xs font-semibold text-foreground transition-colors group-hover:text-primary sm:text-sm">
             {currentSurah.name}
           </span>
-          <span className="font-quran-arabic text-primary text-sm sm:text-base leading-none">
+          <span className="max-w-[3.5rem] shrink font-quran-arabic text-sm leading-none text-primary sm:max-w-none sm:text-base">
             {currentSurah.arabicName}
           </span>
           <ListFilter className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors ml-0.5" />
@@ -61,7 +61,7 @@ export const SurahNavigation = ({ currentSurah, onNavigate }: SurahNavigationPro
           size="sm"
           onClick={() => nextSurah && onNavigate(nextSurah)}
           disabled={!nextSurah}
-          className="flex items-center gap-1.5 h-9 px-3 rounded-xl hover:bg-muted/70 disabled:opacity-30 transition-all"
+          className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-2 transition-all hover:bg-muted/70 disabled:opacity-30 sm:px-3"
           title={nextSurah ? `${t("nav.next") || "Siguiente"}: ${nextSurah.name}` : undefined}
           aria-label={nextSurah ? `Ir a ${nextSurah.name}` : "Siguiente sura"}
         >

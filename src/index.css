@@ -207,7 +207,13 @@ All colors MUST be HSL.
   }
   body {
     @apply bg-background text-foreground;
+    max-width: 100%;
+    overflow-x: hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  #root {
+    max-width: 100%;
+    overflow-x: clip;
   }
   .font-quran-arabic, .font-analysis-arabic {
     -webkit-font-smoothing: antialiased;
