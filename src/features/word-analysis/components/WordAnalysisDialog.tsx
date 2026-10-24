@@ -331,7 +331,11 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] p-0 bg-background border-border flex flex-col overflow-hidden">
+            <DialogContent
+                closeButtonLabel={t("common.close")}
+                closeButtonClassName="right-3 top-[calc(env(safe-area-inset-top)+0.5rem)] z-50 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground opacity-100 shadow-md transition-colors hover:bg-secondary hover:text-secondary-foreground active:scale-95 active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:right-4 sm:top-4 sm:h-9 sm:w-9"
+                className="left-0 right-0 top-0 h-[100dvh] max-h-none w-screen max-w-none translate-x-0 translate-y-0 rounded-none p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-background border-border flex flex-col overflow-hidden sm:left-[50%] sm:right-auto sm:top-[50%] sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:pt-0 sm:pb-0"
+            >
                 <DialogTitle className="sr-only">{transliteration} — {word}</DialogTitle>
 
                 {/* Sticky header */}
@@ -438,7 +442,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                 </div>
 
                 {/* Scrollable body */}
-                <div ref={letterListRef} className="min-h-0 flex-1 overflow-y-auto px-6 py-4" onKeyDown={handleHeaderKeyDown}>
+                <div ref={letterListRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-3 py-3 [-webkit-overflow-scrolling:touch] sm:px-6 sm:py-4" onKeyDown={handleHeaderKeyDown}>
                     <div className="flex flex-col gap-3">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground px-1" dir="rtl">
                             {t("common.readingOrder")}

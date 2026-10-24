@@ -1,5 +1,6 @@
 {
   "common": {
+    "close": "Close",
     "reference": "Reference",
     "back": "Back",
     "backToWord": "Back to word",
