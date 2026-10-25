@@ -70,7 +70,7 @@ const LetterDetailCard = ({
         })}
         aria-describedby={formsDescriptionId}
         aria-pressed={selected}
-        className="flex h-auto w-full flex-col gap-3 rounded-none p-3 text-left hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:gap-4 sm:p-4"
+        className="flex h-auto w-full flex-col gap-2 rounded-none p-2.5 text-left hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:gap-3 sm:p-3"
       >
         <div className="flex min-h-9 w-full min-w-0 items-center gap-2 sm:gap-3">
           <h3 className="min-w-0 flex-1 truncate font-serif text-sm font-semibold uppercase tracking-wide text-foreground sm:text-base">
@@ -99,7 +99,7 @@ const LetterDetailCard = ({
 
         <div
           aria-hidden="true"
-          className="grid h-44 w-full grid-cols-4 overflow-hidden rounded-xl border border-foreground/55 bg-background/45 sm:h-52 md:h-56"
+          className="grid h-32 w-full grid-cols-4 overflow-hidden rounded-xl border border-foreground/55 bg-background/45 sm:h-40 md:h-44"
         >
           {FORM_ORDER.map(({ key, pos }, formIndex) => {
             const active = connection.position === pos;
@@ -113,7 +113,7 @@ const LetterDetailCard = ({
                 aria-label={`${formLabel}: ${glyph}`}
                 aria-current={active ? "true" : undefined}
                 className={cn(
-                  "relative grid min-w-0 grid-rows-[1fr_auto] items-center justify-items-center gap-1 px-1 py-3 text-center transition-colors sm:gap-1.5 sm:px-2 sm:py-4",
+                  "relative grid min-w-0 grid-rows-[1fr_auto] items-center justify-items-center gap-1 px-1 py-2 text-center transition-colors sm:gap-1.5 sm:px-2 sm:py-3",
                   formIndex < FORM_ORDER.length - 1 && "border-r border-border/80",
                   active
                     ? "z-[1] bg-primary/10 text-foreground ring-2 ring-inset ring-primary/75"

@@ -349,7 +349,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
 
                     <div className="relative z-10 flex min-w-0 flex-col items-center gap-1.5 px-12 text-center sm:gap-6 sm:px-20">
                         {!hideDetails && (
-                            <DialogDescription className="text-base uppercase tracking-widest text-muted-foreground">
+                            <DialogDescription className="text-lg uppercase tracking-widest text-muted-foreground sm:text-xl">
                                 <span ref={transliterationContainerRef} className="relative inline-block">
                                     <span ref={transliterationRef} className={cn("relative z-[1] transition-colors duration-200", selectedIndex !== null && transliterationRect ? "text-muted-foreground/50" : undefined)}>
                                         {transliteration}
@@ -371,7 +371,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         )}
                         <div
                             ref={containerRef}
-                            className="relative mt-1 sm:mt-8 font-analysis-arabic text-6xl sm:text-8xl md:text-9xl leading-[1.3] sm:leading-[4.6] select-none"
+                            className="relative mt-5 select-none font-analysis-arabic text-8xl leading-[1.3] sm:mt-8 sm:text-8xl sm:leading-[4.6] md:text-9xl"
                             style={{ direction: "rtl" }}
                         >
                             {/* Precision highlight remains tied to the active logical letter. */}
@@ -412,7 +412,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                             )}
                         </div>
                         {!hideDetails && (
-                            <p className="mt-1 sm:mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
+                            <p className="mt-10 sm:mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
                         )}
                     </div>
                     <button
