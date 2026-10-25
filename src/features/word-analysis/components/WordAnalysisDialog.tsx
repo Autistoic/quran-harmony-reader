@@ -412,7 +412,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                             )}
                         </div>
                         {!hideDetails && (
-                            <p className="mt-10 sm:mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
+                            <p className="mt-7 sm:mt-10 text-sm italic text-muted-foreground">"{meaning}"</p>
                         )}
                     </div>
                     <button
@@ -502,7 +502,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                                 const isBlockStart = block?.startIndex === localIndex;
                                                 const hasCutAfter = group.cuts.some((cut) => cut.afterIndex === localIndex && cut.reason === "non-joining-letter");
                                                 return (
-                                                    <div key={index} className={hasCutAfter && localIndex < group.letters.length - 1 ? "mb-[22px]" : undefined}>
+                                                    <div key={index} className={hasCutAfter && localIndex < group.letters.length - 1 ? "mb-[15px]" : undefined}>
                                                         {isBlockStart && block.size >= 2 && (
                                                             <div className="mb-1 flex min-h-5 items-center justify-end pr-2">
                                                                 <span

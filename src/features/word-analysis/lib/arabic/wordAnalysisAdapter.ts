@@ -28,6 +28,7 @@ if (override && !overrideRanges) {
     expected: letters.length,
     got: override.length,
     translitLength: transliteration.length,
+    ranges: JSON.stringify(override),
   });
 }
   const transliterationRanges = overrideRanges ?? alignTransliterationRanges(letters, transliteration);

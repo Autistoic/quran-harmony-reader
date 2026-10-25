@@ -55,7 +55,7 @@
 
 @media (max-width: 480px) {
   .connection-block-label:not([data-active="true"]) { display: none; }
-  .connection-cut-label { display: none; }
+  /* .connection-cut-label { display: none; } */
   .connection-rail-node-circle:not([data-active="true"]) { r: 6px; }
 }
 
