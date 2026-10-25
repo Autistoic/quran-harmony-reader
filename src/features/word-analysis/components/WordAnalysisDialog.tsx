@@ -347,7 +347,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                     onKeyDown={handleHeaderKeyDown}
                 >
 
-                    <div className="relative z-10 flex min-w-0 flex-col items-center gap-1.5 px-12 text-center sm:gap-6 sm:px-20">
+                    <div className="pointer-events-none relative z-10 flex min-w-0 flex-col items-center gap-1.5 px-6 text-center sm:pointer-events-auto sm:gap-6 sm:px-20">
                         {!hideDetails && (
                             <DialogDescription className="text-lg uppercase tracking-widest text-muted-foreground sm:text-xl">
                                 <span ref={transliterationContainerRef} className="relative inline-block">
@@ -419,10 +419,30 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         type="button"
                         onClick={goNext}
                         disabled={!canGoNext}
+                        aria-label={t("wordAnalysis.nextLetter")}
+                        title={t("wordAnalysis.nextLetter")}
+                        className="absolute inset-y-0 left-0 z-[5] flex w-1/2 items-center justify-start px-3 text-muted-foreground/35 transition-colors active:text-primary/70 disabled:opacity-15 sm:hidden"
+                    >
+                        <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goPrevious}
+                        disabled={!canGoPrevious}
+                        aria-label={t("wordAnalysis.previousLetter")}
+                        title={t("wordAnalysis.previousLetter")}
+                        className="absolute inset-y-0 right-0 z-[5] flex w-1/2 items-center justify-end px-3 text-muted-foreground/35 transition-colors active:text-primary/70 disabled:opacity-15 sm:hidden"
+                    >
+                        <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        disabled={!canGoNext}
                         aria-disabled={!canGoNext}
                         aria-label={t("wordAnalysis.nextLetter")}
                         title={t("wordAnalysis.nextLetter")}
-                        className="absolute inset-y-0 left-0 z-20 flex w-12 flex-col items-center justify-center gap-2 border-r border-border/60 bg-background/30 text-foreground/75 transition-colors hover:bg-secondary/55 hover:text-foreground active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 sm:w-20"
+                        className="absolute inset-y-0 left-0 z-20 hidden w-12 flex-col items-center justify-center gap-2 border-r border-border/60 bg-background/30 text-foreground/75 transition-colors hover:bg-secondary/55 hover:text-foreground active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 sm:flex sm:w-20"
                     >
                         <ArrowLeft aria-hidden="true" className="h-5 w-5" />
                         <span className="hidden px-1 text-center text-xs font-medium sm:inline">{t("wordAnalysis.nextLetter")}</span>
@@ -434,7 +454,7 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                         aria-disabled={!canGoPrevious}
                         aria-label={t("wordAnalysis.previousLetter")}
                         title={t("wordAnalysis.previousLetter")}
-                        className="absolute inset-y-0 right-0 z-20 flex w-12 flex-col items-center justify-center gap-2 border-l border-border/60 bg-background/30 text-foreground/75 transition-colors hover:bg-secondary/55 hover:text-foreground active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 sm:w-20"
+                        className="absolute inset-y-0 right-0 z-20 hidden w-12 flex-col items-center justify-center gap-2 border-l border-border/60 bg-background/30 text-foreground/75 transition-colors hover:bg-secondary/55 hover:text-foreground active:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 sm:flex sm:w-20"
                     >
                         <ArrowRight aria-hidden="true" className="h-5 w-5" />
                         <span className="hidden px-1 text-center text-xs font-medium sm:inline">{t("wordAnalysis.previousLetter")}</span>
