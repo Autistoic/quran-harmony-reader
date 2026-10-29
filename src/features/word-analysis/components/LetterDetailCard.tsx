@@ -82,7 +82,7 @@ const LetterDetailCard = ({
             /{sound}/
           </span>
           {(hasShadda(letter) || letter.vowel) && (
-            <div className="ml-auto hidden shrink-0 items-center gap-1.5 sm:flex">
+            <div className="shrink-0 items-center gap-1.5 sm:flex">
               {hasShadda(letter) && (
                 <span className="rounded-full border border-accent/30 bg-accent/20 px-2 py-1 text-[10px] font-medium text-accent-foreground">
                   {t("wordAnalysis.chips.shaddah")}
