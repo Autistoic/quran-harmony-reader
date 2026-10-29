@@ -513,7 +513,6 @@ const WordAnalysisDialog = ({ open, onOpenChange, word, transliteration, meaning
                                                                         borderColor: `hsl(var(${["--stroke-block-1", "--stroke-block-2", "--stroke-block-3"][(block.id - 1) % 3]}) / 0.35)`,
                                                                     }}
                                                                 >
-                                                                    {t("wordAnalysis.rail.block.many", { block: block.id, count: block.size })}
                                                                 </span>
                                                             </div>
                                                         )}
