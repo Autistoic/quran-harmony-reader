@@ -29,18 +29,18 @@ export const surahAlFatiha: Surah = {
     arabicName: "الفاتحة",
     audioUrl: "https://archive.org/download/00.-fatiha-suresi/00.Fatiha%20suresi.mp3",
     verses: [
-        // {
-        //     arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-        //     transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
-        //     translation: "En el nombre de Dios, el Compasivo con toda la creación, el Misericordioso con los creyentes.",
-        //     verseNumber: 1,
-        //     wordTimings: [
-        //         { word: "بِسْمِ", translit: "bismi", translation: "en (el) nombre", start: 0.0, end: 0.8 },
-        //         { word: "ٱللَّهِ", translit: "llāhi", translation: "(de) Allah", start: 0.8, end: 1.5 },
-        //         { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Clementísimo", start: 1.5, end: 3.5 },
-        //         { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordiosísimo", start: 3.5, end: 4.5 }
-        //     ]
-        // },
+        {
+            arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+            transliteration: "bismi llāhi r-raḥmāni r-raḥīm",
+            translation: "En el nombre de Dios, el Compasivo con toda la creación, el Misericordioso con los creyentes.",
+            verseNumber: 1,
+            wordTimings: [
+                { word: "بِسْمِ", translit: "bismi", translation: "en (el) nombre", start: 0.0, end: 0.8 },
+                { word: "ٱللَّهِ", translit: "llāhi", translation: "(de) Allah", start: 0.8, end: 1.5 },
+                { word: "ٱلرَّحْمَـٰنِ", translit: "r-raḥmāni", translation: "el Clementísimo", start: 1.5, end: 3.5 },
+                { word: "ٱلرَّحِيمِ", translit: "r-raḥīm", translation: "el Misericordiosísimo", start: 3.5, end: 4.5 }
+            ]
+        },
         {
             arabic: "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
             transliteration: "al-ḥamdu lillāhi rabbi l-ʿālamīn",

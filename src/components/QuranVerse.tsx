@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useTranslation } from '@/i18n';
 
 interface QuranVerseProps {
+    surahId: number;
     verse: Verse;
     verseIndex: number;
     currentWord: { verseIndex: number; wordIndex: number } | null;
@@ -36,6 +37,7 @@ interface QuranVerseProps {
 }
 
 export const QuranVerse = memo(({
+    surahId,
     verse,
     verseIndex,
     currentWord,
@@ -190,10 +192,10 @@ export const QuranVerse = memo(({
                     {verse.verseNumber && (
                         <div
                             className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/50 border border-border/80 shadow-2xs group-hover:border-primary/40 transition-colors"
-                            title={`Aleya ${verse.verseNumber}`}
+                            title={`Aleya ${surahId}:${verse.verseNumber}`}
                         >
                             <span className="text-xs font-bold text-primary">
-                                {verse.verseNumber}
+                                {surahId}:{verse.verseNumber}
                             </span>
                         </div>
                     )}

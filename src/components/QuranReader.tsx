@@ -101,6 +101,7 @@ export const QuranReader = ({ surah, onNavigate }: QuranReaderProps) => {
                     {effectiveSurah.verses.map((verse, index) => (
                         <QuranVerse
                             key={index}
+                            surahId={effectiveSurah.id}
                             verse={verse}
                             verseIndex={index}
                             currentWord={currentWord?.verseIndex === index ? currentWord : null}

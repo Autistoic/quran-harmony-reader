@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import type { Position } from "../lib/arabic/types";
 import type { WordAnalysisLetter } from "../lib/arabic/wordAnalysisAdapter";
 import { getFullSound, hasShadda } from "../lib/arabic/phonetics";
+import { getPhoneticBadges } from "../lib/arabic/phoneticBadges";
 import { getContextualForms } from "../lib/arabic/forms";
 import type { LetterConnectionState } from "../lib/arabic/joining";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ const LetterDetailCard = ({
   const forms = getContextualForms(letter.base);
   const { t } = useTranslation();
   const sound = getFullSound(letter) || "∅";
+  const phoneticBadges = getPhoneticBadges(letter);
   const formsDescriptionId = useId();
 
   return (
@@ -81,8 +83,8 @@ const LetterDetailCard = ({
           <span className="inline-flex shrink-0 items-center rounded-full border border-border/70 bg-secondary/75 px-3 py-1 font-mono text-sm font-bold tracking-tight text-foreground sm:text-base">
             /{sound}/
           </span>
-          {(hasShadda(letter) || letter.vowel) && (
-            <div className="shrink-0 items-center gap-1.5 sm:flex">
+          {(hasShadda(letter) || letter.vowel || phoneticBadges.length > 0) && (
+            <div className="flex max-w-full shrink-0 flex-wrap items-center gap-1">
               {hasShadda(letter) && (
                 <span className="rounded-full border border-accent/30 bg-accent/20 px-2 py-1 text-[10px] font-medium text-accent-foreground">
                   {t("wordAnalysis.chips.shaddah")}
@@ -93,6 +95,14 @@ const LetterDetailCard = ({
                   {t(`wordAnalysis.vowels.${letter.vowel.type}`)}
                 </span>
               )}
+              {phoneticBadges.map(({ key, label }) => (
+                <span
+                  key={key}
+                  className="rounded-full border border-border/70 bg-muted/70 px-2 py-1 text-[10px] font-medium leading-none text-muted-foreground"
+                >
+                  {label}
+                </span>
+              ))}
             </div>
           )}
         </div>
