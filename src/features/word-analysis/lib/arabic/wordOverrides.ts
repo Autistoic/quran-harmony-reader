@@ -69,6 +69,32 @@ export const WORD_SEGMENT_OVERRIDES: Readonly<Record<string, WordSegmentOverride
 
     // al-waswāsi (10 caracteres)
     "ٱلْوَسْوَاسِ|al-waswāsi": [[0, 1], [1, 3], [3, 5], [5, 6], [6, 8], [7, 8], [8, 10]],
+
+    // ── An-Nas ──
+
+    // أ ع و ذ  (4)
+    "أَعُوذُ|aʿūdhu": [[0, 1], [1, 3], [2, 3], [3, 6]],
+
+    // إ لٰ ه  (3) — la alif jañjarīya es marca de ل
+    "إِلَـٰهِ|ʾilāhi": [[0, 2], [2, 4], [4, 6]],
+
+    // ف ى  (2)
+    "فِى|fī": [[0, 2], [1, 2]],
+
+    // ص د و ر  (4)
+    "صُدُورِ|ṣudūri": [[0, 2], [2, 4], [3, 4], [4, 6]],
+
+    // ٱ ل خ ن ا س  (6) — ل solar no hay: la khāʾ es letra lunar, la lām suena
+    "ٱلْخَنَّاسِ|l-khannās": [[0, 0], [0, 2], [2, 5], [5, 8], [7, 8], [8, 9]],
+
+    // ٱ ل ذ ى  (4) — aquí la alif de waṣl suena ("a") porque está al inicio
+    "ٱلَّذِى|alladhī": [[0, 1], [1, 4], [4, 7], [6, 7]],
+
+    // ٱ ل ج ن ة  (5)
+    "ٱلْجِنَّةِ|l-jinnati": [[0, 0], [0, 2], [2, 4], [4, 7], [7, 9]],
+
+    // و ٱ ل ن ا س  (6) — el espacio no pertenece a ninguna letra; la ٱ queda muda
+    "وَٱلنَّاسِ|wa n-nās": [[0, 2], [3, 3], [3, 5], [5, 7], [6, 7], [7, 8]],
 };
 
 export const overrideKey = (word: string, translit: string) =>

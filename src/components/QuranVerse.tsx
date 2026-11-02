@@ -186,7 +186,7 @@ export const QuranVerse = memo(({
     return (
         <article className="py-7 md:py-9 border-b border-border/50 last:border-b-0 group transition-colors">
             {/* Verse header with number, audio control, and copy action */}
-            <div className="flex items-center justify-between mb-5 px-1">
+            <div className="flex items-center justify-between mb-8 px-1">
                 {/* Ayah number medallion */}
                 <div className="flex items-center gap-2.5">
                     {verse.verseNumber && (
@@ -242,10 +242,10 @@ export const QuranVerse = memo(({
                     return (
                         <span
                             key={wordIndex}
-                            className="flex flex-col items-center max-w-[11rem] text-center"
+                            className="flex w-fit min-w-0 max-w-[11rem] flex-col items-center text-center"
                         >
                             {/* Arabic word */}
-                            <span className={cn('font-quran-arabic text-foreground drop-shadow-2xs', arabicFontSizeClass)}>
+                            <span className={cn('max-w-full font-quran-arabic text-foreground drop-shadow-2xs', arabicFontSizeClass)}>
                                 {renderArabicWord(wordTiming.word, wordIndex, isHighlighted)}
                             </span>
 
@@ -254,7 +254,7 @@ export const QuranVerse = memo(({
                                 <span
                                     onClick={!editMode && onPlayWord ? () => onPlayWord(verseIndex, wordIndex) : undefined}
                                     className={cn(
-                                        'mt-6 font-transliteration text-muted-foreground italic leading-snug break-words rounded-md px-1 transition-all duration-200',
+                                        'mt-6 max-w-full min-w-0 font-transliteration text-muted-foreground italic leading-snug break-words [overflow-wrap:anywhere] rounded-md px-1 transition-all duration-200',
                                         transliterationSizeClass,
                                         !editMode && onPlayWord && 'cursor-pointer hover:bg-accent/20',
                                         editMode && 'ring-1 ring-border/60',
@@ -267,7 +267,7 @@ export const QuranVerse = memo(({
 
                             {/* Word Translation */}
                             {showWordTranslation && hasAnyTranslation && (
-                                <span dir="ltr" className="text-[11px] sm:text-xs text-muted-foreground/75 leading-tight break-words mt-1">
+                                <span dir="ltr" className="mt-1 max-w-[5rem] min-w-0 text-[11px] sm:text-xs text-muted-foreground/75 leading-tight break-words [overflow-wrap:anywhere]">
                                     {wordTiming.translation || <span className="opacity-25">—</span>}
                                 </span>
                             )}
